@@ -8,9 +8,9 @@
     {
       title: 'Estimate a support queue’s workload',
       brief:
-        'Trace the function. Enter the number of staff-hours required for the batch.',
+        'Trace the estimate by hand. First find the total minutes for the queue. Then convert that total to hours and enter the number of staff-hours. A pencil or a calculator works for this check.',
       stimulus:
-        'def workload_hours(tickets, minutes_each):\n    return tickets * minutes_each / 60\n\nworkload_hours(36, 15)',
+        'Queue report\nTickets waiting: 36\nAverage handling time: 15 minutes per ticket\nConversion: 60 minutes = 1 staff-hour',
       kind: 'short',
       answer: ['9', '9.0', '9.00', '9 hours', '9 staff-hours', '9h', '9 h'],
       hint: 'Calculate total minutes first. Sixty minutes make one staff-hour.',

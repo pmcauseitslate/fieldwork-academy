@@ -6,6 +6,31 @@
   const QUESTION_COUNT = 5;
   const PASS_PERCENT = 80;
   const durations = [10, 20, 100];
+  const BANK_VERSION = 2;
+  // Journals saved before question-bank versioning draw this item both in Week 1
+  // and when it is selected for cumulative review in a later week.
+  const originalWeekOneFileQuestion = {
+    prompt:
+      'The terminal reports that it cannot find workload.py. What is the quickest informative check?',
+    correct: 0,
+    options: [
+      {
+        text: 'List the current folder and look for the exact filename.',
+        feedback:
+          'A relative filename is resolved from the current working folder.',
+      },
+      {
+        text: 'Install a new package that handles hourly estimates.',
+        feedback:
+          'The error occurs while locating the file, before any imports or calculations run.',
+      },
+      {
+        text: 'Check the units on the function’s return value.',
+        feedback:
+          'The program has yet to run. Its return value cannot explain a file lookup error.',
+      },
+    ],
+  };
   const onboarding = [
     {
       prompt:
@@ -89,7 +114,17 @@
   }
   function paper(lessons, week, attempt) {
     const random = randomStream(attempt.seed);
-    const current = lessons[week - 1].questions.map((q) => ({ q, week }));
+    const legacy =
+      attempt.bankVersion === undefined || attempt.bankVersion === 1;
+    const fromLesson = (lesson) =>
+      lesson.questions.map((question, index) => ({
+        q:
+          legacy && lesson.week === 1 && index === 2
+            ? originalWeekOneFileQuestion
+            : question,
+        week: lesson.week,
+      }));
+    const current = fromLesson(lessons[week - 1]);
     const start = (attempt.sequence - 1) % current.length;
     const currentCount = week === 1 ? 4 : 3;
     const items = Array.from(
@@ -103,14 +138,9 @@
         week: 1,
       });
     } else {
-      const previous = lessons[week - 2].questions.map((q) => ({
-        q,
-        week: week - 1,
-      }));
+      const previous = fromLesson(lessons[week - 2]);
       const recent = sample(previous);
-      const older = lessons
-        .slice(0, week - 2)
-        .flatMap((l) => l.questions.map((q) => ({ q, week: l.week })));
+      const older = lessons.slice(0, week - 2).flatMap(fromLesson);
       items.push(
         recent,
         sample(
@@ -136,6 +166,7 @@
       throw new Error('Unsupported quiz duration');
     const seed = crypto.getRandomValues(new Uint32Array(1))[0];
     return {
+      bankVersion: BANK_VERSION,
       seed,
       sequence,
       started: now,
@@ -146,6 +177,7 @@
   function restore(value) {
     if (
       !value ||
+      ![undefined, 1, BANK_VERSION].includes(value.bankVersion) ||
       !Number.isSafeInteger(value.seed) ||
       value.seed < 0 ||
       value.seed > 4294967295 ||
@@ -159,6 +191,7 @@
     )
       return null;
     const a = {
+      bankVersion: value.bankVersion ?? 1,
       seed: value.seed,
       sequence: value.sequence,
       started: value.started,

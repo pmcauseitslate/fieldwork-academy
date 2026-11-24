@@ -10,30 +10,75 @@ window.COURSE_LEVELS = [
         "week": 1,
         "id": "estimate-a-support-workload",
         "title": "Estimate a support workload",
-        "summary": "Translate a team’s planning question into a small Python function with measurable inputs and outputs.",
+        "summary": "Run a first Python program, change its inputs, then write and test a function that estimates a support team's work in hours.",
         "minutes": 15,
         "teaching": [
-          "A support ticket is a record of a customer question or issue. A startup support lead is estimating the time needed to clear a queue of these records. Break the question into inputs, a rule and an output. A variable gives a value a useful name. Multiplying ticket count by average minutes produces minutes of work. Dividing by 60 converts the result to hours. The estimate assumes the average holds across the queue.",
-          "A function packages that calculation. In Python, def introduces the function, parentheses enclose its inputs, and indentation groups the lines that belong to it. return sends a value back to the caller. print displays a value on screen. Keeping the calculation separate from the display makes it possible to test and reuse it.",
-          "Start in the browser’s Python editor under Skill lab. To use a local computer, install Python 3 from the library and open a terminal in a practice folder. On macOS or Linux, pwd displays the current folder and ls lists files. On Windows PowerShell, Get-Location and Get-ChildItem do the same. Save a file named workload.py, then run python3 workload.py on macOS/Linux or py workload.py on Windows. A traceback reports the file, line and type of an error."
+          "A support ticket is one customer request. A queue is the list waiting for a reply. Suppose six tickets take ten minutes each. On paper, six groups of ten minutes add up to 60 minutes, or one staff-hour. Staff-hours measure the total work. Two people sharing the queue might finish sooner.",
+          "A program is a set of instructions a computer follows. An editor is the box where those instructions are written. All required Python work runs in this browser. Start with the worked program, change one number, then use the same idea to solve a different problem in the skill lab.",
+          "Python uses * for multiplication and / for division. For example, 3 * 8 gives 24, and 30 / 60 gives 0.5. The second calculation converts 30 minutes to half an hour. A decimal such as 0.5 is a valid result, so keep that precision in an estimate."
         ],
         "example": {
-          "title": "Convert a queue into hours",
-          "text": "A queue of 36 tickets at five minutes each takes 180 minutes, or three staff-hours. Doubling the tickets doubles the hours if the average handling time stays constant. That estimate describes labor effort. Elapsed clock time also depends on staffing and when the work arrives."
+          "title": "Estimate a quarter-hour by hand",
+          "text": "Three requests take five minutes each. That is 5 + 5 + 5, or 15 minutes altogether. An hour contains 60 minutes, so 15 ÷ 60 gives 0.25 staff-hours. Check the answer by working backward. One quarter of 60 minutes is 15. This gives a known answer to compare against a program later."
+        },
+        "walkthrough": {
+          "title": "Count the welcome messages",
+          "intro": "Three new teams each need four welcome messages. Count the messages on paper. Then run the example unchanged and compare the number that Python prints with that prediction.",
+          "code": "def welcome_messages(teams, messages_each):\n    total = teams * messages_each\n    return total\n\nprint(welcome_messages(3, 4))",
+          "expected": "12",
+          "lines": [
+            {
+              "snippet": "def welcome_messages(teams, messages_each):",
+              "explanation": "def starts a function, a named calculation that can be used again. welcome_messages is its name. The two names inside the parentheses are parameters, or places for the caller's values. The comma separates them. The colon at the end begins the instructions for this function."
+            },
+            {
+              "snippet": "    total = teams * messages_each",
+              "explanation": "The four leading spaces place this instruction inside the function. Python multiplies the two values on the right of = and stores the result under the name total. For the first call, total becomes 3 × 4, which is 12."
+            },
+            {
+              "snippet": "    return total",
+              "explanation": "return sends the number back to the line that called the function. This makes the number available for another calculation or for display. A function that reaches the end without returning a value sends back None."
+            },
+            {
+              "snippet": "print(welcome_messages(3, 4))",
+              "explanation": "This line starts at the left edge, outside the function. The inner parentheses call welcome_messages with 3 for teams and 4 for messages_each. The outer print displays the returned number. Defining a function gives it a name; the call is what runs it."
+            }
+          ],
+          "change": {
+            "prompt": "Keep four messages per team. Change the 3 in the final line to 5. Predict the new total, then run the edited program. Leave the function definition as it is.",
+            "code": "def welcome_messages(teams, messages_each):\n    total = teams * messages_each\n    return total\n\nprint(welcome_messages(5, 4))",
+            "expected": "20",
+            "explanation": "The same function received five teams. Four messages for each of five teams gives 20. It can now handle another team count without any change inside the function."
+          },
+          "troubleshooting": [
+            {
+              "symptom": "Python reports SyntaxError or IndentationError.",
+              "fix": "Check the colon after the function definition and the matching parentheses. Start both lines inside the function with four spaces. Start the final print line at the left edge."
+            },
+            {
+              "symptom": "Python reports NameError.",
+              "fix": "Compare the name on the reported line with where it was introduced. Python treats total, Total, and totla as three different names. Check the spelling and capitalization, then run again."
+            },
+            {
+              "symptom": "The output contains None, or no number appears.",
+              "fix": "Keep return inside the function so the caller gets a number. Keep a print call outside the function to display it. A function definition by itself produces no printed output."
+            }
+          ],
+          "beforeQuiz": "The exercises pass numbers such as 6 directly to the function. A text box can instead supply \"6\", a string of characters. For a ticket count, check that the text represents a nonnegative whole number and convert it before doing arithmetic. int(\"6\") gives the number 6. The text \"six\" requires a correction."
         },
         "project": {
-          "prompt": "Create workload_hours(tickets, minutes_each) using the optional starter. Run the function on two made-up queues and an empty queue. Record the expected and observed hours. Add one sentence about when the estimate would break down. The same method can estimate onboarding reviews or another startup workflow.",
-          "deliverable": "A runnable function, three input/output pairs with units, and one limitation.",
-          "placeholder": "Function or file … Normal case … Empty queue … Changed input … Assumption …",
+          "prompt": "Test the workload_hours function on three queues of your own. First choose a handling time in minutes. Run two queues with that same time and different positive ticket counts so that one estimate is under an hour. Then try an empty queue with zero tickets. Predict the hours before each run. The skill lab’s Try a queue tool records the numbers for this project.",
+          "deliverable": "Three queue results and a short note explaining what changed when the ticket count changed. Identify one reason an actual queue might take longer than the estimate.",
+          "placeholder": "When I changed the ticket count from … to …, the returned hours …\nAn actual queue might take longer because …",
           "reference": {
-            "title": "Forecasting document review time",
+            "title": "A sample test record for welcome messages",
             "steps": [
-              "Name the two inputs and the unit of the output before writing the function.",
-              "Multiply documents by minutes per review, then convert minutes to hours.",
-              "Run both assertions. Change the review time from eight minutes to four and predict the new result."
+              "State the unit and the rule. The sample function returns a number of messages. Multiply the two inputs by hand to predict each answer.",
+              "Run the function definition from the lesson. On separate lines below it, print the result of each call and write down what appeared.",
+              "Change only the team count in the first case. Compare its new result with the original, then record an assumption the program makes."
             ],
-            "artifact": "def review_hours(documents, minutes_each):\n    return documents * minutes_each / 60\n\nassert review_hours(15, 8) == 2\nassert review_hours(0, 8) == 0\nprint(review_hours(15, 4))  # 1.0",
-            "check": "Fifteen eight-minute reviews take 120 minutes. Halving the review time halves the two-hour estimate."
+            "artifact": "Function: welcome_messages\nInputs (teams, messages per team) | Predicted messages | Observed messages\n(2, 3) | 6 | 6\n(4, 3) | 12 | 12\n(0, 3) | 0 | 0\n\nChange: doubling the number of teams doubled the output.\nAssumption: every team needs the same number of messages.",
+            "check": "The three observations agree with the hand calculations, including zero teams. Apply the same test-record format to the workload function and label its output in staff-hours."
           }
         },
         "questions": [
@@ -74,20 +119,20 @@ window.COURSE_LEVELS = [
             ]
           },
           {
-            "prompt": "The terminal reports that it cannot find workload.py. What is the quickest informative check?",
+            "prompt": "A function stores the number of minutes under total_minutes. On the next line Python reports NameError for total_minuts. What should be checked first?",
             "correct": 0,
             "options": [
               {
-                "text": "List the current folder and look for the exact filename.",
-                "feedback": "A relative filename is resolved from the current working folder."
+                "text": "Compare the name used on the error line with the name that stored the minutes.",
+                "feedback": "One letter is missing from total_minuts. Python needs the same spelling to find the stored value."
               },
               {
-                "text": "Install a new package that handles hourly estimates.",
-                "feedback": "The error occurs while locating the file, before any imports or calculations run."
+                "text": "Give the next call a smaller number of tickets.",
+                "feedback": "Changing the input changes the calculation. The missing name on that line still needs a correction."
               },
               {
-                "text": "Check the units on the function’s return value.",
-                "feedback": "The program has yet to run. Its return value cannot explain a file lookup error."
+                "text": "Move print inside the calculation to display the missing name.",
+                "feedback": "Python must find a value for the name before print can display it. Check where the name was introduced."
               }
             ]
           },

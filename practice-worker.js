@@ -23,7 +23,7 @@ const pythonCases = {
   },
 };
 
-async function runPython(source) {
+async function runPython(source, queue) {
   let stdout = '';
   Sk.configure({
     __future__: Sk.python3,
@@ -31,11 +31,6 @@ async function runPython(source) {
     output: (message) => {
       if (stdout.length < 1000)
         stdout += String(message).slice(0, 1000 - stdout.length);
-    },
-    read: (name) => {
-      throw new Error(
-        `This exercise uses built-in Python only. Cannot load ${name}.`,
-      );
     },
   });
   const program = await Sk.misceval.asyncToPromise(() =>
@@ -47,13 +42,41 @@ async function runPython(source) {
     throw new Error(
       `Define a function named ${exercise.name} with the arguments shown in the starter.`,
     );
-  const cases = [];
-  for (const test of exercise.cases) {
-    const args = test.args.map((value) => Sk.ffi.remapToPy(value));
+  async function callWith(values) {
+    const args = values.map((value) => Sk.ffi.remapToPy(value));
     const result = await Sk.misceval.asyncToPromise(() =>
       Sk.misceval.callsimOrSuspend(learnerFunction, ...args),
     );
-    const actual = Sk.ffi.remapToJs(result);
+    return Sk.ffi.remapToJs(result);
+  }
+  if (queue !== undefined) {
+    if (
+      week !== 1 ||
+      !queue ||
+      !Number.isInteger(queue.tickets) ||
+      queue.tickets < 0 ||
+      queue.tickets > 1000000 ||
+      !Number.isFinite(queue.minutes) ||
+      queue.minutes < 0 ||
+      queue.minutes > 100000
+    ) {
+      throw new Error(
+        'Use a whole ticket count and a nonnegative handling time within the displayed limits.',
+      );
+    }
+    const actual = await callWith([queue.tickets, queue.minutes]);
+    if (typeof actual !== 'number' || !Number.isFinite(actual)) {
+      throw new Error(
+        actual == null
+          ? 'The function returned None. Keep the calculation on a return line inside the function. A print line only displays a value.'
+          : 'The function must return a number of hours. Leave words and quotation marks out of its return value.',
+      );
+    }
+    return { actual, stdout };
+  }
+  const cases = [];
+  for (const test of exercise.cases) {
+    const actual = await callWith(test.args);
     const passed =
       typeof actual === typeof test.expected && actual === test.expected;
     const call = `${exercise.name}(${test.args.map((x) => JSON.stringify(x)).join(', ')})`;
@@ -164,14 +187,19 @@ self.onmessage = async ({ data }) => {
             new URL(`./vendor/sql.js/${name}`, self.location.href).href,
         });
       } else if (pythonCases[week]) {
-        importScripts('./vendor/skulpt/skulpt.min.js');
+        importScripts(
+          './vendor/skulpt/skulpt.min.js',
+          './vendor/skulpt/skulpt-sys.js',
+        );
       } else {
         throw new Error('This week has no code exercise.');
       }
       self.postMessage({ ready: true });
     } else {
       self.postMessage(
-        week === 7 ? runSql(data.source) : await runPython(data.source),
+        week === 7
+          ? runSql(data.source)
+          : await runPython(data.source, data.queue),
       );
     }
   } catch (error) {

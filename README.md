@@ -17,6 +17,8 @@
 
 Each weekly lab and project has a separate worked reference with reasoning, a sample artifact, and a way to verify it. The three browser coding exercises have parallel examples as well. The example library is open from the beginning. The Week 16 retrieval demonstration and Week 18 release comparison let students change inputs and inspect the results in the browser.
 
+Week 1 begins with a hand calculation and an editable Python example that prints a welcome-message count. Students then write a separate support-workload calculator, pass four code checks and test three queues of their own. The project saves the predicted and returned hours with the student's explanation. Saving the project review opens the timed quiz once the lab and code checks pass.
+
 The weekly assessment has five graded scenario questions. Starting an attempt starts a ten-minute timer. Extended allowances of 20 and 100 minutes are available before starting. A refresh retains the paper, saved answers, and deadline. At expiry, the academy grades the recorded answers; a blank earns zero points. On returning to a closed page, the expired attempt is settled before it can accept further answers. The results show answer explanations and references for missed topics. Retakes draw a fresh paper and retain the highest score.
 
 A passing score of at least 80%, a passed lab, and a self-reviewed project with written evidence complete a week. Weeks 1, 2, and 7 also require the student’s code to pass all runtime tests. Subsequent weeks unlock in order. Each completed week earns 100 XP. The journal offers seven badges, backup and restore, and a Markdown portfolio as completed projects accumulate.

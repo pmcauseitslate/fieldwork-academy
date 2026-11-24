@@ -2000,3 +2000,114 @@ textarea {
   border-top: 1px solid var(--line);
   margin-top: 9px;
 }
+
+/* The first workshop pairs each line of Python with its meaning. */
+.first-workshop {
+  margin: 26px 0;
+  padding-block: 22px;
+  border-block: 1px solid var(--line);
+}
+.first-workshop > h3 {
+  margin: 8px 0 12px;
+  font: 400 1.7rem/1.14 var(--serif);
+}
+.line-guide > summary {
+  color: var(--pine);
+  font-weight: 650;
+  cursor: pointer;
+}
+.line-guide ol {
+  margin: 14px 0 22px;
+  padding-left: 1.6rem;
+}
+.line-guide li {
+  padding: 4px 0 7px 4px;
+}
+.line-guide li::marker {
+  color: var(--muted);
+  font-family: var(--mono);
+}
+.line-guide code {
+  display: block;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font: 600 0.88rem/1.55 var(--mono);
+  color: var(--pine);
+}
+.line-guide li p,
+.beginner-practice p,
+.queue-record p {
+  margin: 6px 0 12px;
+}
+.beginner-practice h4,
+.first-workshop .hint h4 {
+  margin: 18px 0 6px;
+}
+.beginner-practice .code-editor {
+  width: 100%;
+  min-height: 10rem;
+}
+.beginner-practice pre,
+.queue-output pre {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.optional-study {
+  margin-top: 24px;
+}
+.remaining-work li {
+  margin: 8px 0;
+}
+.queue-trial,
+.queue-record {
+  margin: 24px 0 16px;
+  padding: 18px;
+  border: 1px solid var(--line);
+  background: #f6f8f2;
+  border-radius: 8px;
+}
+.queue-trial h4,
+.queue-record h3 {
+  margin: 0 0 8px;
+}
+.queue-trial .field-label {
+  margin-top: 12px;
+}
+.queue-trial .answer-input {
+  display: block;
+  width: min(100%, 16rem);
+}
+.queue-trial button {
+  margin-top: 16px;
+}
+.queue-output {
+  overflow-wrap: anywhere;
+}
+.table-scroll {
+  max-width: 100%;
+  overflow-x: auto;
+}
+.queue-record table {
+  width: 100%;
+  text-align: left;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+  font-size: 0.92rem;
+}
+.queue-record caption {
+  text-align: left;
+  font-weight: 650;
+  padding: 8px 0;
+}
+.queue-record td,
+.queue-record th {
+  border-bottom: 1px solid var(--line);
+  padding: 7px 6px;
+  vertical-align: top;
+}
+.queue-checks {
+  padding-left: 1.3rem;
+}
+.queue-checks li {
+  margin-block: 4px;
+}

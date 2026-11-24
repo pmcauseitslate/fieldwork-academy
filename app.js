@@ -336,6 +336,7 @@
     ['quiz', 'target', 'Knowledge check'],
     ['project', 'pen', 'Project'],
   ];
+  const firstWeekTabs = [tabs[0], tabs[1], tabs[3], tabs[2]];
   function checklist(week, work) {
     const items = [['lab', 'Pass the skill lab', work.labPassed]];
     if (window.PRACTICE_WEEKS.includes(week))
@@ -344,11 +345,54 @@
         'Pass the coding tests',
         work.codePassed || work.carried,
       ]);
-    items.push(
-      ['quiz', 'Score 80% on the quiz', Number(work.best) >= 80],
-      ['project', 'Review the weekly project', work.reviewed],
-    );
+    const quiz = ['quiz', 'Score 80% on the quiz', Number(work.best) >= 80];
+    const project = ['project', 'Review the weekly project', work.reviewed];
+    items.push(...(week === 1 ? [project, quiz] : [quiz, project]));
     return items;
+  }
+  function canStartQuiz(week, w) {
+    return (
+      week !== 1 ||
+      done(week) ||
+      Boolean(w.labPassed && w.codePassed && w.reviewed)
+    );
+  }
+  function validQueueCase(row) {
+    return (
+      row &&
+      Number.isInteger(row.tickets) &&
+      row.tickets >= 0 &&
+      row.tickets <= 1000000 &&
+      Number.isFinite(row.minutes) &&
+      row.minutes >= 0 &&
+      row.minutes <= 100000 &&
+      Number.isFinite(row.expected) &&
+      row.expected >= 0 &&
+      row.expected <= 10000000000 &&
+      Number.isFinite(row.actual)
+    );
+  }
+  function recentQueueCases(rows) {
+    if (!Array.isArray(rows)) return [];
+    return rows
+      .filter(validQueueCase)
+      .slice(-5)
+      .map(({ tickets, minutes, expected, actual }) => ({
+        tickets,
+        minutes,
+        expected,
+        actual,
+      }));
+  }
+  function recordQueueCase(result) {
+    if (!validQueueCase(result)) return;
+    syncJournal();
+    const w = workFor(1);
+    const existing = recentQueueCases(w.queueCases).filter(
+      (row) => row.tickets !== result.tickets || row.minutes !== result.minutes,
+    );
+    w.queueCases = recentQueueCases([...existing, result]);
+    save();
   }
   function recordCodePass(week) {
     syncJournal();
@@ -363,8 +407,8 @@
     const lesson = lessons[week - 1],
       li = levelOf(week),
       work = workFor(week);
-    return `<div class="breadcrumbs"><a href="#/">Learning path</a> ${icon('right', 14)} <span>Level ${num(li + 1)}</span></div><div class="lesson-header"><div class="eyebrow"><i></i> WEEK ${num(week)} OF 24</div><h1>${h(lesson.title)}</h1><p>${h(lesson.summary)}</p><div class="path-meta">${icon(levelIcons[li], 16)} ${h(levelTitles[li])}<b>·</b>${icon('clock', 16)} 8–10 hours including project</div></div>
-    <div class="lesson-tabs">${tabs.map(([id, im, t]) => `<a href="#/week/${week}/${id}" aria-current="${id === tab ? 'page' : 'false'}">${icon(im, 17)} ${t}</a>`).join('')}</div>
+    return `<div class="breadcrumbs"><a href="#/">Learning path</a> ${icon('right', 14)} <span>Level ${num(li + 1)}</span></div><div class="lesson-header"><div class="eyebrow"><i></i> WEEK ${num(week)} OF 24</div><h1>${h(lesson.title)}</h1><p>${h(lesson.summary)}</p><div class="path-meta">${icon(levelIcons[li], 16)} ${h(levelTitles[li])}<b>·</b>${week === 1 ? icon('terminal', 16) + ' Browser workshop · No installation required' : icon('clock', 16) + ' 8–10 hours including project'}</div></div>
+    <div class="lesson-tabs">${(week === 1 ? firstWeekTabs : tabs).map(([id, im, t]) => `<a href="#/week/${week}/${id}" aria-current="${id === tab ? 'page' : 'false'}">${icon(im, 17)} ${t}</a>`).join('')}</div>
     <div class="lesson-grid"><article class="lesson-panel" id="activity">${tab === 'lab' ? labPage(week) : tab === 'quiz' ? quizPage(week) : tab === 'project' ? projectPage(week) : learnPage(week)}</article>
     <aside class="work-sidebar"><div class="panel-head"><div class="eyebrow">WEEK ${num(week)}</div>${icon('flag', 19)}</div><h2>Field checklist</h2><ul class="checklist">${checklist(
       week,
@@ -378,6 +422,26 @@
         '',
       )}</ul><div class="week-award">${icon('bolt', 17)} ${done(week) ? '100 XP earned' : '100 XP on completion'}</div><a class="text-link" href="#/">Return to learning path</a></aside></div>`;
   }
+  function firstLessonPage(lesson, materials, downloads) {
+    const guide = lesson.walkthrough;
+    return `<div class="eyebrow">FIRST PYTHON WORKSHOP</div><h2>Start with a pencil</h2>
+      <p>Follow the example, write a new function in the skill lab, and record its results in the project. The timed quiz opens after the practical work.</p>
+      <p>${h(lesson.teaching[0])}</p>
+      <div class="worked"><h3>${h(lesson.example.title)}</h3><p>${h(lesson.example.text)}</p></div>
+      <h2>Meet the Python editor</h2>${lesson.teaching
+        .slice(1)
+        .map((t) => `<p>${h(t)}</p>`)
+        .join('')}
+      <section class="first-workshop"><div class="eyebrow">GUIDED PRACTICE</div><h3>${h(guide.title)}</h3><p>${h(guide.intro)}</p>
+      <div id="first-python"></div>
+      <details class="hint"><summary>Help with Python errors</summary>${guide.troubleshooting.map((item) => `<h4>${h(item.symptom)}</h4><p>${h(item.fix)}</p>`).join('')}</details></section>
+      <h3>When the input is text</h3><p>${h(guide.beforeQuiz)}</p>
+      <div class="activity-next"><a class="button" href="#/week/1/lab">Open skill lab ${icon('right', 16)}</a></div>
+      <details class="hint optional-study"><summary>Optional reading, videos and project file</summary>
+      <p>The lab and project run in the browser. For local Python practice, the starter file includes its own checks.</p>
+      <div class="downloads">${downloads.map((d) => `<a href="${h(d.filename || d.file || d.url || d.href)}" download>${icon('download', 16)} ${h(d.label || d.title)}</a>`).join('')}</div>
+      ${materials.map(resourceCard).join('')}<a class="text-link" href="#/library/1">Browse all Level 01 resources</a></details>`;
+  }
   function learnPage(week) {
     const lesson = lessons[week - 1],
       li = levelOf(week);
@@ -389,6 +453,7 @@
     const picks = picked.slice(0, 4);
     const more = picked.slice(4);
     const dl = (window.WEEKLY_DOWNLOADS || {})[week] || [];
+    if (week === 1) return firstLessonPage(lesson, picked, dl);
     return `<div class="eyebrow">WORKSHOP</div><h2>Workshop concepts</h2>${lesson.teaching.map((t) => `<p>${h(t)}</p>`).join('')}<div class="worked"><div class="eyebrow">WORKED EXAMPLE</div><h3>${h(lesson.example.title)}</h3><p>${h(lesson.example.text)}</p></div>${demoSlot(week)}
     ${dl.length ? `<h3>Project files</h3><div class="downloads">${dl.map((d) => `<a href="${h(d.filename || d.file || d.url || d.href)}" download>${icon('download', 16)} ${h(d.label || d.title)}</a>`).join('')}</div>` : ''}
     <h3 class="subheading">Study materials</h3>${picks.map(resourceCard).join('')}${more.length ? `<details class="hint more-resources"><summary>Additional study materials (${more.length})</summary>${more.map(resourceCard).join('')}</details>` : ''}<a class="text-link" href="#/library/${li + 1}">Browse all Level ${num(li + 1)} resources</a><div class="activity-next"><a class="button" href="#/week/${week}/lab">Open skill lab</a></div>`;
@@ -402,7 +467,7 @@
           : lab.options?.map((_, i) => i);
     let controls = '';
     if (lab.kind === 'short')
-      controls = `<label class="field-label" for="lab-answer">Answer</label><input class="answer-input" id="lab-answer" autocomplete="off" value="${h(w.short || '')}">`;
+      controls = `<label class="field-label" for="lab-answer">${week === 1 ? 'Estimated staff-hours' : 'Answer'}</label><input class="answer-input" id="lab-answer" autocomplete="off" value="${h(w.short || '')}">`;
     if (lab.kind === 'select')
       controls = lab.options
         .map(
@@ -414,7 +479,7 @@
       controls = `<ol class="order-list">${order.map((index, pos) => `<li><span>${h(lab.options[index])}</span><div><button type="button" data-move="-1" data-pos="${pos}" aria-label="Move step ${pos + 1} up" ${!pos ? 'disabled' : ''}>↑</button><button type="button" data-move="1" data-pos="${pos}" aria-label="Move step ${pos + 1} down" ${pos === order.length - 1 ? 'disabled' : ''}>↓</button></div></li>`).join('')}</ol>`;
     return `<div class="eyebrow">SKILL LAB</div><h2>${h(lab.title)}</h2><p>${h(lab.brief)}</p>${lab.stimulus ? `<pre class="stimulus"><code>${h(lab.stimulus)}</code></pre>` : ''}${referencePanel(lab.reference, 'Skill lab reference')}<form id="lab-form">${controls}<div class="button-row"><button class="button">Check answer</button></div></form>
     <details class="hint"><summary>Show a hint</summary><p>${h(lab.hint)}</p></details><div role="status" id="lab-feedback">${w.labPassed ? `<div class="feedback good">${icon('check', 17)}<span>Skill lab passed. ${h(lab.explanation)}</span></div>` : ''}</div>
-    ${window.PRACTICE_WEEKS?.includes(week) ? '<div id="code-practice"></div>' : ''}<div class="activity-next"><a class="text-link" href="#/week/${week}/quiz">Open knowledge check</a></div>`;
+    ${window.PRACTICE_WEEKS?.includes(week) ? '<div id="code-practice"></div>' : ''}<div class="activity-next">${week === 1 ? '<a class="button" href="#/week/1/project">Open project review</a>' : `<a class="text-link" href="#/week/${week}/quiz">Open knowledge check</a>`}</div>`;
   }
   function scoreAttempt(week, attempt, time) {
     if (attempt.ended) return;
@@ -424,6 +489,12 @@
     attempt.expired = time >= attempt.deadline;
     attempt.ended = Math.max(attempt.started, Math.min(time, attempt.deadline));
     w.best = Math.max(w.best || 0, result.score);
+    if (
+      week === 1 &&
+      w.best >= assessment.PASS_PERCENT &&
+      canStartQuiz(week, w)
+    )
+      progress.completed[week] = true;
     save();
   }
   function syncJournal() {
@@ -438,7 +509,7 @@
   function startQuiz(week, minutes) {
     syncJournal();
     const w = workFor(week);
-    if (!available(week)) {
+    if (!available(week) || !canStartQuiz(week, w)) {
       render();
       return;
     }
@@ -460,7 +531,15 @@
     const qs = a ? assessment.paper(lessons, week, a) : [];
     const result = a?.ended ? assessment.result(qs, a) : null;
     const passed = result?.score >= assessment.PASS_PERCENT;
-    const configuration = `<form id="start-quiz"><div class="quiz-setup"><label for="quiz-time">Time allowance</label><select id="quiz-time"><option value="10">10 minutes · standard</option><option value="20">20 minutes · extended</option><option value="100">100 minutes · extended</option></select></div><p class="muted">The timer begins on start and continues if the page closes. Answers saved before the deadline are graded automatically. All time allowances use the same passing score.</p><button class="button">${icon('clock', 16)} ${a ? 'Start another attempt' : 'Start graded quiz'}</button></form>`;
+    const pending =
+      week === 1
+        ? checklist(1, w).filter(
+            ([route, , complete]) => route !== 'quiz' && !complete,
+          )
+        : [];
+    const configuration = !canStartQuiz(week, w)
+      ? `<div class="worked"><h3>Finish the practical work to open the quiz</h3><p>The timer starts only when an attempt begins. Complete the remaining steps below.</p><ul class="remaining-work">${pending.map(([route, label]) => `<li><a href="#/week/1/${route}">${h(label)}</a></li>`).join('')}</ul></div>`
+      : `<form id="start-quiz"><div class="quiz-setup"><label for="quiz-time">Time allowance</label><select id="quiz-time"><option value="10">10 minutes · standard</option><option value="20">20 minutes · extended</option><option value="100">100 minutes · extended</option></select></div><p class="muted">The timer begins on start and continues if the page closes. Answers saved before the deadline are graded automatically. All time allowances use the same passing score.</p><button class="button">${icon('clock', 16)} ${a ? 'Start another attempt' : 'Start graded quiz'}</button></form>`;
     return `<div class="eyebrow">GRADED ASSESSMENT</div><h2 id="quiz-title" tabindex="-1">Week ${num(week)} knowledge check</h2>
       ${!activeAttempt ? `<p>Five applied questions. Four correct answers earn a pass. ${week > 1 ? 'The assessment includes earlier concepts.' : ''} Completing the week requires a passing quiz, a passed lab, and a reviewed project.</p>` : ''}
       ${
@@ -474,7 +553,7 @@
         })
         .join(
           '',
-        )}</div>${passed ? `<p><a class="text-link" href="#/week/${week}/project">Open weekly project</a></p>` : `<p class="remediation">${Number(w.best) >= 80 ? 'An earlier attempt earned a pass.' : 'Progression stays locked.'} Review the missed concepts, then take another attempt with a fresh question set.</p>`}`
+        )}</div>${passed ? (week === 1 && done(week) ? finishMessage(week) : `<p><a class="text-link" href="#/week/${week}/project">Open weekly project</a></p>`) : `<p class="remediation">${Number(w.best) >= 80 ? 'An earlier attempt earned a pass.' : 'Progression stays locked.'} Review the missed concepts, then take another attempt with a fresh question set.</p>`}`
           : ''
       }
       ${
@@ -564,11 +643,85 @@
       .join(' · ');
     return `<details class="hint"><summary>Earlier edition record</summary><p>${work.carried ? 'Credit for this completed week was carried forward.' : 'These records belong to the earlier assignment.'}</p>${grades ? `<p>${h(grades)}</p>` : ''}${old.draft ? `<pre class="legacy-draft">${h(old.draft)}</pre>` : ''}</details>`;
   }
+  function queueRequirements(rows) {
+    const correct = rows.filter((row) => {
+      const hours = (row.tickets * row.minutes) / 60;
+      return (
+        Math.abs(row.actual - hours) <=
+        1e-9 * Math.max(1, Math.abs(row.actual), hours)
+      );
+    });
+    const positive = correct.filter(
+      (row) => row.tickets > 0 && row.minutes > 0,
+    );
+    const paired = positive.some((row) =>
+      positive.some(
+        (other) =>
+          other.minutes === row.minutes &&
+          other.tickets !== row.tickets &&
+          Math.min(row.actual, other.actual) < 1,
+      ),
+    );
+    return [
+      [
+        paired,
+        'Two different positive ticket counts at the same handling time, with at least one result under an hour',
+      ],
+      [
+        correct.some((row) => row.tickets === 0 && row.actual === 0),
+        'An empty queue that returns zero hours',
+      ],
+    ];
+  }
+  function queueEvidence(w) {
+    const rows = recentQueueCases(w.queueCases);
+    return `<section class="queue-record"><h3>Queue test record</h3><p>The latest five runs from <strong>Try a queue</strong> appear here. Repeating the same inputs updates that row.</p>
+      ${rows.length ? `<div class="table-scroll"><table><caption>Test runs for workload_hours</caption><thead><tr><th scope="col">Tickets</th><th scope="col">Minutes per ticket</th><th scope="col">Predicted hours</th><th scope="col">Returned hours</th></tr></thead><tbody>${rows.map((row) => `<tr><td>${row.tickets}</td><td>${row.minutes}</td><td>${row.expected}</td><td>${row.actual}</td></tr>`).join('')}</tbody></table></div>` : '<p>No queue runs recorded yet.</p>'}
+      <ul class="queue-checks">${queueRequirements(rows)
+        .map(
+          ([ok, label]) =>
+            `<li><strong>${ok ? 'Complete' : 'Needed'}.</strong> ${label}.</li>`,
+        )
+        .join('')}</ul>
+      <a class="text-link" href="#/week/1/lab/queue">Try a queue in the skill lab</a></section>`;
+  }
+  function portfolioEntry(lesson) {
+    const work = workFor(lesson.week);
+    const historical = work.carried && work.draft === work.legacy?.draft;
+    const title = historical ? 'Earlier edition project' : lesson.title;
+    const entry = `## Week ${lesson.week} · ${title}\n\n${work.draft || ''}`;
+    const rows = lesson.week === 1 ? recentQueueCases(work.reviewCases) : [];
+    if (!rows.length) return entry;
+    return [
+      entry,
+      'Queue tests for workload_hours',
+      '| Tickets | Minutes per ticket | Predicted hours | Returned hours |\n| --- | --- | --- | --- |\n' +
+        rows
+          .map(
+            (row) =>
+              `| ${row.tickets} | ${row.minutes} | ${row.expected} | ${row.actual} |`,
+          )
+          .join('\n'),
+    ].join('\n\n');
+  }
+  function firstProjectStatus(w) {
+    return canStartQuiz(1, w)
+      ? '<div class="feedback good"><span>Project review saved. <a href="#/week/1/quiz">Open the Week 1 quiz</a>.</span></div>'
+      : '<div class="feedback good"><span>Project review saved. <a href="#/week/1/lab">Finish the skill lab and coding tests</a> to open the quiz.</span></div>';
+  }
   function projectPage(week) {
     const project = lessons[week - 1].project,
       w = workFor(week),
       marked = Array.isArray(w.review) ? w.review : [];
-    return `<div class="eyebrow">WEEKLY PROJECT</div><h2>Project brief</h2><p>${h(project.prompt)}</p>${project.deliverable ? `<div class="worked"><div class="eyebrow">DELIVERABLE</div><p>${h(project.deliverable)}</p></div>` : ''}${referencePanel(project.reference, 'Project reference')}${earlierEvidence(w)}<label class="field-label" for="project-draft">Project evidence</label><p class="muted">Record the deliverable, a test result, and one independent revision. A repository or demo link can accompany the evidence.</p><textarea id="project-draft" rows="7" maxlength="24000" placeholder="${h(project.placeholder)}">${h(w.draft || '')}</textarea><p class="save-note" id="draft-status" role="status">${w.draft ? 'Draft saved in this browser.' : 'Notes are saved in this browser.'}</p><h3>Project review</h3><p class="muted">Projects use student self-review. The academy grades the quiz and skill lab automatically.</p>${reviewLabels.map((s, i) => `<label class="choice"><input type="checkbox" name="review" value="${i}" ${marked.includes(i) ? 'checked' : ''}><span>${s}</span></label>`).join('')}<div class="button-row"><button class="button" data-finish>${done(week) ? 'Save review' : 'Complete week'}</button></div><div role="status" id="project-feedback">${done(week) ? finishMessage(week) : ''}</div>`;
+    const first = week === 1;
+    const labels = first
+      ? [
+          'I ran my function on two different ticket counts and an empty queue.',
+          'I compared my predictions with the returned hours and investigated any difference.',
+          'My notes explain what changed and one assumption about real handling time.',
+        ]
+      : reviewLabels;
+    return `<div class="eyebrow">WEEKLY PROJECT</div><h2>Project brief</h2><p>${h(project.prompt)}</p>${project.deliverable ? `<div class="worked"><div class="eyebrow">DELIVERABLE</div><p>${h(project.deliverable)}</p></div>` : ''}${referencePanel(project.reference, 'Project reference')}${earlierEvidence(w)}${first ? queueEvidence(w) : ''}<label class="field-label" for="project-draft">${first ? 'Explain the results' : 'Project evidence'}</label><p class="muted">${first ? 'Explain the change in hours and one assumption in your own words. Saving the review adds the completed test record to the portfolio.' : 'Record the deliverable, a test result, and one independent revision. A repository or demo link can accompany the evidence.'}</p><textarea id="project-draft" rows="7" maxlength="24000" placeholder="${h(project.placeholder)}">${h(w.draft || '')}</textarea><p class="save-note" id="draft-status" role="status">${w.draft ? 'Draft saved in this browser.' : 'Notes are saved in this browser.'}</p><h3>Project review</h3><p class="muted">Projects use student self-review. The academy grades the quiz and skill lab automatically.</p>${labels.map((s, i) => `<label class="choice"><input type="checkbox" name="review" value="${i}" ${marked.includes(i) ? 'checked' : ''}><span>${s}</span></label>`).join('')}<div class="button-row"><button class="button" data-finish>${first ? 'Save project review' : done(week) ? 'Save review' : 'Complete week'}</button></div><div role="status" id="project-feedback">${done(week) ? finishMessage(week) : first && w.reviewed ? firstProjectStatus(w) : ''}</div>`;
   }
   function finishMessage(week) {
     return `<div class="feedback good"><span><b>Week ${week} completed.</b> 100 XP earned. ${week < 24 ? `<a href="#/week/${week + 1}">Open Week ${week + 1}</a>` : '<a href="#/achievements">View achievements and download the portfolio</a>'}</span></div>`;
@@ -622,6 +775,11 @@
     main.innerHTML = content;
     const demo = main.querySelector('[data-demo-week]');
     if (demo) window.mountFieldDemo(demo, Number(demo.dataset.demoWeek));
+    if (main.querySelector('#first-python'))
+      practiceCleanup = window.mountBeginnerPractice(
+        document.getElementById('first-python'),
+        lessons[0].walkthrough,
+      );
     nav(active.page);
     document.title = title + ' · Fieldwork Academy';
     if (document.getElementById('resource-results')) renderResults();
@@ -634,7 +792,14 @@
         document.getElementById('code-practice'),
         active.week,
         recordCodePass,
+        active.week === 1 ? recordQueueCase : undefined,
       );
+    if (route[3] === 'queue' && document.getElementById('queue-tickets')) {
+      const queue = document.querySelector('.queue-trial');
+      queue.scrollIntoView();
+      document.getElementById('queue-tickets').focus({ preventScroll: true });
+      return;
+    }
     if (route[3] === 'code' && document.getElementById('code-practice')) {
       document.getElementById('code-practice').scrollIntoView();
       return;
@@ -668,7 +833,14 @@
     let pass = false;
     if (lab.kind === 'short') {
       w.short = document.getElementById('lab-answer').value;
-      pass = lab.answer.map(normal).includes(normal(w.short));
+      if (week === 1) {
+        const answer = normal(w.short).match(
+          /^([0-9]+(?:\.[0-9]+)?)(?:\s*(?:staff[ -]?)?(?:h|hr|hrs|hour|hours))?$/,
+        );
+        pass = Boolean(answer && Number(answer[1]) === Number(lab.answer[0]));
+      } else {
+        pass = lab.answer.map(normal).includes(normal(w.short));
+      }
     }
     if (lab.kind === 'select') {
       w.selected = [
@@ -690,6 +862,7 @@
   }
 
   function finish() {
+    syncJournal();
     const week = active.week,
       w = workFor(week),
       target = document.getElementById('project-feedback');
@@ -698,9 +871,45 @@
     w.review = [...main.querySelectorAll('input[name="review"]:checked')].map(
       (el) => Number(el.value),
     );
-    w.reviewed = draft.length >= 20 && w.review.length === reviewLabels.length;
+    const queueMissing =
+      week === 1 &&
+      !done(week) &&
+      !w.reviewed &&
+      queueRequirements(recentQueueCases(w.queueCases)).some(([ok]) => !ok);
+    w.reviewed =
+      !queueMissing &&
+      draft.length >= 20 &&
+      w.review.length === reviewLabels.length;
+    if (
+      week === 1 &&
+      w.reviewed &&
+      queueRequirements(recentQueueCases(w.queueCases)).every(([ok]) => ok)
+    )
+      w.reviewCases = recentQueueCases(w.queueCases);
     save();
     refreshChecklist();
+    if (week === 1 && !done(week)) {
+      if (!w.reviewed) {
+        const reminders = [
+          queueMissing
+            ? '<a href="#/week/1/lab/queue">Run the remaining queues shown in the test record</a>.'
+            : '',
+          draft.length < 20
+            ? 'Write a short explanation of the results (at least 20 characters).'
+            : '',
+          w.review.length < 3 ? 'Check each project review item.' : '',
+        ];
+        target.innerHTML = `<div class="feedback retry"><span>${reminders.filter(Boolean).join(' ')}</span></div>`;
+        return;
+      }
+      if (
+        !canStartQuiz(week, w) ||
+        !(Number(w.best) >= assessment.PASS_PERCENT)
+      ) {
+        target.innerHTML = firstProjectStatus(w);
+        return;
+      }
+    }
     const missing = [];
     if (!w.labPassed) missing.push('pass the skill lab');
     if (window.PRACTICE_WEEKS.includes(week) && !w.codePassed && !w.carried)
@@ -780,6 +989,10 @@
           );
         if (Number.isInteger(src.best) && src.best >= 0 && src.best <= 100)
           w.best = src.best;
+        if (l.week === 1 && Array.isArray(src.queueCases))
+          w.queueCases = recentQueueCases(src.queueCases);
+        if (l.week === 1 && Array.isArray(src.reviewCases))
+          w.reviewCases = recentQueueCases(src.reviewCases);
         w.labPassed = src.labPassed === true;
         w.codePassed = src.codePassed === true;
         w.reviewed =
@@ -849,6 +1062,8 @@
       const w = workFor(active.week);
       w.draft = el.value;
       w.reviewed = false;
+      if (active.week === 1 && !done(1))
+        document.getElementById('project-feedback').replaceChildren();
       save();
       refreshChecklist();
       document.getElementById('draft-status').textContent = writable
@@ -875,6 +1090,8 @@
         (i) => Number(i.value),
       );
       w.reviewed = false;
+      if (active.week === 1 && !done(1))
+        document.getElementById('project-feedback').replaceChildren();
       save();
       refreshChecklist();
     }
@@ -923,6 +1140,10 @@
             localStorage.setItem(storageKey, code[week].slice(0, 20000));
           else localStorage.removeItem(storageKey);
         }
+        window.guidedPracticeDraft.restore(
+          lessons[0].walkthrough.code,
+          imported.guidedPython,
+        );
         progress = clean;
         save();
         render();
@@ -1007,6 +1228,9 @@
             progress,
             practice,
             legacyPractice,
+            guidedPython: window.guidedPracticeDraft.read(
+              lessons[0].walkthrough.code,
+            ),
           },
           null,
           2,
@@ -1019,12 +1243,7 @@
         'fieldwork-portfolio.md',
         [
           '# Fieldwork Academy portfolio',
-          ...lessons
-            .filter((l) => done(l.week))
-            .map(
-              (l) =>
-                `## Week ${l.week} · ${workFor(l.week).carried && workFor(l.week).draft === workFor(l.week).legacy?.draft ? 'Earlier edition project' : l.title}\n\n${workFor(l.week).draft || ''}`,
-            ),
+          ...lessons.filter((l) => done(l.week)).map(portfolioEntry),
         ].join('\n\n'),
         'text/markdown',
       );
