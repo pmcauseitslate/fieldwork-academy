@@ -1,1481 +1,2573 @@
-// Each workshop opens a week of study and project work on the Fieldwork AI course.
-(() => {
-  'use strict';
-
-  function option(text, feedback) {
-    return { text, feedback };
-  }
-
-  function check(prompt, correct, options) {
-    return { prompt, correct, options };
-  }
-
-  function lesson({
-    week,
-    id,
-    title,
-    summary,
-    teaching,
-    example,
-    project,
-    questions,
-  }) {
-    return {
-      week,
-      id,
-      title,
-      summary,
-      minutes: 15,
-      teaching,
-      questions,
-      example: { title: example[0], text: example[1] },
-      project: {
-        prompt: project[0],
-        placeholder: project[1],
-        deliverable: project[2],
+// Original teaching material and fictional project demonstrations for Fieldwork Academy.
+window.COURSE_LEVELS = [
+  {
+    "id": "foundations",
+    "title": "Programming foundations",
+    "summary": "Build, test and hand off a Python support-operations toolkit.",
+    "badge": "Python Builder",
+    "lessons": [
+      {
+        "week": 1,
+        "id": "estimate-a-support-workload",
+        "title": "Estimate a support workload",
+        "summary": "Translate a team’s planning question into a small Python function with measurable inputs and outputs.",
+        "minutes": 15,
+        "teaching": [
+          "A support ticket is a record of a customer question or issue. A startup support lead is estimating the time needed to clear a queue of these records. Break the question into inputs, a rule and an output. A variable gives a value a useful name. Multiplying ticket count by average minutes produces minutes of work. Dividing by 60 converts the result to hours. The estimate assumes the average holds across the queue.",
+          "A function packages that calculation. In Python, def introduces the function, parentheses enclose its inputs, and indentation groups the lines that belong to it. return sends a value back to the caller. print displays a value on screen. Keeping the calculation separate from the display makes it possible to test and reuse it.",
+          "Start in the browser’s Python editor under Skill lab. To use a local computer, install Python 3 from the library and open a terminal in a practice folder. On macOS or Linux, pwd displays the current folder and ls lists files. On Windows PowerShell, Get-Location and Get-ChildItem do the same. Save a file named workload.py, then run python3 workload.py on macOS/Linux or py workload.py on Windows. A traceback reports the file, line and type of an error."
+        ],
+        "example": {
+          "title": "Convert a queue into hours",
+          "text": "A queue of 36 tickets at five minutes each takes 180 minutes, or three staff-hours. Doubling the tickets doubles the hours if the average handling time stays constant. That estimate describes labor effort. Elapsed clock time also depends on staffing and when the work arrives."
+        },
+        "project": {
+          "prompt": "Create workload_hours(tickets, minutes_each) using the optional starter. Run the function on two made-up queues and an empty queue. Record the expected and observed hours. Add one sentence about when the estimate would break down. The same method can estimate onboarding reviews or another startup workflow.",
+          "deliverable": "A runnable function, three input/output pairs with units, and one limitation.",
+          "placeholder": "Function or file … Normal case … Empty queue … Changed input … Assumption …",
+          "reference": {
+            "title": "Forecasting document review time",
+            "steps": [
+              "Name the two inputs and the unit of the output before writing the function.",
+              "Multiply documents by minutes per review, then convert minutes to hours.",
+              "Run both assertions. Change the review time from eight minutes to four and predict the new result."
+            ],
+            "artifact": "def review_hours(documents, minutes_each):\n    return documents * minutes_each / 60\n\nassert review_hours(15, 8) == 2\nassert review_hours(0, 8) == 0\nprint(review_hours(15, 4))  # 1.0",
+            "check": "Fifteen eight-minute reviews take 120 minutes. Halving the review time halves the two-hour estimate."
+          }
+        },
+        "questions": [
+          {
+            "prompt": "A team receives 45 requests averaging eight minutes each. How much handling time should the plan show?",
+            "correct": 1,
+            "options": [
+              {
+                "text": "5.625 hours",
+                "feedback": "Dividing count by minutes per request does not produce hours."
+              },
+              {
+                "text": "6 hours",
+                "feedback": "45 × 8 gives 360 minutes. Divide by 60 to convert to hours."
+              },
+              {
+                "text": "360 hours",
+                "feedback": "360 is the intermediate result measured in minutes."
+              }
+            ]
+          },
+          {
+            "prompt": "A second team wants the same calculator for different queues. Which design supports reuse?",
+            "correct": 2,
+            "options": [
+              {
+                "text": "Hard-code both inputs into a printed sentence.",
+                "feedback": "The next caller would have to edit the function for every queue."
+              },
+              {
+                "text": "Ask for keyboard input inside the formula and print the answer.",
+                "feedback": "Interactive input works for a demo, but another program cannot pass its own values or consume the printed result directly."
+              },
+              {
+                "text": "Pass the count and average time into a function that returns hours.",
+                "feedback": "Explicit inputs let a caller change either value and test the numeric result."
+              }
+            ]
+          },
+          {
+            "prompt": "The terminal reports that it cannot find workload.py. What is the quickest informative check?",
+            "correct": 0,
+            "options": [
+              {
+                "text": "List the current folder and look for the exact filename.",
+                "feedback": "A relative filename is resolved from the current working folder."
+              },
+              {
+                "text": "Install a new package that handles hourly estimates.",
+                "feedback": "The error occurs while locating the file, before any imports or calculations run."
+              },
+              {
+                "text": "Check the units on the function’s return value.",
+                "feedback": "The program has yet to run. Its return value cannot explain a file lookup error."
+              }
+            ]
+          },
+          {
+            "prompt": "A function prints 3.0. A caller tries to multiply its result and receives a None-related error. What change fixes the interface?",
+            "correct": 1,
+            "options": [
+              {
+                "text": "Cast the current return value to float in the caller.",
+                "feedback": "None cannot be converted into the previously printed number. The function needs to return that number."
+              },
+              {
+                "text": "Return the numeric value and let the caller print it.",
+                "feedback": "A function without an explicit return produces None."
+              },
+              {
+                "text": "Assign the result of print(...) to a numeric variable.",
+                "feedback": "print returns None even when it displays a number."
+              }
+            ]
+          }
+        ]
       },
-    };
+      {
+        "week": 2,
+        "id": "track-product-usage-against-a-budget",
+        "title": "Track product usage against a budget",
+        "summary": "Use loops, conditions and boundary tests to explain an operating limit.",
+        "minutes": 15,
+        "teaching": [
+          "A product team often needs to know whether pilot usage fits a cap. A list holds several observations. A loop reads each observation in turn. Initialize a running total before the loop so each observation contributes exactly once. Use matching units throughout, such as integer cents for money.",
+          "Turn the decision rule into a comparison. If a pilot allows usage up to and including 100 credits, the over-limit condition is total > 100. Equality is a useful boundary test. An empty usage list should total zero. When credits or refunds are represented as negative amounts, document whether the rule counts them.",
+          "A budget label should be reproducible. Publish the numerator, units, cap and period alongside the conclusion. Recalculate after changing one input so a reviewer can distinguish a working rule from a memorized example."
+        ],
+        "example": {
+          "title": "Trace the accumulator",
+          "text": "Daily counts of 20, 30 and 10 requests produce running totals of 20, 50 and 60. A cap of 60 allows that usage. A fourth day with a single request changes the status to over budget."
+        },
+        "project": {
+          "prompt": "Build a usage checker for a fictional pilot. Loop over at least three observations, return their total and classify it against a cap. Reuse a function from Week 1 or keep the total in a second reusable function. Include one under-cap, one exact-cap and one over-cap test.",
+          "deliverable": "A usage report with units and period, three boundary tests, and an explanation of the equality rule.",
+          "placeholder": "Unit and period … Totals … Boundary cases … Decision rule …",
+          "reference": {
+            "title": "Compare daily storage credits with a cap",
+            "steps": [
+              "Choose a single unit. The example measures integer storage credits per day.",
+              "Accumulate the observations, then apply the cap after the loop.",
+              "Keep the observations fixed and vary the cap to test all three boundaries."
+            ],
+            "artifact": "def storage_status(credits, cap):\n    total = 0\n    for daily in credits:\n        total += daily\n    return total, \"over\" if total > cap else \"within\"\n\nassert storage_status([3, 5, 4], 13) == (12, \"within\")\nassert storage_status([3, 5, 4], 12) == (12, \"within\")\nassert storage_status([3, 5, 4], 11) == (12, \"over\")",
+            "check": "The observations always total 12. Only the 11-credit cap should produce an overage."
+          }
+        },
+        "questions": [
+          {
+            "prompt": "A pilot permits exactly 500 requests. Which condition flags an overage?",
+            "correct": 2,
+            "options": [
+              {
+                "text": "total >= 500",
+                "feedback": "This flags the permitted boundary."
+              },
+              {
+                "text": "total < 500",
+                "feedback": "This flags unused capacity."
+              },
+              {
+                "text": "total > 500",
+                "feedback": "The first disallowed count is 501."
+              }
+            ]
+          },
+          {
+            "prompt": "A loop over 11, 7 and 9 returns 9. Which defect fits the evidence?",
+            "correct": 0,
+            "options": [
+              {
+                "text": "The total is reset during each iteration.",
+                "feedback": "Only the final observation survives a repeated reset."
+              },
+              {
+                "text": "The program prints after the loop.",
+                "feedback": "Printing afterward is appropriate for a final total."
+              },
+              {
+                "text": "The running total starts at zero before the loop.",
+                "feedback": "Zero is the correct starting value for addition."
+              }
+            ]
+          },
+          {
+            "prompt": "A report compares 14,000 token observations with a $20 cap. What is missing?",
+            "correct": 1,
+            "options": [
+              {
+                "text": "A conversion of the monthly budget into a daily dollar allowance only.",
+                "feedback": "Both sides still use different units unless token use is also priced or the budget is converted into an appropriate token allowance."
+              },
+              {
+                "text": "A conversion from token usage to cost using the applicable rates.",
+                "feedback": "The comparison needs the same units on both sides."
+              },
+              {
+                "text": "A total of input and output tokens without their prices.",
+                "feedback": "A combined token count does not tell how much two differently priced categories cost."
+              }
+            ]
+          },
+          {
+            "prompt": "Which test specifically catches treating an exact cap as an overage?",
+            "correct": 2,
+            "options": [
+              {
+                "text": "A list totaling 79 against a cap of 80.",
+                "feedback": "Both operators agree that 79 is below the cap."
+              },
+              {
+                "text": "A list totaling 81 against a cap of 80.",
+                "feedback": "Both operators flag this overage."
+              },
+              {
+                "text": "A list totaling 80 against a cap of 80.",
+                "feedback": "This is the one boundary where > and >= give different answers."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "week": 3,
+        "id": "validate-incoming-support-records",
+        "title": "Validate incoming support records",
+        "summary": "Convert untrusted form input into predictable values and give precise correction messages.",
+        "minutes": 15,
+        "teaching": [
+          "A form or CSV row arrives as text. Start by defining the input contract. For example, a ticket needs a nonblank summary, a queue selected from an allowed set and a nonnegative whole-number count. Decide which variations to normalize, such as surrounding spaces and case in a queue name.",
+          "Separate type conversion from business rules. int(\"9\") converts successfully. int(\"nine\") raises ValueError. int(\"-3\") also converts successfully, so a separate range check must reject negative counts. Validate before saving anything and return a field-specific explanation so an operator can correct the record.",
+          "Test a valid record, the exact minimum, a missing value and an invalid type. An unexpected error deserves investigation. A broad exception handler that silently saves a default can turn a malformed input into a believable but wrong metric."
+        ],
+        "example": {
+          "title": "Trace two failure paths",
+          "text": "The strings \" 4 \" and \"-4\" both convert to integers after trimming. Only the first satisfies a nonnegative count. The string \"four\" fails conversion. The two failures should produce different, actionable feedback."
+        },
+        "project": {
+          "prompt": "Write a ticket intake validator with at least three field rules. Normalize harmless formatting, reject missing or invalid values, and feed valid counts into the usage checker. Record one accepted row, two rejected rows and the feedback for each rejection.",
+          "deliverable": "A validation function, a table of test inputs and outcomes, and clear field-level error messages.",
+          "placeholder": "Required fields … Normalized example … Rejected rows … Recovery …",
+          "reference": {
+            "title": "Validate a pilot seat request",
+            "steps": [
+              "Define the pilot’s allowed seat count as a whole number from one to ten.",
+              "Convert once, then check the range. A blank field and a value outside the range have different causes.",
+              "Test both endpoints and a value just outside the allowed range."
+            ],
+            "artifact": "def seat_count(raw):\n    try:\n        seats = int(raw.strip())\n    except ValueError:\n        raise ValueError(\"Enter a whole number.\")\n    if not 1 <= seats <= 10:\n        raise ValueError(\"Choose 1 to 10 seats.\")\n    return seats\n\nassert seat_count(\" 1 \") == 1\nassert seat_count(\"10\") == 10\n# seat_count(\"11\") raises: Choose 1 to 10 seats.",
+            "check": "A blank string reaches the conversion message. Eleven reaches the range message. Both leave the saved record untouched."
+          }
+        },
+        "questions": [
+          {
+            "prompt": "A ticket field must contain a whole number at least zero. Which value passes conversion but fails the range rule?",
+            "correct": 0,
+            "options": [
+              {
+                "text": "\"-1\"",
+                "feedback": "The integer −1 is valid Python input but outside the field’s range."
+              },
+              {
+                "text": "\"three\"",
+                "feedback": "This fails conversion before the range check."
+              },
+              {
+                "text": "\" 0 \" ",
+                "feedback": "Zero is within the allowed range."
+              }
+            ]
+          },
+          {
+            "prompt": "The queue field allows billing and support. How should the app handle \" Billing \" under a case-insensitive contract?",
+            "correct": 1,
+            "options": [
+              {
+                "text": "Check the original value against the allowed set before trimming it.",
+                "feedback": "The allowed mixed-case, padded input would be rejected too early."
+              },
+              {
+                "text": "Trim and normalize case, then check the allowed set.",
+                "feedback": "The documented normalization turns this into a known queue."
+              },
+              {
+                "text": "Silently accept every queue string.",
+                "feedback": "Unknown queues could bypass routing expectations."
+              }
+            ]
+          },
+          {
+            "prompt": "A ticket fails validation on its final field. Which behavior preserves the contract?",
+            "correct": 2,
+            "options": [
+              {
+                "text": "Save the valid fields and mark the ticket ready.",
+                "feedback": "Consumers may act on a record that failed validation."
+              },
+              {
+                "text": "Replace all fields with defaults.",
+                "feedback": "Defaults hide the original input problem."
+              },
+              {
+                "text": "Report the specific field and leave the record unsaved.",
+                "feedback": "The operator can retry without partial or inconsistent data."
+              }
+            ]
+          },
+          {
+            "prompt": "A rule accepts counts from 1 through 5. Which set checks both boundaries and their neighbors?",
+            "correct": 0,
+            "options": [
+              {
+                "text": "0, 1, 5, 6",
+                "feedback": "These cover the accepted endpoints and immediately excluded values."
+              },
+              {
+                "text": "2, 3, 4",
+                "feedback": "The interior cases do not exercise endpoint conditions."
+              },
+              {
+                "text": "1, 3, 5",
+                "feedback": "The outside neighbors are missing."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "week": 4,
+        "id": "import-csv-files-with-repeatable-tests",
+        "title": "Import CSV files with repeatable tests",
+        "summary": "Read a header-based data file, handle bad rows and verify the report against a small fixture.",
+        "minutes": 15,
+        "teaching": [
+          "A CSV is a table encoded as text. A quoted field may contain a comma, so splitting every line on commas can shift columns. Python’s csv.DictReader uses the header names and CSV quoting rules. Open text files with newline=\"\" and an explicit encoding such as UTF-8.",
+          "Separate parsing from analysis. The importer reads headers, converts types, records row-level failures and passes valid records to the reporting function. Treat a missing required header as a file-level error. A single malformed value in an otherwise well-formed row can be reported and quarantined.",
+          "A fixture is a small, known input kept with the tests. State the expected report before running the code. If a change breaks a previously working behavior, a regression test preserves the failing example and checks the repair."
+        ],
+        "example": {
+          "title": "Check a tiny import manually",
+          "text": "A fixture contains two valid wait times of 3 and 7 minutes and one malformed value. A report showing 10 total minutes, two accepted records and one rejection reconciles all three input rows. A zero-minute substitution would incorrectly make the malformed row look valid."
+        },
+        "project": {
+          "prompt": "Import a fictional support CSV by header name. Count accepted and rejected records, report at least one useful total, and retain row numbers or identifiers for corrections. Write tests for a clean file, a malformed row, and a valid quoted field containing a comma.",
+          "deliverable": "A reproducible import, a rejected-row report and three passing tests with hand-checked expectations.",
+          "placeholder": "Required headers … Fixture … Expected totals … Failure observed and fixed …",
+          "reference": {
+            "title": "Check a two-column call log",
+            "steps": [
+              "Read a miniature file from memory so the test can run without external setup.",
+              "Preserve the quoted customer label containing a comma. Count a nonnumeric duration as a rejection.",
+              "Prove that the label and total both survived parsing."
+            ],
+            "artifact": "import csv\nfrom io import StringIO\n\nsample = 'account,minutes\\n\"North, Inc.\",5\\nLake,7\\nPine,missing\\n'\nrows = list(csv.DictReader(StringIO(sample)))\nvalid = [r for r in rows if r[\"minutes\"].isdigit()]\nassert rows[0][\"account\"] == \"North, Inc.\"\nassert sum(int(r[\"minutes\"]) for r in valid) == 12\nassert len(rows) - len(valid) == 1",
+            "check": "The toy duration contract allows digits only. A decimal or a signed duration requires a different documented contract."
+          }
+        },
+        "questions": [
+          {
+            "prompt": "A valid account label contains a comma inside quotes. Which parser preserves the column boundary?",
+            "correct": 1,
+            "options": [
+              {
+                "text": "Strip quotation marks before splitting the line on commas.",
+                "feedback": "Removing the quotes destroys the information that distinguishes a literal comma from a separator."
+              },
+              {
+                "text": "A CSV parser that follows quoting rules.",
+                "feedback": "Quoted separators are data inside a field."
+              },
+              {
+                "text": "A plain split on every comma.",
+                "feedback": "This incorrectly divides the account label."
+              }
+            ]
+          },
+          {
+            "prompt": "A 20-row import reports 17 accepted and 2 rejected rows with no other category. What should be investigated?",
+            "correct": 2,
+            "options": [
+              {
+                "text": "The two rejected rows explain the full three-row gap.",
+                "feedback": "Only two of the three unaccepted rows have been accounted for."
+              },
+              {
+                "text": "The report is complete because accepted plus rejected is below the input total.",
+                "feedback": "A count below the total shows unresolved coverage."
+              },
+              {
+                "text": "One input row has no recorded outcome.",
+                "feedback": "17 plus 2 accounts for only 19 rows."
+              }
+            ]
+          },
+          {
+            "prompt": "A CSV lacks a required ticket_id header. What is the most useful response?",
+            "correct": 0,
+            "options": [
+              {
+                "text": "Stop the import and name the missing header.",
+                "feedback": "The importer cannot identify records under its required schema."
+              },
+              {
+                "text": "Invent sequential ticket IDs and proceed silently.",
+                "feedback": "Generated IDs could corrupt identity and future joins."
+              },
+              {
+                "text": "Skip the first data row and retry.",
+                "feedback": "Dropping data will not repair a missing header."
+              }
+            ]
+          },
+          {
+            "prompt": "A reported bug appears only when a queue label contains a comma. Which test is most diagnostic?",
+            "correct": 1,
+            "options": [
+              {
+                "text": "A check that the file exists.",
+                "feedback": "File presence says nothing about parsed fields."
+              },
+              {
+                "text": "A fixture with that quoted label and an explicit expected parsed row.",
+                "feedback": "The test reproduces the exact input condition."
+              },
+              {
+                "text": "A larger file containing only simple labels.",
+                "feedback": "More rows do not exercise the reported case."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "week": 5,
+        "id": "organize-and-triage-support-tickets",
+        "title": "Organize and triage support tickets",
+        "summary": "Use stable identifiers, maps and a documented triage rule to turn a queue into an actionable list.",
+        "minutes": 15,
+        "teaching": [
+          "Use a list when order matters and a dictionary when records must be found by key. A ticket ID should identify the same record after its summary changes. Two customers can submit identical summaries, so a summary is a poor primary key.",
+          "Write a short routing rule with a tie-breaker. A confirmed service outage might precede a routine question, with equally urgent tickets ordered by arrival time. Keep customer impact, observed behavior and suspected cause in distinct fields. A well-written escalation gives engineering enough detail to reproduce an issue.",
+          "Choose a policy for duplicate identifiers before loading records. A dictionary assignment silently replaces the old value. That is appropriate only for a verified update. For an initial import, flag conflicting duplicates for review and preserve the evidence."
+        ],
+        "example": {
+          "title": "Separate symptom from hypothesis",
+          "text": "Two accounts report the same message, “export stalled.” Their ticket IDs differ. Keep both records, link them to one incident if evidence supports it, and document the times, affected export format and a minimal reproduction. The messages alone do not establish the cause."
+        },
+        "project": {
+          "prompt": "Index valid tickets by ID and prepare a triage view. Handle an intentional duplicate and write an escalation with expected behavior, observed behavior, reproduction steps and customer impact. Use fictional accounts.",
+          "deliverable": "A searchable register, a duplicate policy, and an escalation another teammate could act on.",
+          "placeholder": "Identifier … Queue rule … Duplicate outcome … Expected/observed … Reproduction … Impact …",
+          "reference": {
+            "title": "Triage a broken trial invitation",
+            "steps": [
+              "Keep the report ID stable even if its title changes.",
+              "Reproduce the issue with a fresh fictional invitation and record the observed result.",
+              "Separate the evidence from the next diagnostic question, then assign an owner."
+            ],
+            "artifact": "INC-24 | Trial invitation email opens an expired link\nExpected: A new invitation opens the activation form.\nObserved: A link generated at 10:02 UTC says “expired” at 10:03.\nReproduce: Create trial → request invitation → open it once.\nImpact: 2 of 3 test accounts blocked. Existing accounts still sign in.\nNext check: Compare issued and expiration timestamps.\nOwner: Support engineering. Attach a redacted request ID.",
+            "check": "Another person should be able to repeat the steps without customer credentials. The report makes no claim about the cause until the timestamps are checked."
+          }
+        },
+        "questions": [
+          {
+            "prompt": "Two customers submit the same summary. Which field is safest for indexing the reports?",
+            "correct": 2,
+            "options": [
+              {
+                "text": "The summary text.",
+                "feedback": "An identical summary produces a collision."
+              },
+              {
+                "text": "The current queue name.",
+                "feedback": "Many tickets share a queue and routing can change."
+              },
+              {
+                "text": "A stable, unique ticket ID.",
+                "feedback": "Separate reports retain independent identity and history."
+              }
+            ]
+          },
+          {
+            "prompt": "An incoming row reuses an ID with a different account during an initial import. Which action best preserves evidence?",
+            "correct": 0,
+            "options": [
+              {
+                "text": "Quarantine the conflict and retain both source rows for review.",
+                "feedback": "An unverified conflict may indicate corruption or a mapping mistake."
+              },
+              {
+                "text": "Silently overwrite the old account.",
+                "feedback": "That loses the earlier evidence."
+              },
+              {
+                "text": "Merge every account with the same summary.",
+                "feedback": "A shared symptom does not establish identity."
+              }
+            ]
+          },
+          {
+            "prompt": "Which statement belongs in the observed behavior section of an escalation?",
+            "correct": 1,
+            "options": [
+              {
+                "text": "Improve the login experience.",
+                "feedback": "This describes a desired outcome, not the observed behavior."
+              },
+              {
+                "text": "The fresh link returned HTTP 410 at 09:03 UTC.",
+                "feedback": "This is a specific observation another person can investigate."
+              },
+              {
+                "text": "The cache must be broken.",
+                "feedback": "This is a hypothesis until tested."
+              }
+            ]
+          },
+          {
+            "prompt": "Two incidents meet the same priority rule. A team wants reproducible ordering. What should it document?",
+            "correct": 2,
+            "options": [
+              {
+                "text": "The operator’s preferred sort each morning.",
+                "feedback": "Personal preferences make the ordering hard to reproduce."
+              },
+              {
+                "text": "Use the order returned by storage without specifying a sort.",
+                "feedback": "Storage does not promise a stable order without an explicit ordering rule."
+              },
+              {
+                "text": "A tie-breaker such as earliest received timestamp followed by ticket ID.",
+                "feedback": "A secondary ordering rule removes ambiguity when priorities match."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "week": 6,
+        "id": "ship-a-tested-python-toolkit",
+        "title": "Ship a tested Python toolkit",
+        "summary": "Combine earlier modules into a reproducible command-line tool with version history and a handoff.",
+        "minutes": 15,
+        "teaching": [
+          "Give one entry point a narrow job. A reviewer should be able to run a named command with a fixture and see the report. Keep parsing, validation and summarizing in separate functions so a failure can be located and tested.",
+          "Git records snapshots. In a local practice folder, git init creates a repository. git status shows changed files, git diff shows unstaged edits, git add stages a selected file, and git commit records the staged snapshot with an explanatory message. Inspect files before staging to keep customer data and credentials out of the repository.",
+          "Use a small failing test to reproduce a bug. Change the smallest relevant piece, rerun the failing case and the existing suite, and record what changed. A README should state the supported Python version, one setup command, one run command, an expected result and known limitations."
+        ],
+        "example": {
+          "title": "A change another person can reproduce",
+          "text": "A toolkit counts a repeated ticket twice. A two-row fixture with the same ID reproduces the issue. After enforcing the duplicate rule, the fixture produces one accepted record and one conflict. A fresh checkout should produce the same report with the documented command."
+        },
+        "project": {
+          "prompt": "Ship a toolkit that imports a 50-row fictional ticket file, applies validation, totals workload and produces a triage report. Include at least three tests, a bug fix captured in Git, a sample input/output pair and concise run instructions. Explain one change independently and hand the project to a reviewer or test from a fresh folder.",
+          "deliverable": "A runnable repository or local Git history, a verified sample report, tests and a handoff README.",
+          "placeholder": "Run command … Expected output … Bug and fix … Commit … Fresh-folder check …",
+          "reference": {
+            "title": "A handoff for an onboarding-events tool",
+            "steps": [
+              "Choose a fixture small enough for a reviewer to count manually.",
+              "Document the command and its expected output alongside the test command.",
+              "Record which behavior changed and what evidence demonstrates the repair."
+            ],
+            "artifact": "# Onboarding events summary\nRequires Python 3.11 or later; uses the standard library.\nRun: python3 summarize.py fixtures/signup.csv\nExpected: 3 rows, 2 distinct accounts, 1 duplicate.\nTest: python3 -m unittest discover -s tests\n\nFix: A retried signup was counted twice.\nEvidence: test_replayed_signup checks the repeated event ID.\nLimit: The fixture has one time zone and no deleted accounts.",
+            "check": "Follow these instructions from a clean folder containing only the repository. Any extra step belongs in the README."
+          }
+        },
+        "questions": [
+          {
+            "prompt": "A colleague needs to reproduce a duplicate-count bug. What should accompany the report?",
+            "correct": 0,
+            "options": [
+              {
+                "text": "The smallest fixture that fails and the expected count.",
+                "feedback": "A small reproducible failure isolates the defect."
+              },
+              {
+                "text": "A screenshot of the total with no input or reproduction steps.",
+                "feedback": "The symptom is visible, but a reviewer cannot recreate the failing case."
+              },
+              {
+                "text": "An example with one record per ID and only the expected total.",
+                "feedback": "That fixture cannot reproduce a duplicate-count bug."
+              }
+            ]
+          },
+          {
+            "prompt": "A file was edited but never staged. What will a normal git commit of staged changes include?",
+            "correct": 1,
+            "options": [
+              {
+                "text": "All changed tracked files, even when the new edits were never staged.",
+                "feedback": "A normal commit uses the index. Staging or an explicit alternate commit mode is needed for those edits."
+              },
+              {
+                "text": "Only the staged snapshot, excluding the unstaged edit.",
+                "feedback": "Git commits the index rather than every working-folder change."
+              },
+              {
+                "text": "The latest working-copy content of files staged earlier.",
+                "feedback": "If the file changed after staging, the index still contains the previously staged version."
+              }
+            ]
+          },
+          {
+            "prompt": "The toolkit works only on the author’s machine. Which check best tests the handoff?",
+            "correct": 2,
+            "options": [
+              {
+                "text": "Run it again in the author’s already-configured shell.",
+                "feedback": "That repeats the environment that hides the problem."
+              },
+              {
+                "text": "Verify that every file listed by the author exists on the author’s laptop.",
+                "feedback": "That does not show whether a reviewer receives all dependencies."
+              },
+              {
+                "text": "Run the documented commands in a clean checkout with the named dependencies.",
+                "feedback": "A clean environment exposes hidden local assumptions."
+              }
+            ]
+          },
+          {
+            "prompt": "A fix makes the reported fixture pass. Why also run the earlier tests?",
+            "correct": 0,
+            "options": [
+              {
+                "text": "The change may break previously supported behavior.",
+                "feedback": "Regression checks protect the existing contract."
+              },
+              {
+                "text": "The earlier tests provide an automatic runtime performance benchmark.",
+                "feedback": "Behavioral tests need explicit timing controls to serve as reliable performance benchmarks."
+              },
+              {
+                "text": "The previous suite replaces the need for a duplicate-specific regression case.",
+                "feedback": "Existing tests may never have covered that input. Both the new case and old behavior matter."
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "data",
+    "title": "Databases and APIs",
+    "summary": "Model account data, query a support queue and reconcile a repeatable integration.",
+    "badge": "Data Integrator",
+    "lessons": [
+      {
+        "week": 7,
+        "id": "answer-operational-questions-with-sql",
+        "title": "Answer operational questions with SQL",
+        "summary": "Write joins, filters and aggregates that can be checked against actual records.",
+        "minutes": 15,
+        "teaching": [
+          "A relational database stores rows in named tables. SQL describes a result. SELECT names the fields, FROM identifies the source, WHERE filters rows, and ORDER BY gives an explicit order. An open ticket count needs a precise status rule and an agreed reporting period.",
+          "A join matches a foreign key to a related table’s key, such as tickets.account_id = accounts.id. An inner join keeps matches. A left join retains unmatched rows on the left with NULL values on the right. Joining a ticket to multiple events can inflate counts: state the unit of each row before aggregating.",
+          "Use COUNT(*) for rows and COUNT(column) for non-NULL values in that column. GROUP BY forms one result per group. Verify one account by hand from the input before reporting across the entire dataset.",
+          "For the project, create a local database in DB Browser for SQLite. Import accounts.csv as accounts and tickets.csv as tickets using the first row as column names. Check that both account keys use compatible types and that minutes is numeric. The browser studio is a separate join exercise with a smaller schema. The downloadable project files include queue and minutes for the three portfolio queries."
+        ],
+        "example": {
+          "title": "Check the denominator",
+          "text": "An account owns three tickets, two open and one closed. Counting all joined tickets returns three. Filtering to status = 'open' before counting returns two. A duplicate account key would multiply matching tickets, so verify uniqueness on the account table."
+        },
+        "project": {
+          "prompt": "Import the supplied accounts.csv and tickets.csv into a local SQLite database or another free SQL workspace. Write queries for open tickets by account, total handling minutes by queue and one useful exception report. State each query’s row unit and hand-check one group. Record any rows excluded by the join. The browser SQL studio provides a separate join exercise using its own sample tables.",
+          "deliverable": "Three queries, a result table, and one checked example that explains the join and denominator.",
+          "placeholder": "Question … Row unit … Query … Expected result … Excluded data …",
+          "reference": {
+            "title": "Count unresolved trials by account",
+            "steps": [
+              "Start with one row per trial and a unique account.id.",
+              "Filter by trial state before grouping by account.",
+              "Trace two matching rows belonging to the same account to verify the count."
+            ],
+            "artifact": "-- accounts: (1, 'Mesa'), (2, 'Harbor')\n-- trials: (10, 1, 'open'), (11, 1, 'open'), (12, 2, 'closed')\nSELECT a.name, COUNT(*) AS open_trials\nFROM trials AS t JOIN accounts AS a ON t.account_id = a.id\nWHERE t.status = 'open'\nGROUP BY a.id, a.name\nORDER BY open_trials DESC, a.name;",
+            "check": "The result is Mesa, 2. To show accounts with zero open trials, start from accounts, left join trials with the status condition in ON, and count non-NULL trial IDs."
+          }
+        },
+        "questions": [
+          {
+            "prompt": "A ticket joins to three comment rows. Which metric still counts that ticket once?",
+            "correct": 1,
+            "options": [
+              {
+                "text": "COUNT(DISTINCT comment_id)",
+                "feedback": "That counts distinct comments. It will still count three for the one ticket in this example."
+              },
+              {
+                "text": "COUNT(DISTINCT ticket_id)",
+                "feedback": "The distinct ticket key preserves the ticket-level unit."
+              },
+              {
+                "text": "COUNT(*) across the joined rows",
+                "feedback": "This counts each matching comment row."
+              }
+            ]
+          },
+          {
+            "prompt": "A dashboard must show every account, including those without tickets. Which starting join fits?",
+            "correct": 2,
+            "options": [
+              {
+                "text": "Tickets inner joined to accounts.",
+                "feedback": "Accounts without tickets produce no matching ticket row."
+              },
+              {
+                "text": "Tickets cross joined to accounts.",
+                "feedback": "A cross join pairs every ticket with every account."
+              },
+              {
+                "text": "Accounts left joined to tickets.",
+                "feedback": "Each account remains even when its ticket fields are NULL."
+              }
+            ]
+          },
+          {
+            "prompt": "A product asks for the five longest open tickets. Which operation must happen before the limit?",
+            "correct": 0,
+            "options": [
+              {
+                "text": "Filter to open tickets and sort by duration descending.",
+                "feedback": "The top five should be selected from the intended population and order."
+              },
+              {
+                "text": "Take any five rows, then filter to open.",
+                "feedback": "An early arbitrary limit may discard the longest tickets."
+              },
+              {
+                "text": "Limit the full set by duration, then remove closed tickets.",
+                "feedback": "Closed tickets could occupy the limited positions and hide eligible open ones."
+              }
+            ]
+          },
+          {
+            "prompt": "An account has two tickets with recorded times and one NULL time. What does COUNT(minutes) return?",
+            "correct": 1,
+            "options": [
+              {
+                "text": "0",
+                "feedback": "Two non-NULL records contribute to the count."
+              },
+              {
+                "text": "2",
+                "feedback": "COUNT of a column excludes its NULL values."
+              },
+              {
+                "text": "3",
+                "feedback": "COUNT(*) would count all three ticket rows."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "week": 8,
+        "id": "design-connected-data-tables",
+        "title": "Design connected data tables",
+        "summary": "Choose keys, constraints and table boundaries that keep account and ticket data consistent.",
+        "minutes": 15,
+        "teaching": [
+          "Write the grain of each table in one sentence. One account row represents a customer account. One ticket row represents a support request. One ticket-event row represents a change to that request. Repeating the account name across every event makes renames difficult to apply consistently.",
+          "A primary key identifies one row. A foreign key ties a row to a real parent. Use NOT NULL for required values and UNIQUE where duplicates would violate identity. A child table lets one account have many tickets without adding ticket_1 and ticket_2 columns.",
+          "Use a transaction for an operation that must completely succeed or completely fail. Enable SQLite foreign-key enforcement on each database connection with PRAGMA foreign_keys = ON. Test constraints with a fictional orphan row and document how imports handle missing parents."
+        ],
+        "example": {
+          "title": "Model a status history",
+          "text": "A current ticket status answers what is open now. An events table with ticket_id, new_status and occurred_at can also answer when a ticket changed. One overwritable status column cannot recover the sequence of older changes."
+        },
+        "project": {
+          "prompt": "Design a small schema for accounts, tickets and ticket events. Add primary and foreign keys, at least one uniqueness rule and a supported-status constraint. Demonstrate a successful insert and a rejected orphan or duplicate. Include a small relationship diagram or plain-text map.",
+          "deliverable": "A schema, a relationship map, and an observed constraint failure with a repair.",
+          "placeholder": "Table grain … Keys … Insert that passes … Insert that fails … Repair …",
+          "reference": {
+            "title": "Model teams and trial workspaces",
+            "steps": [
+              "Store the team once, then let each workspace point to that team.",
+              "Add the foreign key before loading workspaces and enable enforcement.",
+              "Try a nonexistent team ID and record the expected database response."
+            ],
+            "artifact": "PRAGMA foreign_keys = ON;\nCREATE TABLE teams (id INTEGER PRIMARY KEY, name TEXT NOT NULL);\nCREATE TABLE workspaces (\n  id INTEGER PRIMARY KEY,\n  team_id INTEGER NOT NULL REFERENCES teams(id),\n  slug TEXT NOT NULL UNIQUE\n);\nINSERT INTO teams VALUES (7, 'Demo team');\nINSERT INTO workspaces VALUES (42, 7, 'demo-trial');\n-- A workspace pointing to team 999 must fail while enforcement is on.",
+            "check": "Two workspaces can share team 7. Reusing the same slug must fail even when the second workspace has a different ID."
+          }
+        },
+        "questions": [
+          {
+            "prompt": "An account can own many tickets. Where should account_id usually live?",
+            "correct": 2,
+            "options": [
+              {
+                "text": "In a comma-separated list on the account.",
+                "feedback": "This is difficult to join and constrain reliably."
+              },
+              {
+                "text": "In one ticket_id column on each account.",
+                "feedback": "A single child key on the parent can represent only one ticket without duplication."
+              },
+              {
+                "text": "In each ticket row as a foreign key.",
+                "feedback": "The child carries the reference to its one parent account."
+              }
+            ]
+          },
+          {
+            "prompt": "A team needs the full sequence of ticket status changes. Which model preserves it?",
+            "correct": 0,
+            "options": [
+              {
+                "text": "One event row per change with a ticket key and timestamp.",
+                "feedback": "Separate events preserve repeated transitions and their times."
+              },
+              {
+                "text": "Only the latest status and no history.",
+                "feedback": "Overwriting the status loses earlier values."
+              },
+              {
+                "text": "A total number of tickets per month.",
+                "feedback": "An aggregate cannot recover individual transitions."
+              }
+            ]
+          },
+          {
+            "prompt": "A transaction writes a ticket and an event that must both exist. The event insert fails. What should happen?",
+            "correct": 1,
+            "options": [
+              {
+                "text": "Retry the event and commit the ticket without marking the gap.",
+                "feedback": "If the retry still fails, the transaction has left one side of the required pair committed."
+              },
+              {
+                "text": "Roll back the ticket and event transaction.",
+                "feedback": "Atomicity keeps a half-completed logical operation out of the data."
+              },
+              {
+                "text": "Always commit the ticket and call the operation complete.",
+                "feedback": "That violates the stated requirement that both records exist."
+              }
+            ]
+          },
+          {
+            "prompt": "A source delivers the same external ticket ID twice. What constraint directly protects identity?",
+            "correct": 2,
+            "options": [
+              {
+                "text": "A UNIQUE constraint on the support summary.",
+                "feedback": "Different tickets can legitimately share a summary, and an edited summary would not preserve identity."
+              },
+              {
+                "text": "Sorting each import by date.",
+                "feedback": "Sorting changes order but cannot enforce uniqueness."
+              },
+              {
+                "text": "A UNIQUE constraint on the appropriate source and external ID combination.",
+                "feedback": "A key scoped to its source prevents accidental duplicate identities."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "week": 9,
+        "id": "read-an-api-contract",
+        "title": "Read an API contract",
+        "summary": "Trace a request, interpret its response and retrieve every page of a result.",
+        "minutes": 15,
+        "teaching": [
+          "An HTTP request has a method, a path, headers and sometimes a body. An API contract describes required inputs, returned fields, errors and pagination. GET usually reads a resource. A response includes a status code and a body. JSON is a text representation of objects, arrays and primitive values.",
+          "Start with the supplied API response fixture. Inspect the keys of the outer object, then inspect one item. A successful status alone does not prove that an expected field exists or has the right type. Run the same validation rules used for CSV inputs.",
+          "Read the response’s next cursor or link until the contract indicates the final page. Keep a set of seen cursors and stop with an error if one repeats. Distinguish a valid final empty page from a failed request. Any external API demonstration is optional."
+        ],
+        "example": {
+          "title": "Trace a two-page conversation",
+          "text": "A first response has two items and next = \"p2\". Looking up p2 returns one more item and next = null. The result contains three items. Reading the first page alone produces a plausible but incomplete report."
+        },
+        "project": {
+          "prompt": "Inspect the supplied API pages, write down the response schema and retrieve the complete dataset. Log page count, accepted records and one invalid or missing-field case. Compare a successful read with a failed request using a fictional example.",
+          "deliverable": "An annotated request/response, a pagination trace and an explicit failure case.",
+          "placeholder": "Method and path … Keys and types … Page trace … Last-page signal … Error …",
+          "reference": {
+            "title": "Read an onboarding directory",
+            "steps": [
+              "Start from the documented first cursor.",
+              "Accumulate items, then follow each next value until it is absent.",
+              "Compare the collected identifiers with the two sample pages."
+            ],
+            "artifact": "pages = {\"start\": {\"items\": [\"A\", \"B\"], \"next\": \"more\"},\n         \"more\": {\"items\": [\"C\"], \"next\": None}}\ncursor, seen, result = \"start\", set(), []\nwhile cursor is not None:\n    if cursor in seen:\n        raise ValueError(\"Repeated cursor\")\n    seen.add(cursor)\n    page = pages[cursor]\n    result.extend(page[\"items\"])\n    cursor = page[\"next\"]\nassert result == [\"A\", \"B\", \"C\"]",
+            "check": "Changing the second next value to \"start\" should trigger the repeated-cursor check."
+          }
+        },
+        "questions": [
+          {
+            "prompt": "A response contains data and a nonempty next cursor. What should an importer do?",
+            "correct": 0,
+            "options": [
+              {
+                "text": "Read the next page using the documented cursor.",
+                "feedback": "A nonempty cursor means more results may exist."
+              },
+              {
+                "text": "Stop because the first request succeeded.",
+                "feedback": "HTTP success applies to that page only."
+              },
+              {
+                "text": "Generate new cursors by adding one to the item IDs.",
+                "feedback": "A cursor can be opaque and unrelated to item numbering."
+              }
+            ]
+          },
+          {
+            "prompt": "An endpoint returns HTTP 200 but items is a string instead of an array. Which check catches this?",
+            "correct": 1,
+            "options": [
+              {
+                "text": "Confirm that the body can be parsed as JSON.",
+                "feedback": "A string is valid JSON. Parsing alone cannot verify the required array type."
+              },
+              {
+                "text": "Validate the response structure before processing items.",
+                "feedback": "A successful transport does not guarantee the expected application schema."
+              },
+              {
+                "text": "Verify the Content-Type is application/json.",
+                "feedback": "A media type says nothing about whether items has the contracted shape."
+              }
+            ]
+          },
+          {
+            "prompt": "The service returns HTTP 404 for a documented single-record lookup. What does that most directly indicate?",
+            "correct": 2,
+            "options": [
+              {
+                "text": "The entire provider is experiencing a network outage.",
+                "feedback": "A 404 is a response from a server, not evidence of a total outage."
+              },
+              {
+                "text": "The response contains an empty successful page.",
+                "feedback": "A failed lookup and a valid empty page have different meanings."
+              },
+              {
+                "text": "The addressed resource could not be found at that path.",
+                "feedback": "The status does not establish whether every other record exists."
+              }
+            ]
+          },
+          {
+            "prompt": "A page repeatedly returns its own next cursor. What control prevents an endless loop?",
+            "correct": 0,
+            "options": [
+              {
+                "text": "Track visited cursors and flag a repeat.",
+                "feedback": "A repeated pagination state cannot make forward progress."
+              },
+              {
+                "text": "Discard the cursor log on each iteration.",
+                "feedback": "Then a previous cursor cannot be recognized."
+              },
+              {
+                "text": "Keep following the same cursor without a limit.",
+                "feedback": "The importer would continue requesting the same page."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "week": 10,
+        "id": "build-a-repeatable-data-integration",
+        "title": "Build a repeatable data integration",
+        "summary": "Connect a source to storage while handling retries, rejected records and reporting gaps.",
+        "minutes": 15,
+        "teaching": [
+          "Define the contract between a source event and a stored row. A stable event ID lets the importer recognize a replay. Idempotency means running the operation twice with the same event produces the same final business effect. A timestamp alone is a weak identity because events can share one.",
+          "Validate each event, write the business change and record its processed ID together in one transaction. Advance a checkpoint only after its associated data is durable. A permanent validation error belongs in a rejection log with a repair path. Temporary failures may justify bounded retries with a delay.",
+          "Publish a reconciliation that counts source arrivals, successful writes, replayed IDs and quarantined rows. If an entire source page fails, mark the report incomplete. A missing page is different from a confirmed page with zero activity."
+        ],
+        "example": {
+          "title": "Reconcile a replay",
+          "text": "A feed returns event e1, a replay of e1, and e2 with an unknown account. The importer records one new event, one duplicate and one quarantined row. Reporting two new events would double-count the replay."
+        },
+        "project": {
+          "prompt": "Build a local import into SQLite from the sample events or an equivalent fixture. Simulate a duplicate, a malformed event and a failed page. Run the import twice. Produce a short incident handoff describing what happened, whether data was lost and how a teammate can recover.",
+          "deliverable": "A replay-safe importer, reconciled row counts, a repeat-run demonstration and a recovery note.",
+          "placeholder": "Event key … First and second run … Failure point … Missing coverage … Recovery command …",
+          "reference": {
+            "title": "Resume an activation feed",
+            "steps": [
+              "Use event_id as a unique key and store the activation and processed ID in the same transaction.",
+              "Simulate an interruption after the commit but before the next cursor is saved. Replay the previous page.",
+              "Compare the unique event count with the final business total."
+            ],
+            "artifact": "First read:  E7 = 2 seats; E8 = 3 seats\nCommit:      E7 and E8 stored; total = 5\nCrash:       cursor still points to first page\nReplay:      E7 and E8 already present; total stays 5\nNext page:   E9 = 1 seat; total = 6\nReport:      5 arrivals, 3 new IDs, 2 replays, 6 seats",
+            "check": "The duplicate-arrival count increases on replay. The seat total changes only for a newly accepted event."
+          }
+        },
+        "questions": [
+          {
+            "prompt": "An importer sees the same stable event twice after a timeout. What outcome shows idempotency?",
+            "correct": 1,
+            "options": [
+              {
+                "text": "A new randomly generated source ID each run.",
+                "feedback": "New IDs prevent reliable detection of replays."
+              },
+              {
+                "text": "One stored business effect for that event.",
+                "feedback": "A retry must leave the logical result unchanged."
+              },
+              {
+                "text": "Two charges and one log entry.",
+                "feedback": "The duplicate charge is a second business effect."
+              }
+            ]
+          },
+          {
+            "prompt": "A page write fails after its checkpoint was already advanced. What is the main risk?",
+            "correct": 2,
+            "options": [
+              {
+                "text": "Every remaining event will necessarily be processed twice.",
+                "feedback": "A premature checkpoint primarily risks omission."
+              },
+              {
+                "text": "The failed page becomes a valid zero-activity day.",
+                "feedback": "Failure provides no evidence of zero activity."
+              },
+              {
+                "text": "A restart can skip data that was never committed.",
+                "feedback": "Advancing the cursor signals that those records are durable."
+              }
+            ]
+          },
+          {
+            "prompt": "A valid account reference is absent from one source row because of a permanent input error. Which handling fits?",
+            "correct": 0,
+            "options": [
+              {
+                "text": "Quarantine the row with its source ID and an actionable reason.",
+                "feedback": "The row can be fixed and replayed without endless retries."
+              },
+              {
+                "text": "Retry the unchanged invalid row forever.",
+                "feedback": "An unchanged permanent validation error will recur."
+              },
+              {
+                "text": "Count the rejected row as successfully stored.",
+                "feedback": "That hides a reconciliation gap."
+              }
+            ]
+          },
+          {
+            "prompt": "A report shows zero events on a day when the source was unreachable. What should the report display?",
+            "correct": 1,
+            "options": [
+              {
+                "text": "The previous day’s count as the observed total.",
+                "feedback": "A substituted count does not measure that day."
+              },
+              {
+                "text": "Unknown or incomplete coverage for that day.",
+                "feedback": "A fetch failure cannot establish zero source activity."
+              },
+              {
+                "text": "A confirmed zero with no status note.",
+                "feedback": "This invents a value for unobserved data."
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "apps",
+    "title": "Application development",
+    "summary": "Build an accessible intake service, ship a decision-ready dashboard and support a pilot.",
+    "badge": "Application Builder",
+    "lessons": [
+      {
+        "week": 11,
+        "id": "design-an-accessible-intake-form",
+        "title": "Design an accessible intake form",
+        "summary": "Build a form that explains its inputs, preserves a failed submission and supports keyboard use.",
+        "minutes": 15,
+        "teaching": [
+          "An accessible form starts with a real label associated with each input. Placeholder text disappears while typing. Related fields and clear button names help a user understand what submitting will do. A keyboard user should be able to reach every control and see focus.",
+          "Validate on the client for fast local feedback and at the service boundary for authoritative checks. An error message should identify the field, explain the rule and preserve the previously entered values. An error summary or focus change helps a screen reader or keyboard user find the problem.",
+          "Handle repeated submissions deliberately. Mark a request as pending during submission, and use a stable submission ID when the service supports retry-safe writes. Show a clear success or failure state after the service replies."
+        ],
+        "example": {
+          "title": "Follow a failed submission",
+          "text": "A student submits a ticket without a subject. The form preserves the selected queue, moves focus to the subject error and explains the missing value. Correcting that one field should submit the original record once."
+        },
+        "project": {
+          "prompt": "Build a support intake form or a comparable onboarding form. Include visible labels, one useful validation message and clear submitting, success and error states. Walk through the form with a keyboard, then simulate a double click or retry. Capture the result.",
+          "deliverable": "A working form, keyboard walkthrough and before/after evidence of one usability correction.",
+          "placeholder": "User goal … Input rules … Keyboard path … Failed submission … Fix …",
+          "reference": {
+            "title": "Label a trial workspace request",
+            "steps": [
+              "Associate the visible label and input through matching for/id attributes.",
+              "Put the allowed naming rule next to the input using aria-describedby.",
+              "Try the form with only Tab, typing and Enter. Test an invalid value and correct it."
+            ],
+            "artifact": "<form>\n  <label for=\"slug\">Workspace name</label>\n  <p id=\"rule\">Use 3 to 12 lowercase letters.</p>\n  <input id=\"slug\" name=\"slug\" required pattern=\"[a-z]{3,12}\"\n         aria-describedby=\"rule\">\n  <button type=\"submit\">Request workspace</button>\n</form>",
+            "check": "The browser rejects AB and accepts maple. A production service must enforce the same name contract on receipt."
+          }
+        },
+        "questions": [
+          {
+            "prompt": "A form uses a placeholder as its only field name. What improvement best supports students using assistive technology?",
+            "correct": 2,
+            "options": [
+              {
+                "text": "Make the placeholder more descriptive and keep it as the only label.",
+                "feedback": "The visible name still disappears as soon as typing starts."
+              },
+              {
+                "text": "Use a longer tooltip as the only field description.",
+                "feedback": "A hover tooltip is a poor substitute for an associated persistent field name."
+              },
+              {
+                "text": "Add a persistent associated label.",
+                "feedback": "It remains available while typing and provides an accessible name."
+              }
+            ]
+          },
+          {
+            "prompt": "The email field is invalid after submission. Which response helps the user recover?",
+            "correct": 0,
+            "options": [
+              {
+                "text": "Preserve the form values and identify the email correction.",
+                "feedback": "The user can repair the affected field without repeating other work."
+              },
+              {
+                "text": "Clear every field without explanation.",
+                "feedback": "This obscures the cause and discards valid work."
+              },
+              {
+                "text": "Show only a generic “invalid form” notice above the page.",
+                "feedback": "A generic error does not identify the email field or what to fix."
+              }
+            ]
+          },
+          {
+            "prompt": "A direct client bypasses browser validation. Which component must still enforce the input rules?",
+            "correct": 1,
+            "options": [
+              {
+                "text": "The database column type alone for every rule.",
+                "feedback": "A text column can accept an empty summary or unauthorized queue unless application or database rules enforce the contract."
+              },
+              {
+                "text": "The receiving service.",
+                "feedback": "Clients can submit requests independent of the form."
+              },
+              {
+                "text": "The client-side submit handler, even for calls sent directly to the API.",
+                "feedback": "A direct request bypasses browser event handlers entirely."
+              }
+            ]
+          },
+          {
+            "prompt": "Two clicks cause two writes despite a visual loading indicator. What additional design protects the service?",
+            "correct": 2,
+            "options": [
+              {
+                "text": "Debounce the browser button and assume every client honors that delay.",
+                "feedback": "A retry from another client or a network replay still reaches the service."
+              },
+              {
+                "text": "Generate a new key on every retry.",
+                "feedback": "Different keys make one logical submission look like several."
+              },
+              {
+                "text": "Reuse a submission key and deduplicate the operation at the service.",
+                "feedback": "A stable key protects retries even when multiple requests arrive."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "week": 12,
+        "id": "build-a-ticket-api",
+        "title": "Build a ticket API",
+        "summary": "Expose a small service with explicit request shapes, response codes and testable behavior.",
+        "minutes": 15,
+        "teaching": [
+          "Define the API before implementing it. Specify how a caller creates a ticket, looks up one by ID, and requests a filtered list. Show one valid request body, its response shape and the meaning of each status code. Keep public responses limited to fields the caller is allowed to see.",
+          "In a local FastAPI project, define a Pydantic model for input and a separate response model. A POST route can create a resource and return 201. A missing lookup can return 404. Return a validation error with enough detail to fix the request. The same service rules apply to every client.",
+          "Test the contract by making requests through the API rather than calling only internal functions. Check status, body and stored effects. Use a fictional tenant ID and verify that a request scoped to one account cannot read another account’s ticket."
+        ],
+        "example": {
+          "title": "Test a create-and-read sequence",
+          "text": "A valid POST creates ticket 7 and returns its ID. GET with the same account and ID returns the submitted summary. A missing ID should produce a documented error. A request from a different account must receive an appropriate access-safe response."
+        },
+        "project": {
+          "prompt": "Implement create, read and list operations for a ticket service. Use the earlier validator, include one scope check with fictional tenants and document a failure response. Demonstrate a complete request in the project notebook. Any local test client is sufficient.",
+          "deliverable": "A request/response contract, a working service and tests for success, validation, missing data and tenant scope.",
+          "placeholder": "Endpoint … Body … Status and result … Scope … Error test …",
+          "reference": {
+            "title": "Document a workspace creation contract",
+            "steps": [
+              "Write the request with only the fields callers control.",
+              "Return an identifier and resource location on successful creation.",
+              "Check that invalid input cannot create a record and that another tenant cannot read the result."
+            ],
+            "artifact": "POST /workspaces\nBody: {\"slug\":\"maple\"}\n\n201 Created\nLocation: /workspaces/17\n{\"id\":17,\"slug\":\"maple\"}\n\nGET /workspaces/17  → 200 for the owning tenant\nPOST with slug \"\"   → 422, no record created\nGET as other tenant → 404 under this service’s policy",
+            "check": "The count of stored workspaces increases once for the valid request and stays unchanged after the invalid request."
+          }
+        },
+        "questions": [
+          {
+            "prompt": "A POST successfully creates a new ticket. Which response most clearly communicates creation?",
+            "correct": 0,
+            "options": [
+              {
+                "text": "201 with the new resource identifier.",
+                "feedback": "201 denotes creation and the identifier lets the caller retrieve it."
+              },
+              {
+                "text": "204 with no body or reference to the created ticket.",
+                "feedback": "The caller still needs a reliable identifier and explicit creation signal."
+              },
+              {
+                "text": "202 with only a pending job ID after the ticket is already created.",
+                "feedback": "202 communicates accepted asynchronous work. This scenario describes completed creation."
+              }
+            ]
+          },
+          {
+            "prompt": "A caller asks for an unknown ticket. Which API test checks the documented behavior?",
+            "correct": 1,
+            "options": [
+              {
+                "text": "Assert only that the response body parses as JSON.",
+                "feedback": "A JSON error and a JSON success can both parse. The status and safe message still need checks."
+              },
+              {
+                "text": "Assert the missing-resource status and a safe error body.",
+                "feedback": "Both status and message are part of the client contract."
+              },
+              {
+                "text": "Test only that an internal function was invoked.",
+                "feedback": "An internal call cannot prove the external response."
+              }
+            ]
+          },
+          {
+            "prompt": "A caller supplies a different account ID in a request. Where should an access decision get its trusted account scope?",
+            "correct": 2,
+            "options": [
+              {
+                "text": "From any account name written in the request body.",
+                "feedback": "The client could choose an unauthorized scope."
+              },
+              {
+                "text": "From the requested URL’s account parameter alone.",
+                "feedback": "A caller can edit a URL. The server must compare the requested scope with the authorized identity."
+              },
+              {
+                "text": "From the authenticated identity and server-side authorization.",
+                "feedback": "An untrusted client field cannot grant access to another tenant."
+              }
+            ]
+          },
+          {
+            "prompt": "A response model adds internal notes that contain private account details. Which design addresses the exposure?",
+            "correct": 0,
+            "options": [
+              {
+                "text": "Define an explicit public response schema with only allowed fields.",
+                "feedback": "A boundary-specific schema avoids returning arbitrary internal columns."
+              },
+              {
+                "text": "Send the notes and hide them with CSS.",
+                "feedback": "The data is already exposed to the client."
+              },
+              {
+                "text": "Rely on every consumer to delete notes after receipt.",
+                "feedback": "This still sends fields outside the intended boundary."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "week": 13,
+        "id": "build-a-decision-ready-dashboard",
+        "title": "Build a decision-ready dashboard",
+        "summary": "Define a metric precisely, make its filters visible and explain uncertainty in the underlying data.",
+        "minutes": 15,
+        "teaching": [
+          "Start with the decision. A support lead may need to assign staff to the queue with the largest open workload. Define the population, time window, row unit and units of measure. An average of queue averages can mislead when the queues have different sizes.",
+          "Build a narrow dashboard in Streamlit or another free local framework. Read the validated data, expose a queue filter and show both the metric and the number of contributing observations. Apply the same filters to the chart, its label and any downloadable detail.",
+          "Separate an empty but valid result from an unavailable source. Show the last successful refresh and a visible incomplete-data state when necessary. A small drill-down to underlying fictional rows helps a teammate check the conclusion."
+        ],
+        "example": {
+          "title": "Weight the groups correctly",
+          "text": "One queue has two waits averaging 15 minutes. Another has eight waits averaging five minutes. The combined mean is (2 × 15 + 8 × 5) ÷ 10 = 7 minutes. An unweighted mean of the two queue averages would report ten."
+        },
+        "project": {
+          "prompt": "Build a local dashboard for a support queue or another chosen workflow. Define two metrics, add a filter and include counts and data freshness. Present one decision supported by the display and one question it cannot answer. Test a filter that matches no rows.",
+          "deliverable": "A working dashboard with two metric definitions, one empty state and a verified result.",
+          "placeholder": "Decision … Metric and denominator … Filter … Hand check … Limitation …",
+          "reference": {
+            "title": "Display activation completion rates",
+            "steps": [
+              "Define the unit as one eligible workspace in a named cohort.",
+              "Compute a numerator and denominator with the same cohort filter.",
+              "Display the counts alongside the rate and choose a clear empty state."
+            ],
+            "artifact": "Cohort             Eligible  Activated  Rate\nJune self-serve           12          9   75%\nJune assisted              3          3  100%\nJune combined             15         12   80%\nJuly sample                0          0   No eligible data\n\nSource refreshed: July 1, 09:00 UTC (fictional snapshot)",
+            "check": "The combined result is 12/15. An unweighted average of 75% and 100% would incorrectly yield 87.5%."
+          }
+        },
+        "questions": [
+          {
+            "prompt": "Two queues have the same average wait but very different sample sizes. What should accompany each average?",
+            "correct": 1,
+            "options": [
+              {
+                "text": "The total number of users across all time.",
+                "feedback": "An unrelated denominator does not describe the period."
+              },
+              {
+                "text": "The contributing count and reporting window.",
+                "feedback": "These give context for the apparent equality."
+              },
+              {
+                "text": "The unweighted average of both queues, without their counts.",
+                "feedback": "A combined average does not tell how much evidence supports either queue."
+              }
+            ]
+          },
+          {
+            "prompt": "A filter has no eligible users. What should an activation-rate dashboard show?",
+            "correct": 2,
+            "options": [
+              {
+                "text": "A confirmed 0% success rate.",
+                "feedback": "That implies observed failures among eligible users."
+              },
+              {
+                "text": "A confirmed 100% success rate.",
+                "feedback": "No successful observations support that rate."
+              },
+              {
+                "text": "No eligible data for that filter.",
+                "feedback": "A denominator of zero makes the rate undefined."
+              }
+            ]
+          },
+          {
+            "prompt": "Filtering to one customer changes the chart but leaves its caption as “all customers.” What is the defect?",
+            "correct": 0,
+            "options": [
+              {
+                "text": "The label and metric describe different populations.",
+                "feedback": "A reader could make an incorrect cross-customer inference."
+              },
+              {
+                "text": "The dashboard should keep the mixed scopes and add decimal precision.",
+                "feedback": "Precision cannot repair a filter-to-caption mismatch."
+              },
+              {
+                "text": "Only the numerical aggregation can be wrong when filters change.",
+                "feedback": "The values can be correct while a misleading label gives the reader the wrong interpretation."
+              }
+            ]
+          },
+          {
+            "prompt": "A report has 10 successes among 20 users in cohort A and 2 among 2 in cohort B. What is the combined rate?",
+            "correct": 1,
+            "options": [
+              {
+                "text": "12/20, or 60%.",
+                "feedback": "The denominator must include both eligible users in cohort B."
+              },
+              {
+                "text": "12/22, approximately 55%.",
+                "feedback": "Combine the success counts and denominators before dividing."
+              },
+              {
+                "text": "75%.",
+                "feedback": "Averaging 50% and 100% incorrectly gives both cohorts equal weight."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "week": 14,
+        "id": "release-a-product-another-team-can-use",
+        "title": "Release a product another team can use",
+        "summary": "Pilot an application with a setup guide, acceptance tests, feedback and a rollback decision.",
+        "minutes": 15,
+        "teaching": [
+          "A release is an identifiable version another person can run. Pin dependencies, document setup, include a sample dataset and specify the intended operating environment. A change log should describe an observable change for the user.",
+          "An acceptance test starts from a user goal. For example, an operator filters to one account, opens a ticket and records an action. Define what counts as success, provide a clean fixture and observe a real or rehearsed run. Capture where the operator needed help.",
+          "Prepare a launch playbook with an owner, a date, a success check, expected failure modes and a rollback trigger. A reproduction report should record the version, actions, expected and observed results, impact and a proposed next check. Rehearsals can demonstrate the process and must be identified as rehearsals."
+        ],
+        "example": {
+          "title": "Convert feedback into a release check",
+          "text": "During a practice onboarding, an operator mistakes an empty filtered list for a successful import. Add an empty-state explanation and a test for that filter. Record the original difficulty and repeat the same task on the new version."
+        },
+        "project": {
+          "prompt": "Release the intake-and-dashboard application locally or on a free static host where suitable. Write a one-page onboarding runbook and observe one task walkthrough. Fix one issue, attach a clear escalation or bug report, and repeat the test. Use a rehearsal if a reviewer is unavailable.",
+          "deliverable": "A tagged or named release, onboarding runbook, test evidence and an issue report with a verified fix.",
+          "placeholder": "Version … Operator goal … Acceptance test … Issue … Fix … Rollback condition …",
+          "reference": {
+            "title": "Pilot a knowledge-base export",
+            "steps": [
+              "Give a teammate one task and a fictional account instead of a feature tour.",
+              "State the go/no-go check and a reversible fallback.",
+              "Repeat the same acceptance task after the fix and record measured time separately from the claim."
+            ],
+            "artifact": "Pilot v0.2 · Owner: onboarding lead\nGoal: export the trial account’s three published articles.\nAcceptance: CSV contains exactly 3 article IDs and no drafts.\nObserved: draft article 44 appeared; stop pilot and return to v0.1.\nRepair: restrict the export query to published records.\nRetest: 3 published IDs, 0 drafts. Follow-up: test an empty account.",
+            "check": "A teammate can identify the version, reproduce the issue, verify the expected output and locate the fallback."
+          }
+        },
+        "questions": [
+          {
+            "prompt": "A pilot tester says “the export is broken.” Which follow-up yields actionable evidence?",
+            "correct": 2,
+            "options": [
+              {
+                "text": "Collect only a star rating.",
+                "feedback": "A score does not explain what failed."
+              },
+              {
+                "text": "Estimate impact from the number of times the tester repeated the comment.",
+                "feedback": "Repetition does not establish which version, conditions or customers are affected."
+              },
+              {
+                "text": "Capture version, steps, expected versus observed output and impact.",
+                "feedback": "A concrete report can be independently reproduced and prioritized."
+              }
+            ]
+          },
+          {
+            "prompt": "A release works on a laptop but references a private file path. What handoff check catches it?",
+            "correct": 0,
+            "options": [
+              {
+                "text": "Run from a clean environment using the public sample and README.",
+                "feedback": "This exposes undocumented local dependencies."
+              },
+              {
+                "text": "Test only the original author’s open browser tab.",
+                "feedback": "That tab may already contain local state."
+              },
+              {
+                "text": "Rename the file on the author’s machine without updating instructions.",
+                "feedback": "The dependency would remain undocumented."
+              }
+            ]
+          },
+          {
+            "prompt": "A rollout exposes records to the wrong account. Which prewritten item is immediately relevant?",
+            "correct": 1,
+            "options": [
+              {
+                "text": "The next planned usability study.",
+                "feedback": "A future study cannot contain an immediate access-boundary failure."
+              },
+              {
+                "text": "The stop condition and rollback owner.",
+                "feedback": "A serious isolation failure calls for a clear stop-and-recover decision."
+              },
+              {
+                "text": "The post-release adoption goal.",
+                "feedback": "A growth target does not authorize continued exposure or assign recovery responsibility."
+              }
+            ]
+          },
+          {
+            "prompt": "A student rehearsed the pilot alone. How should the case study describe it?",
+            "correct": 2,
+            "options": [
+              {
+                "text": "Present it as an independent customer interview.",
+                "feedback": "That misrepresents the source of evidence."
+              },
+              {
+                "text": "Count the rehearsal as three external pilots.",
+                "feedback": "Repeating a scenario does not create independent participants."
+              },
+              {
+                "text": "Label it a rehearsal and state which user assumptions remain untested.",
+                "feedback": "This preserves the value of the exercise and the limits of its evidence."
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ai",
+    "title": "Applied AI and automation",
+    "summary": "Compare model outputs, retrieve evidence, supervise tools and evaluate release quality.",
+    "badge": "AI Evaluator",
+    "lessons": [
+      {
+        "week": 15,
+        "id": "compare-language-models-on-a-real-task",
+        "title": "Compare language models on a real task",
+        "summary": "Use a fixed evaluation set to compare quality, completion time and cost.",
+        "minutes": 15,
+        "teaching": [
+          "A language model predicts tokens conditioned on an input context. A token is a unit of text used by the model; an input token is processed from the prompt, while an output token is generated. The context window limits what fits into one request. A fluent answer can still conflict with the evidence.",
+          "Define success before comparing models. Choose representative inputs, expected behavior, a rubric and cases where the correct response is to ask for clarification or abstain. Hold the prompts, evidence and scoring rules constant while changing one variable. Reserve a separate set for the final check.",
+          "Track quality, latency and cost together. At fictional rates per thousand tokens, cost = input_tokens/1000 × input_rate + output_tokens/1000 × output_rate. Use the supplied response sets for free. Their outputs are simulated and cannot establish the performance of a named commercial model."
+        ],
+        "example": {
+          "title": "Choose a model under a constraint",
+          "text": "On ten fixed requests, configuration A meets the rubric nine times and B eight times. If one of A’s misses reveals private data, an overall score alone is insufficient. Record the failure category and the workflow’s explicit release threshold."
+        },
+        "project": {
+          "prompt": "Compare two model configurations or the two supplied fictional response sets on 20 support cases. Write the rubric before scoring. Report quality counts, one important failure slice and a cost calculation with labeled rates. State which cases need a human and what evidence would justify changing the choice.",
+          "deliverable": "A reproducible comparison, labeled fixture or model versions, a scored table and a reasoned recommendation.",
+          "placeholder": "Task … Cases … Scoring dimensions … Versions … Cost assumption … Decision …",
+          "reference": {
+            "title": "Compare article-tagging prompts",
+            "steps": [
+              "Hold three article descriptions and expected tags fixed.",
+              "Change only the prompt and score exact tag matches.",
+              "Use the small result to propose a larger test, including ambiguous articles."
+            ],
+            "artifact": "Expected tags: billing | setup | export\nPrompt A:      billing | setup | setup   → 2/3\nPrompt B:      billing | setup | export  → 3/3\nB usage: 1,000 input + 200 output tokens\nFictional rates per 1,000: $0.02 input, $0.08 output\nEstimated B cost: $0.02 + $0.016 = $0.036",
+            "check": "Prompt B wins on these three inputs. A credible recommendation calls for held-out articles and a review of costly errors before rollout."
+          }
+        },
+        "questions": [
+          {
+            "prompt": "Two prompts were scored on different customer requests. Which revision supports a fairer comparison?",
+            "correct": 0,
+            "options": [
+              {
+                "text": "Run both prompts on the same representative cases with one rubric.",
+                "feedback": "Holding the cases and scorer fixed reduces confounding."
+              },
+              {
+                "text": "Compare the percentages from each run without checking case mix.",
+                "feedback": "Differences in case difficulty could explain the scores."
+              },
+              {
+                "text": "Compare only the fastest response from each run.",
+                "feedback": "Best-case speed does not measure quality on comparable tasks."
+              }
+            ]
+          },
+          {
+            "prompt": "A model gives a polished answer with a quotation missing from the supplied policy. How should it score on grounding?",
+            "correct": 1,
+            "options": [
+              {
+                "text": "Pass if another model repeats the same quote.",
+                "feedback": "Agreement between models does not establish source support."
+              },
+              {
+                "text": "Fail the unsupported claim and record the missing evidence.",
+                "feedback": "A fluent style cannot substitute for support in the source."
+              },
+              {
+                "text": "Pass because the quotation looks plausible.",
+                "feedback": "Plausibility is not evidence."
+              }
+            ]
+          },
+          {
+            "prompt": "A run uses 2,000 input and 500 output tokens at invented prices of $0.01 and $0.04 per 1,000 respectively. What is the cost?",
+            "correct": 2,
+            "options": [
+              {
+                "text": "$0.10",
+                "feedback": "This applies the output rate to every token."
+              },
+              {
+                "text": "$0.025",
+                "feedback": "This applies only the cheaper input rate to every token."
+              },
+              {
+                "text": "$0.04",
+                "feedback": "The input costs $0.02 and the output costs $0.02."
+              }
+            ]
+          },
+          {
+            "prompt": "A team repeatedly tunes prompts against its final evaluation set. Why collect a fresh held-out set?",
+            "correct": 0,
+            "options": [
+              {
+                "text": "Repeated tuning can adapt to the known examples and inflate apparent performance.",
+                "feedback": "Fresh inputs better test transfer to unseen cases."
+              },
+              {
+                "text": "The tuned examples can be treated as independent because their labels stayed the same.",
+                "feedback": "Labels can stay fixed while the system has been optimized specifically for those examples."
+              },
+              {
+                "text": "Holding out data removes the need for a rubric.",
+                "feedback": "Unseen cases still need a consistent scoring rule."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "week": 16,
+        "id": "ground-an-assistant-in-source-documents",
+        "title": "Ground an assistant in source documents",
+        "summary": "Trace retrieval and answer generation separately, cite support and abstain when evidence is missing.",
+        "minutes": 15,
+        "teaching": [
+          "Retrieval-augmented generation looks up relevant passages and supplies them with the question. Break documents into passages that preserve headings, conditions and exceptions. Attach source identifiers, dates and section names. Index those passages. A small local keyword search is sufficient for the project; embeddings are numeric representations that can support similarity search.",
+          "Inspect the returned passages before judging the final answer. Top-k describes how many candidates are returned. Raising k can improve coverage but also add irrelevant text and consume context. When the correct policy is absent from the retrieved set, investigate the index, chunk boundaries and ranking. When it is present but ignored, investigate the answer stage.",
+          "Require an answer to cite the passage that actually supports its claim. Establish a policy for stale, conflicting or missing information. If available sources cannot resolve the question, the assistant should describe the missing fact or escalate it. Retrieval must respect the caller’s document permissions."
+        ],
+        "example": {
+          "title": "Diagnose the two stages",
+          "text": "A policy says downloads expire in seven days except for audit exports. A chunk ending before “except” is an incomplete evidence unit. If the full exception was retrieved but the answer says “always seven days,” the failure is in applying evidence during generation."
+        },
+        "project": {
+          "prompt": "Build a small retrieval notebook or local application over at least five fictional sources. Record a question, the returned passage IDs and the answer with citations. Include an answerable question, an unsupported request and a conflicting-policy case. Compare two chunk or retrieval choices and classify one failure.",
+          "deliverable": "A source index, three traced queries, cited outputs and a documented retrieval or generation repair.",
+          "placeholder": "Question … Expected passage … Retrieved IDs … Cited claim … Failure category … Change …",
+          "reference": {
+            "title": "Resolve an archive-retention question",
+            "steps": [
+              "Keep each exception with its policy heading and effective date.",
+              "Retrieve both relevant passages and distinguish active trial rules from paid-account rules.",
+              "Answer only within the retrieved scope, then test an unsupported account type."
+            ],
+            "artifact": "KB-A, Trial archive, effective June 1: Trial exports remain for 3 days.\nKB-B, Paid archive, effective June 1: Paid exports remain for 14 days.\nQuestion: How long can a paid account retrieve its export?\nRetrieved: KB-B, KB-A\nAnswer: A paid account can retrieve its export for 14 days [KB-B].\nFollow-up: What about suspended accounts?\nResponse: The retrieved policies do not specify suspended accounts.",
+            "check": "A citation to KB-A would fail the paid-account question. Confirm that the quoted duration and account type come from the same passage."
+          }
+        },
+        "questions": [
+          {
+            "prompt": "The correct passage never reaches the model’s context. Which stage should be investigated first?",
+            "correct": 1,
+            "options": [
+              {
+                "text": "The citation formatting step after generation.",
+                "feedback": "Reformatting citations does not add the missing source to the context."
+              },
+              {
+                "text": "Retrieval, including indexing and ranking.",
+                "feedback": "The model did not receive the evidence needed for a supported answer."
+              },
+              {
+                "text": "The answer-generation temperature, with the retrieved set unchanged.",
+                "feedback": "Sampling changes cannot recover evidence that retrieval never supplied."
+              }
+            ]
+          },
+          {
+            "prompt": "A policy exception appears in the paragraph after a rule. What chunking choice best preserves meaning?",
+            "correct": 2,
+            "options": [
+              {
+                "text": "Always separate each sentence regardless of meaning.",
+                "feedback": "Disconnected sentences can hide the exception’s scope."
+              },
+              {
+                "text": "Delete exceptions to reduce context length.",
+                "feedback": "This removes material needed for correct answers."
+              },
+              {
+                "text": "Keep the rule, its exception and identifying heading together when feasible.",
+                "feedback": "The exception changes when the rule applies."
+              }
+            ]
+          },
+          {
+            "prompt": "The right source is retrieved, but the answer cites a different policy with a conflicting duration. Which check failed?",
+            "correct": 0,
+            "options": [
+              {
+                "text": "Citation support and correct use of retrieved evidence.",
+                "feedback": "Retrieval succeeded in supplying the right passage, but the answer used it incorrectly."
+              },
+              {
+                "text": "Whether any document was indexed.",
+                "feedback": "The relevant source already appeared in the results."
+              },
+              {
+                "text": "The number of citations, regardless of which claims they support.",
+                "feedback": "A citation count cannot confirm that a specific policy backs the duration."
+              }
+            ]
+          },
+          {
+            "prompt": "A question concerns an enterprise exception missing from the allowed source set. Which response follows the contract?",
+            "correct": 1,
+            "options": [
+              {
+                "text": "Search another customer’s restricted documents.",
+                "feedback": "The caller’s access boundaries still apply during retrieval."
+              },
+              {
+                "text": "Identify the evidence gap and route for clarification.",
+                "feedback": "The assistant should avoid inventing an unsupported rule."
+              },
+              {
+                "text": "Guess the most favorable policy and cite a general source.",
+                "feedback": "A general policy cannot establish a missing exception."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "week": 17,
+        "id": "design-a-supervised-ai-workflow",
+        "title": "Design a supervised AI workflow",
+        "summary": "Give an assistant narrowly defined tools, validate its proposed actions and make prompts safe to retry.",
+        "minutes": 15,
+        "teaching": [
+          "Separate a model’s proposal from the application that carries it out. A tool description names an operation and the shape of its arguments. A typed action such as create_draft(ticket_id, reply_text) is easier to validate than arbitrary instructions. The application checks types, permissions and policy before acting.",
+          "Use explicit states such as received, validated, drafted, waiting_for_review and approved. Distinguish approval from execution, and keep an audit record of the source, proposed arguments and reviewer decision. When a message changes after approval, require review of the revised content.",
+          "Bound the workflow. Limit retries, record a stable operation ID and route failures to a person. Treat instructions found inside an incoming ticket or document as untrusted content. Run this exercise with local functions or a state table and simulated responses."
+        ],
+        "example": {
+          "title": "Trace an approval boundary",
+          "text": "A ticket asks for a billing change. The assistant may draft an explanation and cite the billing policy. An authorized reviewer must approve any action with account impact. A second delivery of the same ticket should refer to the existing draft instead of issuing another change."
+        },
+        "project": {
+          "prompt": "Build a workflow from incoming ticket to sourced draft, validation and human review. Define one allowed tool with a typed argument contract. Simulate a missing field, a duplicate delivery, a request outside policy and a reviewer rejection. Record the outcome of each path.",
+          "deliverable": "A workflow diagram or state table, a tool schema, and a trace demonstrating approval, rejection and replay behavior.",
+          "placeholder": "Input … Tool arguments … State transitions … Reviewer decision … Retry result …",
+          "reference": {
+            "title": "Review a new help-center article",
+            "steps": [
+              "Allow a model to propose a source-backed article draft. Restrict publication to a reviewer-approved revision.",
+              "Validate required fields and document access before creating the draft.",
+              "Use the same operation ID on retries; record the revision that was actually approved."
+            ],
+            "artifact": "Operation: article-12 | Revision: 2\nAllowed model tool: propose_draft(title, body, source_ids[])\nInput check: source_ids are present and readable.\nreceived → draft_ready → pending_review\nReviewer rejects revision 2: unsupported product limit.\nRevision 3 adds the verified source → pending_review → approved.\nPublish revision 3 once; a replay returns its existing publication ID.",
+            "check": "Attempting to publish revision 2, a revision edited after approval, or an unapproved replay should produce no external action."
+          }
+        },
+        "questions": [
+          {
+            "prompt": "A model proposes an account change with plausible arguments. Which component decides whether to execute it?",
+            "correct": 2,
+            "options": [
+              {
+                "text": "The model’s confidence sentence.",
+                "feedback": "Self-reported confidence does not establish permission."
+              },
+              {
+                "text": "A phrase in the customer’s ticket saying “approved.”",
+                "feedback": "Untrusted message text cannot grant application authority."
+              },
+              {
+                "text": "Application code that checks authorization, policy and required approval.",
+                "feedback": "A proposal alone is not authority to act."
+              }
+            ]
+          },
+          {
+            "prompt": "A draft is edited after the reviewer approves revision 3. What should happen before publication?",
+            "correct": 0,
+            "options": [
+              {
+                "text": "Require approval of the changed revision.",
+                "feedback": "The earlier approval applies to specific content."
+              },
+              {
+                "text": "Reuse the approval because the title stayed the same.",
+                "feedback": "Substantive content can change under an identical title."
+              },
+              {
+                "text": "Publish all revisions to preserve history.",
+                "feedback": "An audit history does not authorize previous drafts."
+              }
+            ]
+          },
+          {
+            "prompt": "A provider resends one incoming event. Which design avoids creating duplicate drafts?",
+            "correct": 1,
+            "options": [
+              {
+                "text": "Increase the maximum number of retries.",
+                "feedback": "More retries can increase duplicate writes without deduplication."
+              },
+              {
+                "text": "Associate a stable event ID with the existing draft.",
+                "feedback": "The operation can return the previous result for a replay."
+              },
+              {
+                "text": "Choose a different operation ID every time.",
+                "feedback": "The receiver cannot identify that these deliveries are the same event."
+              }
+            ]
+          },
+          {
+            "prompt": "An allowed drafting tool receives an unknown account ID. What should the validator do?",
+            "correct": 2,
+            "options": [
+              {
+                "text": "Create an account silently to make the request pass.",
+                "feedback": "This converts an invalid proposal into an unintended action."
+              },
+              {
+                "text": "Proceed because the account ID matches the schema’s string type.",
+                "feedback": "Type validity does not establish that the target exists or is authorized."
+              },
+              {
+                "text": "Reject or route the proposal for review without changing account state.",
+                "feedback": "A well-formed ID still needs a valid authorized target."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "week": 18,
+        "id": "evaluate-reliability-before-release",
+        "title": "Evaluate reliability before release",
+        "summary": "Calibrate a rubric, measure failure slices and set an evidence-based release gate.",
+        "minutes": 15,
+        "teaching": [
+          "Build a “golden” evaluation set from representative, labeled cases. Include ordinary requests, ambiguous questions, missing facts and requests that must be escalated. Keep a held-out portion separate from examples used to tune the prompt. Define the unit of judgment: a single claim, full answer or proposed action.",
+          "Take a small overlap of cases and score them independently with two reviewers when available. Discuss disagreement and revise the rubric, then rescore. A solo student can document how two plausible interpretations lead to different labels and flag the missing second review.",
+          "Classify failures by stage: retrieval missed evidence, generation misused evidence, a tool proposed the wrong action, or routing skipped review. For must-escalate cases, recall = correctly escalated / all cases that required escalation. A high overall pass rate can hide a serious miss in a small slice. Compare baseline and candidate on the same held-out cases.",
+          "Treat the 20 cases reviewed in Week 15 as regression material. For the release check, freeze the candidate before opening the separate Week 18 cases. Keep expected labels covered until responses have been produced. The provided baseline and candidate responses are fictional, so reported comparisons characterize these fixtures only."
+        ],
+        "example": {
+          "title": "Find a masked regression",
+          "text": "A candidate passes 18 of 20 cases overall. Five cases required escalation, but it escalated only three of the five. Escalation recall is 60%. If the release rule requires all five, those overall results still block release."
+        },
+        "project": {
+          "prompt": "Evaluate the supervised workflow with a written rubric. Use the Week 15 cases for regression and the separate Week 18 release set for a fresh check after freezing the candidate, or construct an independent set for an original domain. Compare two configurations, classify at least three failures across the suites and report a required-review slice. Resolve one grading disagreement or ambiguity, then document a release or hold decision and a retest plan.",
+          "deliverable": "A scored evaluation sheet, failure taxonomy, rubric revision, release decision and a human-review trace.",
+          "placeholder": "Baseline/candidate … Slice counts … Rater disagreement … Gate … Retest …",
+          "reference": {
+            "title": "Score a trial cancellation assistant",
+            "steps": [
+              "Set the release rule before testing: every action that changes billing requires human review.",
+              "Score quality and the must-review slice separately. Classify each missed case by stage.",
+              "Hold a candidate that misses the safety-critical slice, even if aggregate performance improved."
+            ],
+            "artifact": "Held-out cases: 12. Billing-changing cases: 4.\nBaseline: 9/12 overall; 4/4 correctly routed for review.\nCandidate: 10/12 overall; 3/4 correctly routed for review.\nMiss B-7: tool selection proposed an immediate cancellation.\nDisagreement: “archive workspace” initially labeled as billing-changing.\nResolution: use policy section 2 to check whether billing changes.\nDecision: hold candidate; fix route, then rerun both suites.",
+            "check": "Candidate recall for mandatory review is 3/4 = 75%. Record the false negative explicitly and preserve its input as a regression case."
+          }
+        },
+        "questions": [
+          {
+            "prompt": "A test set has eight must-escalate cases and the system escalates six correctly. What is escalation recall?",
+            "correct": 0,
+            "options": [
+              {
+                "text": "75%.",
+                "feedback": "Recall measures six correctly routed cases out of eight required ones."
+              },
+              {
+                "text": "100%.",
+                "feedback": "Two required cases were missed."
+              },
+              {
+                "text": "25%.",
+                "feedback": "Two missed out of eight is the false-negative proportion here. Recall counts the six correctly routed ones."
+              }
+            ]
+          },
+          {
+            "prompt": "Two reviewers disagree about whether an answer may infer a missing date. What should happen before reporting scores?",
+            "correct": 1,
+            "options": [
+              {
+                "text": "Discard every disagreement without recording it.",
+                "feedback": "That can hide precisely the difficult cases the evaluation should capture."
+              },
+              {
+                "text": "Clarify the rubric with examples and rescore the affected cases.",
+                "feedback": "Comparable judgments require an explicit scoring rule."
+              },
+              {
+                "text": "Choose the more generous label for every disagreement without revising the rule.",
+                "feedback": "That changes the scores without settling when a date can be inferred."
+              }
+            ]
+          },
+          {
+            "prompt": "A candidate’s overall quality improves while a required review gate fails. What decision follows a mandatory gate?",
+            "correct": 2,
+            "options": [
+              {
+                "text": "Publish because the top-line percentage rose.",
+                "feedback": "That ignores the stated release condition."
+              },
+              {
+                "text": "Remove the failed examples from the result.",
+                "feedback": "Removing hard cases misrepresents the evaluated population."
+              },
+              {
+                "text": "Hold release and investigate the failed slice.",
+                "feedback": "An aggregate improvement does not waive a predeclared requirement."
+              }
+            ]
+          },
+          {
+            "prompt": "An answer cites the correct policy but calls the close-account tool instead of the create-draft tool. What is the primary failure category?",
+            "correct": 0,
+            "options": [
+              {
+                "text": "Tool selection or action execution.",
+                "feedback": "The evidence was available and cited, but the action was incorrect."
+              },
+              {
+                "text": "Missing source document.",
+                "feedback": "The scenario already confirms retrieval of the right policy."
+              },
+              {
+                "text": "Incorrect retrieval ranking alone.",
+                "feedback": "The prompt already contained the correct retrieved policy. The observed defect concerns the chosen action."
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "product",
+    "title": "Engineering and product",
+    "summary": "Turn customer evidence into a product decision and a reliable release.",
+    "badge": "Product Operator",
+    "lessons": [
+      {
+        "week": 19,
+        "id": "turn-customer-evidence-into-a-product-brief",
+        "title": "Turn customer evidence into a product brief",
+        "summary": "Translate a workflow problem into measurable requirements and a prioritized backlog.",
+        "minutes": 15,
+        "teaching": [
+          "A product brief explains who experiences a problem, how they handle it today, what the change should accomplish and how success will be measured. Distinguish a direct observation from an assumption. An interview quote illustrates a problem; it does not by itself measure prevalence.",
+          "Write acceptance criteria that a tester can observe. Include a failure path as well as the happy path. Name non-goals so the pilot stays small. Prioritize work using the expected user impact, uncertainty, effort and dependencies. State why a smaller feature might come first.",
+          "Leadership shows up in decisions and tradeoffs. Design a brief a support lead and an engineer can both use. Include a workflow diagram or sequence, an owner for each major step and an unresolved question that could change the plan."
+        ],
+        "example": {
+          "title": "Narrow an AI request",
+          "text": "“Build a better support bot” leaves the user and outcome unclear. A narrower hypothesis is that a support agent can produce a source-backed draft in four minutes for routine policy questions. Define eligible tickets and record baseline handling time before claiming improvement."
+        },
+        "project": {
+          "prompt": "Write a one-page brief for the support assistant or an original startup idea. Document the current workflow, target user, baseline, hypothesis, non-goals, acceptance tests and a four-item backlog. Identify one assumption to test before engineering work begins.",
+          "deliverable": "A product brief, prioritized backlog and one evidence-linked tradeoff.",
+          "placeholder": "User and job … Evidence … Baseline … Hypothesis … Acceptance … First decision …",
+          "reference": {
+            "title": "Scope an onboarding checklist pilot",
+            "steps": [
+              "Start from a specific observed friction point in a fictional scenario.",
+              "Use a measure the team can collect without instrumenting an entire product.",
+              "Cut unrelated features and give the first backlog item a testable acceptance condition."
+            ],
+            "artifact": "User: implementation lead opening a new pilot workspace.\nObserved in rehearsal: required setup steps were skipped in 2/5 runs.\nHypothesis: a checklist reduces skipped steps to 0/5 in the next test.\nAcceptance: each required item has an owner and verified completion.\nNon-goal: automatic billing or CRM synchronization.\nBacklog: record baseline → build checklist → add recovery → retest.\nOpen question: which steps differ across customer segments?",
+            "check": "The 2/5 observation is rehearsal evidence. The document should not claim a reduction before the next test is run."
+          }
+        },
+        "questions": [
+          {
+            "prompt": "Which requirement is easiest for a tester to verify?",
+            "correct": 1,
+            "options": [
+              {
+                "text": "Increase user satisfaction without specifying a cohort, metric or threshold.",
+                "feedback": "A metric and population are needed before the tester can determine success."
+              },
+              {
+                "text": "When a source is missing, the draft identifies the gap and enters review.",
+                "feedback": "It defines a specific trigger and observable outcome."
+              },
+              {
+                "text": "Improve draft quality, with a scoring rubric to be decided after launch.",
+                "feedback": "The testing standard is not yet defined."
+              }
+            ]
+          },
+          {
+            "prompt": "A demo rehearsal suggests a problem affects many customers. What can the brief honestly claim?",
+            "correct": 2,
+            "options": [
+              {
+                "text": "All target customers experience the problem.",
+                "feedback": "The sample cannot support a market-wide claim."
+              },
+              {
+                "text": "The team has confirmed product-market fit.",
+                "feedback": "That conclusion requires broader evidence."
+              },
+              {
+                "text": "The rehearsal exposed a hypothesis to validate with target customers.",
+                "feedback": "A rehearsal tests the process but cannot estimate real customer prevalence."
+              }
+            ]
+          },
+          {
+            "prompt": "A backlog item depends on identifying the source of a failure. Which item should usually precede a large rebuild?",
+            "correct": 0,
+            "options": [
+              {
+                "text": "A small diagnostic test that can distinguish the leading explanations.",
+                "feedback": "Reducing uncertainty can avoid solving the wrong problem."
+              },
+              {
+                "text": "A complete rewrite of every related component.",
+                "feedback": "A broad rewrite can consume effort without diagnosing the cause."
+              },
+              {
+                "text": "A detailed implementation estimate for the largest untested fix.",
+                "feedback": "An estimate cannot determine whether that fix addresses the actual cause."
+              }
+            ]
+          },
+          {
+            "prompt": "A founder adds billing, analytics and chat to a one-week onboarding pilot. Which brief section helps preserve focus?",
+            "correct": 1,
+            "options": [
+              {
+                "text": "A delivery date with no list of excluded features.",
+                "feedback": "A date alone does not decide which features are outside the pilot."
+              },
+              {
+                "text": "Explicit non-goals tied to the pilot hypothesis.",
+                "feedback": "Non-goals explain which expansions can wait and why."
+              },
+              {
+                "text": "A list of every possible market.",
+                "feedback": "A wider list does not define the pilot boundary."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "week": 20,
+        "id": "operate-and-explain-a-reliable-release",
+        "title": "Operate and explain a reliable release",
+        "summary": "Use automated checks, useful telemetry and a rollback plan to support a small production pilot.",
+        "minutes": 15,
+        "teaching": [
+          "Describe the system as components with clear inputs and outputs: interface, service, data store, retrieval, model or fixture, and human review. Mark trust boundaries and which component owns customer scope. Keep secret values outside source code and use fictional data in public demonstrations.",
+          "Continuous integration runs repeatable tests on a proposed change. Start with deterministic tests for parsing, authorization and routing, then run an evaluation suite over recorded model responses. Make a failure visible to the reviewer before release. A local test script demonstrates the same checks at no cost.",
+          "Use logs for event details, metrics for trends and a request or trace ID to connect steps across components. Record latency, failures, volume and quality signals with minimal sensitive content. Define a stop threshold, a rollback owner and a customer-facing update. This makes an incident diagnosable and a launch reversible."
+        ],
+        "example": {
+          "title": "Connect a failure to a change",
+          "text": "A release doubles p95 latency from 1.2 seconds to 2.4 seconds across comparable windows. p95 is the value at or below which about 95% of observations fall. A trace shows retrieval time stayed steady while model-call time rose. That is a reason to investigate the model stage, not proof of a particular provider fault."
+        },
+        "project": {
+          "prompt": "Package the pilot with an architecture sketch, an automated test command, a sample trace, a rollback trigger and a short stakeholder briefing. Rehearse a broken integration and produce a clear customer-facing status update and an engineering escalation. Use mock events and remove sensitive information.",
+          "deliverable": "A release checklist, component diagram, passing/failing evidence, redacted trace and stakeholder handoff.",
+          "placeholder": "Version … Risk … Test run … Trace … Revert trigger … Operator and customer update …",
+          "reference": {
+            "title": "Investigate a slow onboarding workflow",
+            "steps": [
+              "Compare the same metric before and after a single named change.",
+              "Use a synthetic request ID to separate validation, retrieval and model timings.",
+              "Set the response owner and a verifiable return-to-service condition."
+            ],
+            "artifact": "Release v0.4 · 100 comparable pilot requests per window\np95 end-to-end: 1.0 s baseline → 2.8 s candidate\nSample trace d-17: validation 20 ms, retrieval 80 ms, model 2,500 ms\nStop rule: p95 > 2 s for two consecutive five-minute windows.\nAction: release lead reverts model configuration after the second breach.\nPublic update: replies are delayed; existing tickets remain available.\nRecovery check: p95 below 2 s and previous evaluation gate passes.",
+            "check": "One slow trace guides investigation. The rollback decision uses the declared time windows and includes a post-rollback quality check."
+          }
+        },
+        "questions": [
+          {
+            "prompt": "Two services log a failure during the same minute. What best links their entries to one request?",
+            "correct": 2,
+            "options": [
+              {
+                "text": "The UTC minute on both log entries.",
+                "feedback": "Many unrelated requests can occur within the same minute."
+              },
+              {
+                "text": "The HTTP status code alone.",
+                "feedback": "Many requests can share the same status code."
+              },
+              {
+                "text": "A shared request or trace ID.",
+                "feedback": "A propagated identifier connects records across components."
+              }
+            ]
+          },
+          {
+            "prompt": "A change to routing breaks a deterministic escalation test. What should CI communicate?",
+            "correct": 0,
+            "options": [
+              {
+                "text": "A failed check with the case and expected versus observed routing.",
+                "feedback": "A reviewer can reproduce and repair the specific regression."
+              },
+              {
+                "text": "A successful build because the code compiled.",
+                "feedback": "Compilation does not establish behavioral correctness."
+              },
+              {
+                "text": "An overall test count without the failed case or expected result.",
+                "feedback": "A count alone does not tell the reviewer which behavior regressed."
+              }
+            ]
+          },
+          {
+            "prompt": "A team wants to diagnose latency without logging raw customer tickets. Which data is most proportionate?",
+            "correct": 1,
+            "options": [
+              {
+                "text": "A full response body attached to every timing sample.",
+                "feedback": "The timing question does not require copying entire responses into logs."
+              },
+              {
+                "text": "A synthetic request ID, stage names, durations and error classes.",
+                "feedback": "These help locate delays while limiting exposure of message content."
+              },
+              {
+                "text": "Unredacted customer conversations in every metric label.",
+                "feedback": "Full conversations are unnecessary for timing analysis and expose sensitive content."
+              }
+            ]
+          },
+          {
+            "prompt": "A rollback restored the previous version. What evidence establishes recovery?",
+            "correct": 2,
+            "options": [
+              {
+                "text": "The rollback button was clicked.",
+                "feedback": "A click does not establish that the service recovered."
+              },
+              {
+                "text": "The incident channel went quiet.",
+                "feedback": "Silence does not measure system behavior."
+              },
+              {
+                "text": "The predeclared health and quality checks are healthy again.",
+                "feedback": "A version change is an action; the checks show its effect."
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "venture",
+    "title": "Technology entrepreneurship",
+    "summary": "Validate a narrow workflow, model its economics and present a portfolio-ready product.",
+    "badge": "Startup Builder",
+    "lessons": [
+      {
+        "week": 21,
+        "id": "interview-potential-users",
+        "title": "Interview potential users",
+        "summary": "Investigate a real workflow and separate evidence about past behavior from interest in a hypothetical product.",
+        "minutes": 15,
+        "teaching": [
+          "Choose a narrow customer segment and one decision the interviews should inform. Ask about the most recent time the problem occurred. Trace the sequence, frequency, current workaround, cost of a mistake and who approves spending. A question about a past event usually yields more specific evidence than a request for praise.",
+          "Ask permission to take notes. Avoid collecting names, private tickets or sensitive details in a public portfolio. Record observations and participant claims separately from interpretations. Sample deliberately: five interviews with the same type of person are useful for discovering patterns but do not establish a market-wide rate.",
+          "Look for disconfirming evidence. A manual workaround may already be cheap and reliable. Write the smallest follow-up that could distinguish real buying intent from polite interest, such as offering a scheduled pilot with a named success metric."
+        ],
+        "example": {
+          "title": "Replace a leading question",
+          "text": "“Would an AI summary save time?” suggests the desired answer. “Walk through the last escalation. What did the handoff include, and how long did it take?” reveals the actual workflow and whether creating the summary was even the slow step."
+        },
+        "project": {
+          "prompt": "Plan five interviews with one target segment. Conduct as many as access permits. Summarize distinct patterns, a counterexample and a concrete next experiment. Label rehearsal interviews and invented examples separately; they can test the interview guide, but customer demand remains unverified.",
+          "deliverable": "An interview guide, anonymized evidence notes, clearly labeled participant count and a next-step decision.",
+          "placeholder": "Segment … Last event … Workaround … Observed evidence … Counterexample … Next experiment …",
+          "reference": {
+            "title": "Investigate onboarding handoffs",
+            "steps": [
+              "Interview a fictional operations lead in rehearsal to test the wording.",
+              "Capture one recent event, what the participant actually did and what remains uncertain.",
+              "Design a follow-up experiment that could change the product decision."
+            ],
+            "artifact": "Rehearsal question: Walk through the last account handoff.\nReported event: two files arrived separately; an owner reconciled versions.\nReported effort: about 15 minutes. No time log was available.\nInterpretation: version tracking may matter more than auto-summarization.\nCounterexample to seek: a team using one shared source of truth.\nNext test: observe an authorized handoff and time the reconciliation.",
+            "check": "The note separates the participant’s estimate, the student’s interpretation and the future measurement. A rehearsal cannot establish external demand."
+          }
+        },
+        "questions": [
+          {
+            "prompt": "Which interview question is most likely to reveal actual behavior?",
+            "correct": 0,
+            "options": [
+              {
+                "text": "Walk through the last time an onboarding handoff failed.",
+                "feedback": "A specific event anchors the answer in observable details."
+              },
+              {
+                "text": "Would a generated summary make this process easier in the future?",
+                "feedback": "A hypothetical preference is less specific than evidence from a real recent event."
+              },
+              {
+                "text": "How much time would the perfect future product save?",
+                "feedback": "A forecast about an imagined tool does not establish the current workflow."
+              }
+            ]
+          },
+          {
+            "prompt": "Four friendly colleagues say the idea sounds good. What does this establish?",
+            "correct": 1,
+            "options": [
+              {
+                "text": "A market-wide conversion rate.",
+                "feedback": "The sample cannot support that estimate."
+              },
+              {
+                "text": "Interest worth investigating, with demand and willingness to pay still open.",
+                "feedback": "Polite reactions provide limited evidence of purchase behavior."
+              },
+              {
+                "text": "Four paying customers.",
+                "feedback": "No payment or commitment has occurred."
+              }
+            ]
+          },
+          {
+            "prompt": "One participant already solves the problem cheaply. How should the evidence be handled?",
+            "correct": 2,
+            "options": [
+              {
+                "text": "Exclude the interview because it contradicts the pitch.",
+                "feedback": "Discarding contrary evidence biases the discovery process."
+              },
+              {
+                "text": "Treat that one response as proof nobody needs the product.",
+                "feedback": "An individual counterexample does not establish universal demand."
+              },
+              {
+                "text": "Record the counterexample and investigate which segment differs.",
+                "feedback": "A counterexample can reveal the limits of the customer hypothesis."
+              }
+            ]
+          },
+          {
+            "prompt": "A case study uses invented interview responses to rehearse a process. What label is accurate?",
+            "correct": 0,
+            "options": [
+              {
+                "text": "Fictional rehearsal; customer validation is pending.",
+                "feedback": "This transparently distinguishes practice from observed demand."
+              },
+              {
+                "text": "Verified customer research.",
+                "feedback": "Invented responses do not come from customers."
+              },
+              {
+                "text": "Revenue evidence.",
+                "feedback": "A rehearsal contains no purchase data."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "week": 22,
+        "id": "test-the-smallest-useful-product",
+        "title": "Test the smallest useful product",
+        "summary": "Design a narrow MVP and a pilot that can disprove a product assumption.",
+        "minutes": 15,
+        "teaching": [
+          "An MVP tests a specific assumption with the smallest useful end-to-end experience. Pick one user, one job and one measurable outcome. A manually reviewed workflow can test whether a result is valuable before a team automates expensive steps.",
+          "Write the experiment as a decision: if a defined cohort achieves the threshold over the agreed window, continue to the next test. If it misses, inspect qualitative notes before deciding whether to change the interface, underlying workflow or target user. Decide in advance what would count as a failed hypothesis.",
+          "Instrument the steps needed to explain the outcome: eligible user, attempted task, completed task and observable value. Account for retries and duplicates. Record how much manual labor the pilot hides so a high completion rate does not conceal an unsustainable service."
+        ],
+        "example": {
+          "title": "Test value before automation",
+          "text": "A founder can manually review five source-grounded drafts and deliver them through a basic interface. If operators still rewrite every draft, a complex orchestration layer would not solve the value problem. Log edits and time spent to identify why the drafts missed."
+        },
+        "project": {
+          "prompt": "Build one end-to-end pilot for the support assistant or another selected domain. Write an explicit hypothesis and stop rule, scope the smallest workflow, run at least three task trials, and record completion, assistance and limitations. Identify the riskiest untested assumption.",
+          "deliverable": "A demoable MVP, an experiment plan, trial observations and a decision grounded in results.",
+          "placeholder": "Target user … Assumption … Workflow … Trial results … Hidden labor … Decision …",
+          "reference": {
+            "title": "Pilot a draft onboarding summary",
+            "steps": [
+              "Select one simple handoff from a fictional account. A human can review the proposed summary.",
+              "Choose a success criterion before observing the runs.",
+              "Compare corrected, accepted and abandoned results and measure review effort."
+            ],
+            "artifact": "Hypothesis: an operator can produce an accurate handoff in ≤5 minutes.\nPilot: one input form → generated or simulated draft → human review.\nThree rehearsals: 4 min accepted; 7 min corrected; 5 min accepted.\nSuccess rule: all 3 accurate and within 5 min.\nOutcome: 2/3 met the time rule. The correction took 3 extra minutes.\nNext change: surface the source owner next to the disputed field.",
+            "check": "The rehearsed pilot missed its threshold. It supports an iteration decision, while willingness to adopt still requires external evidence."
+          }
+        },
+        "questions": [
+          {
+            "prompt": "A founder wants to test whether reviewed summaries save time. Which MVP is most informative?",
+            "correct": 1,
+            "options": [
+              {
+                "text": "A feature-ranking survey without observing a summary task.",
+                "feedback": "Stated preferences cannot establish whether reviewed summaries save handling time."
+              },
+              {
+                "text": "A small end-to-end draft-and-review flow with measured task time.",
+                "feedback": "It exercises the value hypothesis and records an outcome."
+              },
+              {
+                "text": "A complex account-management system with no summary flow.",
+                "feedback": "That tests infrastructure rather than the proposed value."
+              }
+            ]
+          },
+          {
+            "prompt": "The success threshold is changed after seeing disappointing results. What is the main evaluation problem?",
+            "correct": 2,
+            "options": [
+              {
+                "text": "The comparison is stronger because the threshold fits the observed range.",
+                "feedback": "Choosing criteria after seeing results weakens the claim that the hypothesis was independently tested."
+              },
+              {
+                "text": "The original success criterion has been validated on a fresh sample.",
+                "feedback": "The same outcomes were used to revise the threshold. Independent validation requires new observations."
+              },
+              {
+                "text": "The retrospective threshold can make a miss appear successful.",
+                "feedback": "Predeclared criteria reduce outcome-driven reinterpretation."
+              }
+            ]
+          },
+          {
+            "prompt": "Every pilot task succeeds only after 20 minutes of hidden founder work. What should the pilot report include?",
+            "correct": 0,
+            "options": [
+              {
+                "text": "The manual work and its effect on delivery cost and scalability.",
+                "feedback": "Completion alone conceals the operating burden."
+              },
+              {
+                "text": "Only the success percentage.",
+                "feedback": "That omits a material condition of success."
+              },
+              {
+                "text": "An assumption that manual effort will disappear for free.",
+                "feedback": "Automation and its costs require evidence."
+              }
+            ]
+          },
+          {
+            "prompt": "Three rehearsals succeed, but no target customers have tried the MVP. What is the strongest next test of adoption?",
+            "correct": 1,
+            "options": [
+              {
+                "text": "Add unrelated features before any external trial.",
+                "feedback": "Extra scope does not directly test adoption."
+              },
+              {
+                "text": "Observe target users attempting the workflow under a defined pilot.",
+                "feedback": "External use provides evidence beyond internal rehearsal."
+              },
+              {
+                "text": "Count the same three rehearsals twice.",
+                "feedback": "Duplicate observations do not expand the sample."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "week": 23,
+        "id": "measure-adoption-and-unit-economics",
+        "title": "Measure adoption and unit economics",
+        "summary": "Distinguish revenue, variable cost and actual use before recommending a price.",
+        "minutes": 15,
+        "teaching": [
+          "Define a billable unit such as a workspace-month or completed task. Contribution per unit equals price minus variable cost for that unit. Variable costs may include model usage, human review, payment processing and support effort. Fixed monthly costs remain even at zero volume. Under a simple constant-cost model, break-even units = fixed costs / contribution per unit, rounded up when contribution is positive.",
+          "Measure a funnel on one cohort and time window. Activation rate is activated eligible users divided by eligible users. Retention requires repeated use at a later specified time. A signup alone does not show ongoing use. Report counts with percentages so a small sample is visible.",
+          "Test a price as a hypothesis. Ask about an existing budget and buying process, then seek a concrete next step. Model a conservative and an optimistic scenario and state which assumptions dominate. Hypothetical purchase intent and actual purchases should appear separately."
+        ],
+        "example": {
+          "title": "Check the margin before scaling",
+          "text": "A fictional plan charges $30 per workspace-month and costs $12 in variable services and review time. Its contribution is $18. With $180 monthly fixed costs, 10 workspace-months cover those costs under the stated assumptions. If review cost doubles, recompute before suggesting scale."
+        },
+        "project": {
+          "prompt": "Define a pilot price and modeled variable costs for a chosen product. Calculate contribution and break-even, including a worse-cost scenario. Trace an activation and repeat-use funnel with denominators. Record the type of pricing evidence and two uncertainties that could reverse the decision.",
+          "deliverable": "A pricing worksheet, dated funnel with counts, and a recommendation that distinguishes modeled assumptions from observed behavior.",
+          "placeholder": "Billing unit … Price … Cost components … Break-even … Funnel … Pricing evidence …",
+          "reference": {
+            "title": "Price a reviewed export service",
+            "steps": [
+              "Choose the same billing and cost unit: one completed export.",
+              "Include model processing, review time and delivery before calculating contribution.",
+              "Round break-even upward and increase one cost to see how sensitive the result is."
+            ],
+            "artifact": "Price: $10/export; variable cost: $4/export; fixed costs: $95/month.\nContribution: $6/export. Break-even: ceil(95/6) = 16 exports.\nStress case: $6 variable cost → $4 contribution → 24 exports.\nFictional pilot: 8 eligible teams; 5 activated; 2 returned in week 2.\nActivation: 5/8. Week-2 return among activated teams: 2/5.",
+            "check": "At 15 exports, contribution is $90 and fixed costs are $95. At 16 exports, contribution is $96. The return metric uses activated teams as its stated denominator."
+          }
+        },
+        "questions": [
+          {
+            "prompt": "A plan costs $18 per workspace to deliver and sells for $30. What is contribution per workspace before fixed costs?",
+            "correct": 2,
+            "options": [
+              {
+                "text": "$48",
+                "feedback": "Adding price and cost does not measure contribution."
+              },
+              {
+                "text": "$30",
+                "feedback": "That is revenue before delivery costs."
+              },
+              {
+                "text": "$12",
+                "feedback": "Subtract the variable delivery cost from the selling price."
+              }
+            ]
+          },
+          {
+            "prompt": "A product has $101 fixed cost and contributes $10 per unit. How many whole units are needed to break even?",
+            "correct": 0,
+            "options": [
+              {
+                "text": "11",
+                "feedback": "Ten units contribute $100, one dollar below fixed costs."
+              },
+              {
+                "text": "10",
+                "feedback": "Ten units leave a small loss."
+              },
+              {
+                "text": "101",
+                "feedback": "That would apply only with $1 contribution per unit."
+              }
+            ]
+          },
+          {
+            "prompt": "A cohort has 20 eligible teams, 8 activated teams and 4 of those active again in Week 2. What is Week-2 return among activated teams?",
+            "correct": 1,
+            "options": [
+              {
+                "text": "8/20, or 40%.",
+                "feedback": "That is initial activation."
+              },
+              {
+                "text": "4/8, or 50%.",
+                "feedback": "The question defines the denominator as activated teams."
+              },
+              {
+                "text": "4/20, or 20%.",
+                "feedback": "That is repeat use among all eligible teams."
+              }
+            ]
+          },
+          {
+            "prompt": "Price is $5 per task and variable cost is $6. What does higher volume do under these assumptions?",
+            "correct": 2,
+            "options": [
+              {
+                "text": "It guarantees break-even once enough tasks are sold.",
+                "feedback": "A negative contribution cannot cover fixed costs."
+              },
+              {
+                "text": "It makes the fixed-cost share smaller, which by itself makes each extra task profitable.",
+                "feedback": "Spreading fixed costs cannot turn a negative per-task contribution positive."
+              },
+              {
+                "text": "It increases the loss before fixed costs by $1 per additional task.",
+                "feedback": "Contribution is negative at the modeled price and cost."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "week": 24,
+        "id": "present-a-portfolio-case-study-and-founder-demo",
+        "title": "Present a portfolio case study and founder demo",
+        "summary": "Demonstrate a working product, explain a tradeoff and defend the evidence behind its results.",
+        "minutes": 15,
+        "teaching": [
+          "A strong case study lets a reviewer verify a claim. Show the original workflow, baseline, narrow change, demonstration, evaluation and limits. Make the repository runnable with fictional inputs or provide a reproducible local demonstration. State precisely what the student built, what a library supplied and what a person reviewed.",
+          "Adapt the presentation to the decision. A startup hiring team may probe technical ownership, debugging and customer communication. Prepare a walkthrough of one request, one failed case, the fix and its test. A founder discussion also needs a clear user, pricing hypothesis, delivery cost, adoption evidence and the next experiment.",
+          "Practice a short demo followed by questions. Show an ordinary case and a failure or escalation case. Explain what would fail first at ten times the current volume and which measurement would justify additional engineering. Separate observed results, simulated cases and projections in every public artifact."
+        ],
+        "example": {
+          "title": "Turn a metric into a defensible claim",
+          "text": "“Saved 60% across all customers” needs population-wide evidence. “Median review time fell from ten to four minutes on eight paired fictional rehearsals; external adoption is untested” gives the baseline, method, sample and limit. Link the table so a reviewer can recompute it."
+        },
+        "project": {
+          "prompt": "Publish or locally package a capstone case study in the selected domain. Include a runnable demo, architecture and test evidence, baseline comparison, a failure investigation, pricing and operating assumptions, and a roadmap. Deliver a hiring walkthrough and a short founder pitch. Document one question from a reviewer or a clearly labeled rehearsal and revise one artifact in response.",
+          "deliverable": "A portfolio-ready project with a demonstration, evidence appendix, implementation handoff and an honest pitch.",
+          "placeholder": "Role and contribution … Demo … Baseline/result … Failure and fix … Economics … Limitation … Next experiment …",
+          "reference": {
+            "title": "Present a trial onboarding assistant",
+            "steps": [
+              "Open with the operator’s workflow and a measured or clearly simulated baseline.",
+              "Demonstrate one normal request and one incomplete-source escalation. Trace the data and the test that guards the escalation.",
+              "End with two decisions: what the evidence establishes for a hiring reviewer, and what a founder should test next."
+            ],
+            "artifact": "Case study: source-backed trial handoff (fictional demonstration)\nRole: implemented API, retrieval traces and human-review gate.\nEvidence: 8 paired rehearsals; median time 10 → 6 minutes.\nFailure: a missing policy date produced an unsupported deadline.\nRepair: abstain when the source has no date; regression case R-08.\nUnit model: $15 per account-month, $6 modeled variable delivery cost.\nHiring demo: reproduce R-08 and explain the tradeoff.\nFounder next step: supervised external pilot with 3 target teams.",
+            "check": "The 40% reduction applies to the rehearsal sample. The model estimates $9 contribution before fixed costs. Neither number establishes external demand."
+          }
+        },
+        "questions": [
+          {
+            "prompt": "A case study reports “40% faster.” What evidence makes that claim interpretable?",
+            "correct": 0,
+            "options": [
+              {
+                "text": "The task, baseline, comparison method, sample size and limitations.",
+                "feedback": "The reader can assess what changed and how the result was measured."
+              },
+              {
+                "text": "Only a screenshot of the homepage.",
+                "feedback": "A screenshot cannot establish a timing comparison."
+              },
+              {
+                "text": "An estimate from a different product with a larger user base.",
+                "feedback": "An unrelated population cannot substantiate this result."
+              }
+            ]
+          },
+          {
+            "prompt": "A hiring interviewer asks what the candidate personally implemented. Which response is strongest?",
+            "correct": 1,
+            "options": [
+              {
+                "text": "Describe the team’s architecture without identifying any personally implemented component.",
+                "feedback": "Architecture context helps, but the interviewer requested evidence of individual contribution."
+              },
+              {
+                "text": "Trace one owned component, a failure, the fix and its regression test.",
+                "feedback": "Specific evidence demonstrates technical and operational ownership."
+              },
+              {
+                "text": "List every product visible in the tech stack.",
+                "feedback": "A list does not explain the candidate’s contribution."
+              }
+            ]
+          },
+          {
+            "prompt": "A founder demo works on one fictional account. Which next step most directly tests market fit assumptions?",
+            "correct": 2,
+            "options": [
+              {
+                "text": "Use the technical success rate from the demo as an estimate of paid customer conversion.",
+                "feedback": "Technical completion and willingness to pay are different outcomes."
+              },
+              {
+                "text": "Increase load on the same synthetic account and treat throughput as market demand.",
+                "feedback": "Load testing can establish capacity, not customer adoption."
+              },
+              {
+                "text": "Run a defined pilot with target users and measure activation, value and delivery cost.",
+                "feedback": "This tests adoption and operating assumptions outside the demonstration."
+              }
+            ]
+          },
+          {
+            "prompt": "A workflow slows down at ten times the pilot volume. What is the strongest explanation to present?",
+            "correct": 0,
+            "options": [
+              {
+                "text": "Show stage-level measurements and identify which bottleneck needs the next test.",
+                "feedback": "Measured evidence separates a hypothesis from an established bottleneck."
+              },
+              {
+                "text": "Claim the model provider is responsible without a trace.",
+                "feedback": "The bottleneck could be in retrieval, storage, review or another stage."
+              },
+              {
+                "text": "Promise unlimited scale because the pilot completed.",
+                "feedback": "Pilot completion cannot establish performance under a larger load."
+              }
+            ]
+          }
+        ]
+      }
+    ]
   }
-
-  window.COURSE_LEVELS = [
-    {
-      id: 'foundations',
-      title: 'Programming foundations',
-      summary:
-        'Learn Python by turning estimating, purchasing and change-order problems into small, tested programs.',
-      badge: 'Python Builder',
-      lessons: [
-        lesson({
-          week: 1,
-          id: 'labor-calculator',
-          title: 'Build a labor calculator',
-          summary:
-            'Use variables, numeric inputs and functions to estimate straight-time labor.',
-          teaching: [
-            'Start with a calculation you can do on paper. Give every input a name and a unit. A simple labor estimate needs the crew size, hours per person and hourly rate. The product is an estimated labor cost. A workday length, overhead and payroll rules would need separate assumptions.',
-            'In Python, input() gives you text. Convert values to numbers before doing arithmetic. Put the calculation in a function that takes arguments and returns a result. Keep the questions to the user and the printed display outside that function. This lets you run the same calculation with another crew or test it directly. To quote a markup on direct costs, multiply the combined labor and material cost by 1 + markup_percent / 100.',
-          ],
-          example: [
-            'Estimate one shift',
-            'Three people working six hours each at $24 per hour cost 3 × 6 × 24 = $432 in straight-time labor. A Python function can express that as def labor_cost(people, hours, rate): followed by an indented return people * hours * rate. Label the result in dollars and record that overtime and overhead are outside this estimate.',
-          ],
-          project: [
-            'Build a labor-cost calculator using fictional crew data. Ask for the inputs with units, return the total from a function, and test two shifts against a hand calculation. In your notebook, record the two inputs and outputs and one cost your calculator excludes.',
-            'Crew, hours and rate … Expected and observed total … Scope of estimate …',
-            'A working function, two checked shifts and a stated pricing assumption.',
-          ],
-          questions: [
-            check(
-              'Four people each work five hours at $30 per hour. Which output matches the estimate?',
-              1,
-              [
-                option(
-                  '$150',
-                  'That covers one person for five hours. Multiply by the crew size as well.',
-                ),
-                option(
-                  '$600',
-                  'Four times five gives 20 person-hours. At $30 each, the cost is $600.',
-                ),
-                option(
-                  '$120',
-                  'That is the four-person cost for a single hour.',
-                ),
-              ],
-            ),
-            check(
-              'Your calculator must work with several crews. What should the calculation function receive?',
-              2,
-              [
-                option(
-                  'A sentence containing the completed estimate.',
-                  'The function would have to recover the inputs from a display message.',
-                ),
-                option(
-                  'The name of the person running the program.',
-                  'The operator’s name does not supply the quantities the calculation needs.',
-                ),
-                option(
-                  'Crew size, hours per person and hourly rate as numbers.',
-                  'Explicit inputs let the function calculate a new total and make it easy to check with known values.',
-                ),
-              ],
-            ),
-          ],
-        }),
-        lesson({
-          week: 2,
-          id: 'budget-loop',
-          title: 'Build a budget checker',
-          summary:
-            'Use conditions and loops to total line items and flag a budget overrun.',
-          teaching: [
-            'A condition chooses a branch. Write the boundary rule in words before choosing an operator. If an overrun means spending more than the budget, an actual cost exactly equal to the budget is on budget. Capture that equality case in a test.',
-            'A loop applies the same operation to each item. Set your running total to zero before the loop, add each line cost once, then compare the finished total with the budget. Reuse last week’s function for labor and label materials in the same currency.',
-          ],
-          example: [
-            'Check the boundary',
-            'A $1,000 project includes $600 of labor, $240 of materials and $160 of equipment. The total is exactly $1,000. The rule actual > budget returns false. Replacing the equipment figure with $165 gives $1,005 and a $5 overrun.',
-          ],
-          project: [
-            'Build a budget checker for a fictional job with at least three cost items. Reuse a labor calculation, loop over the items and report both the total and the budget status. Record an under-budget case, an exact match and an overrun.',
-            'Line items … Total and budget … Boundary tests …',
-            'A running total and correct status for below, equal to and above budget.',
-          ],
-          questions: [
-            check(
-              'An overrun starts only when actual cost exceeds the budget. Which condition fits?',
-              0,
-              [
-                option(
-                  'actual > budget',
-                  'This flags a positive overrun and leaves an exact match on budget.',
-                ),
-                option(
-                  'actual >= budget',
-                  'This would incorrectly flag an exact match.',
-                ),
-                option(
-                  'budget > actual',
-                  'This flags the case where money remains.',
-                ),
-              ],
-            ),
-            check(
-              'A loop over $80, $25 and $10 returns only $10. Which issue best explains that result?',
-              1,
-              [
-                option(
-                  'The final total is displayed after the loop.',
-                  'Displaying after the loop is appropriate when you need the overall total.',
-                ),
-                option(
-                  'The running total is reset to zero inside each iteration.',
-                  'Resetting within the loop discards every earlier item. Initialize once before iterating.',
-                ),
-                option(
-                  'Each line is added exactly once to a total initialized before the loop.',
-                  'That behavior should produce $115.',
-                ),
-              ],
-            ),
-          ],
-        }),
-        lesson({
-          week: 3,
-          id: 'material-validation',
-          title: 'Validate material orders',
-          summary:
-            'Handle invalid entries and use a library function to buy whole packs.',
-          teaching: [
-            'Separate two ways an input can fail. A word like “twelve” may raise ValueError when converted with int(). A number like −12 converts successfully but fails a positive-quantity rule. Show a specific message so the person can correct the entry. Catch the exception you expect close to the conversion.',
-            'Match the calculation to the purchasing unit. If materials come in packs, divide units needed by units per pack and round upward to a whole pack with math.ceil(). Validate the pack size before division, and apply the budget check after calculating the price of all required packs.',
-          ],
-          example: [
-            'Round a purchase upward',
-            'A crew needs 23 anchors. Packs contain 10 anchors and cost $8 each. math.ceil(23 / 10) gives three packs. The order costs $24 and leaves seven anchors. A pack size of zero needs a correction before this calculation can run.',
-          ],
-          project: [
-            'Extend the budget tool with a material-order function. Accept units needed, pack size and pack price. Handle words entered for a number and a zero pack size. Record the result for an exact pack and a partial pack, including the effect on the budget.',
-            'Valid example … Invalid entry and recovery … Total sent to budget checker …',
-            'A validated pack calculation with exact-pack, partial-pack and invalid-input evidence.',
-          ],
-          questions: [
-            check(
-              'A buyer needs 31 boards and each pack holds 10. Which result covers the requirement?',
-              2,
-              [
-                option(
-                  'Three packs because 3.1 rounds to 3.',
-                  'Nearest-integer rounding leaves one board missing.',
-                ),
-                option(
-                  '3.1 packs because the division is exact.',
-                  'The supplier sells whole packs.',
-                ),
-                option(
-                  'Four packs because any remainder requires another whole pack.',
-                  'Four packs supply 40 boards, which covers all 31 requested.',
-                ),
-              ],
-            ),
-            check(
-              'The text “0” converts successfully to an integer for units per pack. What should happen next?',
-              0,
-              [
-                option(
-                  'Reject zero with a clear message before dividing.',
-                  'Conversion checks the input type. A separate business rule must enforce a positive pack size.',
-                ),
-                option(
-                  'Let the conversion exception handler reject it.',
-                  'Converting the string “0” to an integer succeeds.',
-                ),
-                option(
-                  'Replace zero silently with one.',
-                  'That would invent a supplier pack size and could change the cost.',
-                ),
-              ],
-            ),
-          ],
-        }),
-        lesson({
-          week: 4,
-          id: 'csv-and-tests',
-          title: 'Read and test project files',
-          summary:
-            'Read CSV data by column name and check calculations with known results.',
-          teaching: [
-            'A CSV file stores rows of text. Use Python’s csv.DictReader to read named fields and with open(..., newline="") to close the file when the operation ends. A CSV parser handles quoted commas that would break a simple split on a comma. Convert quantity and price only after reading the fields.',
-            'Test your calculation separately from the file reader. Make a tiny fixture, which is a sample with a result you know in advance. Test the ordinary case and at least one bad row. Decide whether to stop or flag the row, and make that decision visible in the output.',
-          ],
-          example: [
-            'A comma inside a field',
-            'A CSV has the headers item,quantity,unit_price. One row contains “Bracket, large” as a quoted item, with quantity 2 and price 7.50. The row total is $15. A second row with quantity 3 and price 4 brings the total to $27. The comma in the item name should stay inside that field.',
-          ],
-          project: [
-            'Create a fictional cost CSV and read it by header. Reuse your validation and budget functions, write a test for a known total, and add a row with a missing quantity. Record the expected total and your program’s message for the bad row.',
-            'Fixture rows … Known total … Test result … Bad-row handling …',
-            'A CSV reader, a repeatable known-total test and a visible invalid-row policy.',
-          ],
-          questions: [
-            check(
-              'A quoted vendor name contains a comma. Which approach preserves the correct columns?',
-              1,
-              [
-                option(
-                  'Split every line wherever a comma appears.',
-                  'This breaks a quoted name into two fields.',
-                ),
-                option(
-                  'Use a CSV parser that understands quoting.',
-                  'The parser can distinguish a delimiter from a comma inside a quoted field.',
-                ),
-                option(
-                  'Remove every comma before reading the row.',
-                  'That also removes the separators between actual columns.',
-                ),
-              ],
-            ),
-            check(
-              'Which test catches a function that accidentally adds unit price to quantity?',
-              2,
-              [
-                option(
-                  'Assert that the program displays some text.',
-                  'A wrong calculation can still display a message.',
-                ),
-                option(
-                  'Set the expected total to whatever the function currently returns.',
-                  'This copies the behavior being tested, including its mistakes.',
-                ),
-                option(
-                  'Assert that three items at $8 produce a $24 line total.',
-                  'The expected value comes from an independent calculation and differs from 3 + 8.',
-                ),
-              ],
-            ),
-          ],
-        }),
-        lesson({
-          week: 5,
-          id: 'organize-records',
-          title: 'Organize RFIs and changes',
-          summary:
-            'Use a pattern for IDs and a simple record type for project documents.',
-          teaching: [
-            'A request for information, or RFI, tracks a question and its response. A change order, or CO, records a change to the work under the applicable approval process. Keep the document type and status explicit. A request for clarification alone does not establish an approved cost change.',
-            'A regular expression checks the shape of a string. In Python, re.fullmatch(r"(RFI|CO)-[0-9]{3}", value) accepts exactly one of those prefixes and three digits. A matching ID still needs a duplicate check. A dataclass can keep the ID, summary, status and amount attached to a single record as you load and sort a file.',
-          ],
-          example: [
-            'Two records with different jobs',
-            'RFI-004 asks which finish to use and has status open. CO-004 proposes an extra $250 and has status pending. Both IDs follow the pattern and are distinct. Counting the pending $250 as approved would misstate the job total.',
-          ],
-          project: [
-            'Build a small record organizer with fictional RFIs and changes. Read the records from CSV, validate full IDs, and group by document type and status. Include one malformed ID and one repeat. Record how you keep pending changes out of the approved total.',
-            'Sample IDs … Duplicate or malformed result … Approved total …',
-            'A record structure, full-ID validation and separate handling for pending and approved changes.',
-          ],
-          questions: [
-            check(
-              'Your rule accepts a full ID made of RFI or CO, a hyphen and exactly three digits. Which value qualifies?',
-              0,
-              [
-                option(
-                  'CO-007',
-                  'The prefix, hyphen and three digits match the whole ID.',
-                ),
-                option('RFI-7', 'This has only one digit after the hyphen.'),
-                option(
-                  'old-CO-007-copy',
-                  'A substring matches, but the complete value violates the rule.',
-                ),
-              ],
-            ),
-            check(
-              'Two imported rows both carry CO-014 and each matches the expected pattern. What else must your importer check?',
-              1,
-              [
-                option(
-                  'Whether either row includes a lowercase letter.',
-                  'Case does not address the repeated identifier in these two rows.',
-                ),
-                option(
-                  'Whether the ID already belongs to an existing record.',
-                  'Pattern validation checks the shape, while an identity check detects duplicates.',
-                ),
-                option(
-                  'Whether the sum of both prices fits the budget.',
-                  'The budget could absorb both rows while still counting the same record twice.',
-                ),
-              ],
-            ),
-          ],
-        }),
-        lesson({
-          week: 6,
-          id: 'python-toolkit',
-          title: 'Ship the Python toolkit',
-          summary:
-            'Combine your tools, document a clean run and complete the first practical exam.',
-          teaching: [
-            'Give each job a small entry point. An importer turns CSV rows into validated records, a calculation function works on those records, and a report explains the totals and rejected rows. A test for one stage should help you locate the part that broke.',
-            'Use Git to record a meaningful change and GitHub to keep the repository and its history. A README should tell another person how to run your fictional example and what result to expect. Before marking a release, try those instructions from a separate clean checkout or directory.',
-          ],
-          example: [
-            'Reconcile the imported records',
-            'Suppose a 50-row fixture contains 46 accepted records, two malformed IDs and two duplicate rows. In the supplied CSV, change_id identifies a change, project_id and vendor_id link to their directories, description explains the scope and amount is in US dollars. Status is approved, pending or declined. Only pending records are unresolved. A useful report accounts for all 50 rows. It totals only accepted, approved changes, lists pending amounts separately, and explains why each rejected line was excluded.',
-          ],
-          project: [
-            'Assemble your tools into one repository. For the practical exam, process 50 fictional change-order rows, reconcile every row, count unresolved approvals and compare the approved total with an independent hand or spreadsheet check. Introduce a small bug in a practice copy, show which test detects it, fix the bug and explain the changed code. Add clean-run instructions that use only sample data.',
-            'Run instructions … 50-row reconciliation … Expected vs. observed approved total …',
-            'A reproducible toolkit, tested 50-row import, reconciled totals and a README.',
-          ],
-          questions: [
-            check(
-              'A 50-row input produces 43 accepted rows and four rejected rows. What does the report show?',
-              2,
-              [
-                option(
-                  'All rows balance because the rejected count is low.',
-                  'The size of the rejection count does not explain the missing rows.',
-                ),
-                option(
-                  'The import succeeded if the approved total matches last month.',
-                  'A previous total cannot explain missing rows in this import.',
-                ),
-                option(
-                  'Three input rows are unaccounted for and need investigation.',
-                  '43 + 4 accounts for 47 rows. The remaining three need a recorded outcome.',
-                ),
-              ],
-            ),
-            check(
-              'Which evidence best shows that someone else can run your toolkit?',
-              0,
-              [
-                option(
-                  'A fresh checkout runs the documented command on the included fixture and produces the expected result.',
-                  'This checks the instructions, necessary files and behavior together.',
-                ),
-                option(
-                  'You can run it in a terminal that already has your personal paths set.',
-                  'Your existing setup may hide missing dependencies or undocumented paths.',
-                ),
-                option(
-                  'Every source file has a recent modification date.',
-                  'A timestamp does not confirm that the tool runs.',
-                ),
-              ],
-            ),
-          ],
-        }),
-      ],
-    },
-    {
-      id: 'data',
-      title: 'Databases and APIs',
-      summary:
-        'Connect the project records in SQL, read data from an API and import updates safely.',
-      badge: 'Data Builder',
-      lessons: [
-        lesson({
-          week: 7,
-          id: 'query-project-data',
-          title: 'Query a project database',
-          summary:
-            'Filter, group and join fictional records to answer a project manager’s questions.',
-          teaching: [
-            'Use SQLite to practice locally. A table represents one kind of thing, a row represents an individual record, and a primary key identifies it. SELECT chooses columns, WHERE filters rows and GROUP BY creates a group for each distinct value you select for grouping.',
-            'Join tables on keys that represent the same relationship. Before trusting a sum, count the rows before and after the join. If one change order is repeated for each of three related notes, a sum over the joined rows could count its value three times.',
-          ],
-          example: [
-            'Read the approved total',
-            "Suppose your importer converts each dollar amount to integer cents in a table named changes. Use SELECT project_id, SUM(amount_cents) FROM changes WHERE status = 'approved' GROUP BY project_id. Two approved changes worth 12000 and 8000 cents give 20000 cents for that project. A pending 5000-cent change stays outside the total. A project with no approved rows will need separate handling if the report must show a zero.",
-          ],
-          project: [
-            'Create a small SQLite database from your fictional project files. Write 15 useful SELECT queries covering filters, totals, grouping and joins. In your notebook, show one query and check its result against the toolkit’s approved-change total.',
-            'Question and SQL … Expected result … Reconciliation with Python …',
-            'Fifteen named queries and one independently reconciled result.',
-          ],
-          questions: [
-            check(
-              'Which operation should happen before summing the value of approved changes?',
-              1,
-              [
-                option(
-                  'Sort all records by their amount.',
-                  'Sorting changes the order, not which amounts contribute to the total.',
-                ),
-                option(
-                  'Filter the rows to the approved status.',
-                  'A status filter keeps pending or rejected values out of the sum.',
-                ),
-                option(
-                  'Rename the amount column approved_total.',
-                  'A column label alone does not change the calculation.',
-                ),
-              ],
-            ),
-            check(
-              'Joining a $300 change with its three notes produces three rows. What should you do before reporting its cost?',
-              2,
-              [
-                option(
-                  'Use $900 because a SQL join preserves money totals.',
-                  'The join repeated the same amount once per note.',
-                ),
-                option(
-                  'Divide every project’s total by three.',
-                  'Other changes may have different numbers of notes.',
-                ),
-                option(
-                  'Aggregate at the change-record level so its $300 is counted once.',
-                  'Use the record identity and the desired reporting grain to avoid multiplying the cost.',
-                ),
-              ],
-            ),
-          ],
-        }),
-        lesson({
-          week: 8,
-          id: 'design-related-tables',
-          title: 'Design connected tables',
-          summary:
-            'Model projects, vendors, RFIs and change orders with keys and constraints.',
-          teaching: [
-            'Give each project and vendor a stable ID. Store that ID in related records as a foreign key. When a vendor’s display name changes, update the vendor row once. Design constraints around the actual rule. For example, if each project numbers its own RFIs, the project ID and RFI number together must be unique.',
-            'Test what happens on a bad write. In SQLite, enable foreign-key enforcement on the connection with PRAGMA foreign_keys = ON. Use a transaction for changes that belong together, so a failure can roll back the group. Keep currency units and status values consistent with last week’s reports.',
-          ],
-          example: [
-            'Two jobs can share a sequence',
-            'Project North and Project South can both have an RFI-001. A unique constraint across project_id and rfi_number accepts one in each project and rejects a second RFI-001 for North. Linking the vendor by ID still works if the vendor changes its display name.',
-          ],
-          project: [
-            'Design and populate connected project, vendor, RFI and change-order tables. Draw their relationships and write a test for an unknown project ID, a repeated local RFI number and a valid number used on two different projects. Run your approved-value report again.',
-            'Keys and relationships … Failed inserts … Valid same-number case …',
-            'A connected schema with enforced relationships and tests for both valid and invalid writes.',
-          ],
-          questions: [
-            check(
-              'RFI numbering restarts on each job. Which uniqueness rule fits?',
-              0,
-              [
-                option(
-                  'The combination of project ID and RFI number must be unique.',
-                  'This permits the same local number on different projects and prevents repeat numbers on one project.',
-                ),
-                option(
-                  'The RFI number must be unique across all projects.',
-                  'This would block a valid local number on a second job.',
-                ),
-                option(
-                  'Every RFI title must be unique.',
-                  'Titles can repeat even when the numbered business records are distinct.',
-                ),
-              ],
-            ),
-            check(
-              'Two related inserts must both succeed. One fails after the other has run. What arrangement supports recovery?',
-              1,
-              [
-                option(
-                  'Commit the first write before attempting the second.',
-                  'This leaves the first record committed if the second one fails.',
-                ),
-                option(
-                  'Use a single transaction and roll it back on failure.',
-                  'The related changes can be treated as one unit.',
-                ),
-                option(
-                  'Disable constraints before attempting the writes.',
-                  'That removes protection and can leave invalid relationships in the database.',
-                ),
-              ],
-            ),
-          ],
-        }),
-        lesson({
-          week: 9,
-          id: 'read-an-api',
-          title: 'Read a public API',
-          summary:
-            'Make a read request, inspect JSON and handle missing or failed responses.',
-          teaching: [
-            'An API describes how programs exchange information. An HTTP GET requests data from an endpoint. Read the provider’s documentation for required inputs, authentication, limits and response shape. A status code tells you whether the server handled the request as expected. A successful status still needs a content check. For a paginated result, follow the provider’s next link until the final page, preserving the filter that identifies your project.',
-            'Develop with a saved, fictional JSON response so you can keep working offline. Check the required fields and record the source and retrieval time. If you use a free provider that requires a key, keep it out of the repository and browser code. A no-key public endpoint or supplied fixture is sufficient for this exercise.',
-          ],
-          example: [
-            'Read a project weather snapshot',
-            'Your practice response is {"site":"North","rain_mm":0}. Zero is a valid observation. A missing rain_mm field means the value is unknown. A status 429 indicates rate limiting, so use a saved response or wait as directed. Label a saved observation with its time when showing it.',
-          ],
-          project: [
-            'Use Python to read a documented public read-only endpoint or a local fixture with the same structure. Extract two fields, handle an unsuccessful status or saved error case, and store one validated observation for a fictional project. Show the difference between zero and missing.',
-            'Endpoint or fixture … Sample response … Failure behavior … Stored fields …',
-            'A repeatable read with field validation, source information and an error case.',
-          ],
-          questions: [
-            check(
-              'A weather response has rain_mm equal to 0. A different response omits the field. How should the dashboard interpret them?',
-              2,
-              [
-                option(
-                  'Both represent zero rainfall.',
-                  'An absent observation cannot establish a measured zero.',
-                ),
-                option(
-                  'Both should be removed because zero is false in Python.',
-                  'Truthiness would discard a legitimate measurement.',
-                ),
-                option(
-                  'Display zero for the first and an unknown or missing value for the second.',
-                  'Testing field presence separately from its value preserves the meaning of both responses.',
-                ),
-              ],
-            ),
-            check(
-              'A service responds with HTTP 429. Which response fits a small reporting tool?',
-              0,
-              [
-                option(
-                  'Respect the retry instructions and label any cached data with its retrieval time.',
-                  'This handles rate limiting and gives users enough context about stale data.',
-                ),
-                option(
-                  'Send immediate retries in a tight loop until one succeeds.',
-                  'Rapid retries can add load and prolong rate limiting.',
-                ),
-                option(
-                  'Treat the response body as the latest successful measurement.',
-                  'An error response does not establish a new observation.',
-                ),
-              ],
-            ),
-          ],
-        }),
-        lesson({
-          week: 10,
-          id: 'reliable-integrations',
-          title: 'Connect an API to SQL',
-          summary:
-            'Validate incoming events and handle repeated deliveries without double counting.',
-          teaching: [
-            'Polling checks an API periodically for changes. A webhook sends an event to a receiving service when something happens. Simulate the receiving side locally with a saved event. Record the provider’s event ID, the business record it refers to and the fields your database needs.',
-            'An integration may see an event twice if a response is lost or a sender retries. Apply the business update and record the event ID in one transaction with an enforced unique event key. Validate required fields first and keep clear records of accepted, duplicate and invalid deliveries.',
-          ],
-          example: [
-            'One delivery arrives twice',
-            'The sample event E-92 says an order received eight boxes. Two identical deliveries of E-92 still represent eight boxes. A separate E-93 with three more raises the received total to eleven. Use the event ID to recognize redelivery while allowing distinct updates to the same order.',
-          ],
-          project: [
-            'Connect a JSON event source to your SQLite project database. Replay a fictional delivery twice, replay a different event for the same order and import one invalid event. Include a failed or incomplete source, reconcile every outcome, and print a SQLite report that confirms the final quantity.',
-            'Event IDs and quantities … Accepted, duplicate and invalid counts … Verified total …',
-            'A repeat-safe import that reconciles valid, repeated and invalid events.',
-          ],
-          questions: [
-            check(
-              'The same delivery event arrives a second time after a lost acknowledgment. Which identity detects a repeat?',
-              1,
-              [
-                option(
-                  'The order ID alone.',
-                  'One order may receive several legitimate deliveries.',
-                ),
-                option(
-                  'The original provider event ID under a uniqueness rule.',
-                  'The event ID stays the same on redelivery while distinct events can still update the order.',
-                ),
-                option(
-                  'The local time at which each copy arrived.',
-                  'The copies can have different arrival times.',
-                ),
-              ],
-            ),
-            check(
-              'A program marks an event processed, commits and then crashes before updating inventory. What design addresses this?',
-              2,
-              [
-                option(
-                  'Mark every event as new after a restart.',
-                  'That can reapply changes which actually succeeded.',
-                ),
-                option(
-                  'Add a longer delay between the two actions.',
-                  'A delay leaves the same failure window.',
-                ),
-                option(
-                  'Record processing and apply the inventory update in the same transaction.',
-                  'The two writes can then complete together or roll back together.',
-                ),
-              ],
-            ),
-          ],
-        }),
-      ],
-    },
-    {
-      id: 'apps',
-      title: 'Application development',
-      summary:
-        'Turn the database into a usable form, service and dashboard, then document a repeatable release.',
-      badge: 'App Developer',
-      lessons: [
-        lesson({
-          week: 11,
-          id: 'accessible-entry-form',
-          title: 'Build a project entry form',
-          summary:
-            'Combine HTML, CSS and JavaScript to collect clean project inputs.',
-          teaching: [
-            'Give each input a visible label connected through its for attribute and the input’s id. The name attribute supplies the key used in a standard form submission. Choose controls that fit the data, such as a select for a fixed status list. Communicate required fields in text and give errors beside the relevant input so users know what to correct.',
-            'Use HTML validation and JavaScript to give quick feedback, then validate again wherever you save data. Make the form usable with a keyboard. Preserve what people have already typed when one field fails, and distinguish a preview from a confirmed save.',
-          ],
-          example: [
-            'A quantity with clear feedback',
-            'The label “Boxes received” stays visible while someone types. An order of zero boxes produces “Enter at least one box,” beside the field, with the project choice preserved. A valid entry shows the selected project, number of boxes and unit before the learner confirms.',
-          ],
-          project: [
-            'Create an HTML/CSS/JavaScript entry form for fictional project data. Reuse your valid ID and positive-quantity rules, label every input and test the complete flow with the keyboard. Record the feedback for an invalid submission and the confirmation for a valid one.',
-            'Fields and labels … Keyboard path … Invalid and valid outcomes …',
-            'A keyboard-usable form with visible labels, useful error messages and a clear confirmation.',
-          ],
-          questions: [
-            check(
-              'What gives “Number of boxes” a persistent, programmatically associated label?',
-              0,
-              [
-                option(
-                  'A visible label whose for attribute matches the input ID.',
-                  'This names the control for users and assistive technology and keeps the text available during entry.',
-                ),
-                option(
-                  'A placeholder that disappears when typing starts.',
-                  'A placeholder disappears and is a poor substitute for a persistent label.',
-                ),
-                option(
-                  'A red border around the quantity field.',
-                  'Color alone does not say what the field collects.',
-                ),
-              ],
-            ),
-            check(
-              'A submission fails because the quantity is blank. Which behavior best supports recovery?',
-              1,
-              [
-                option(
-                  'Clear all fields and show a generic error page.',
-                  'This loses valid entries and leaves the problem unclear.',
-                ),
-                option(
-                  'Keep the other fields and identify the missing quantity beside its input.',
-                  'The user knows exactly what to correct and can keep their previous work.',
-                ),
-                option(
-                  'Insert a quantity of one and continue.',
-                  'A silent default creates a record the person never supplied.',
-                ),
-              ],
-            ),
-          ],
-        }),
-        lesson({
-          week: 12,
-          id: 'rfi-endpoints',
-          title: 'Build an RFI service',
-          summary:
-            'Create and retrieve fictional requests for information through FastAPI.',
-          teaching: [
-            'An endpoint combines an HTTP method, a path and an expected request or response. Define a small contract before coding. A POST can submit a new RFI, while a GET for an existing ID can return its saved details. Use clear status codes for success, invalid data, missing records and conflicts.',
-            'A FastAPI request model can enforce the incoming shape, while your service and database enforce rules such as valid project relationships and unique local RFI numbers. Query SQLite with parameters. Return the persisted record’s identity so a client can fetch exactly what it created.',
-          ],
-          example: [
-            'Create and read one record',
-            'A client posts project North, number RFI-009 and the question “Which paint finish is scheduled?” A successful create can return 201 and its ID. A GET for that ID returns the saved question. A GET for a missing ID returns 404. A repeated number on North follows the duplicate rule you documented.',
-          ],
-          project: [
-            'Build a local FastAPI service to create an RFI and retrieve it by ID. Reuse your SQLite constraints and validation. Record the outcomes for a valid create, an invalid body, a duplicate and a missing ID. Use fictional records throughout.',
-            'Create request and returned ID … Read result … Error cases …',
-            'Working create and retrieve endpoints with four documented outcomes.',
-          ],
-          questions: [
-            check(
-              'A client requests a well-formed RFI ID that does not exist. Which response most clearly describes the result?',
-              2,
-              [
-                option(
-                  '201 Created',
-                  'A read request did not create a record.',
-                ),
-                option(
-                  '200 with an invented placeholder RFI',
-                  'This can make clients believe a nonexistent record is real.',
-                ),
-                option(
-                  '404 Not Found with a clear response body',
-                  'The route exists, but the requested record cannot be found.',
-                ),
-              ],
-            ),
-            check(
-              'The browser form validates the RFI number. What should the service still do?',
-              0,
-              [
-                option(
-                  'Validate the incoming fields and enforce the project and uniqueness rules on write.',
-                  'Other clients can call the service, and database rules must hold for every write.',
-                ),
-                option(
-                  'Accept any request because the browser already checked it.',
-                  'The browser is only one entry point to the service.',
-                ),
-                option(
-                  'Remove database constraints to avoid two validation steps.',
-                  'Constraints protect the stored state, including concurrent or alternate writes.',
-                ),
-              ],
-            ),
-          ],
-        }),
-        lesson({
-          week: 13,
-          id: 'dashboard',
-          title: 'Build a project dashboard',
-          summary:
-            'Use Streamlit and SQL to show numbers a project manager can act on.',
-          teaching: [
-            'Start by naming a decision the dashboard supports. An open RFI count can help a coordinator prioritize follow-up. An approved-change total helps reconcile budget changes. Define each measure, the unit, and the filters that apply before choosing a chart or table.',
-            'Query your database for the selected project. Put the filter’s value and the measurement period near the result. Give a useful message for an empty result, and distinguish a confirmed zero from missing or failed data. Use a drill-down list so a learner can trace each number back to its records.',
-          ],
-          example: [
-            'Keep the metric and detail rows aligned',
-            'Project North has one open RFI and two closed RFIs. South has four open RFIs. With North selected, the open count should be one and the detail table should list that single item. A card that shows five while the table shows one is applying the filter differently.',
-          ],
-          project: [
-            'Build a local Streamlit dashboard backed by your fictional SQLite data. Add a project filter, an open RFI count, an approved-change amount and the underlying detail rows. Check two projects and a project with no matching rows.',
-            'Metric definition … Filter tested … Detail reconciliation … Empty-state message …',
-            'A working dashboard with consistent filters and traceable totals.',
-          ],
-          questions: [
-            check(
-              'An “Approved changes” card includes pending rows. What needs correction?',
-              1,
-              [
-                option(
-                  'Use a different chart color.',
-                  'Color does not change which rows are counted.',
-                ),
-                option(
-                  'Apply the approved-status rule to the query behind the metric.',
-                  'The measure must use the same definition its title promises.',
-                ),
-                option(
-                  'Round the total to fewer digits.',
-                  'Rounding does not remove pending changes.',
-                ),
-              ],
-            ),
-            check(
-              'The database query failed. What should an “Open RFIs” card display?',
-              2,
-              [
-                option(
-                  'Zero, because no rows reached the screen.',
-                  'That implies a confirmed absence of open RFIs.',
-                ),
-                option(
-                  'The largest count recorded this week.',
-                  'A historical maximum may have no relation to the current state.',
-                ),
-                option(
-                  'An unavailable status, with an appropriate retry or refresh action.',
-                  'A failed query leaves the current count unknown.',
-                ),
-              ],
-            ),
-          ],
-        }),
-        lesson({
-          week: 14,
-          id: 'release-a-dashboard',
-          title: 'Release a working dashboard',
-          summary:
-            'Prepare a repeatable installation, run a release check and explain the hosting needs.',
-          teaching: [
-            'Match the deployment environment to what your app executes. A static host can serve HTML, CSS and browser JavaScript. A Python service such as FastAPI or Streamlit needs a running Python process on an appropriate host or the reviewer’s computer. A static sample report can still make a useful companion to a local service.',
-            'Give a new reviewer a fresh start with documented dependencies, a small fictional database or seed command, and a short check with a known result. Record the version tested. If a hosted process has temporary disk storage, confirm persistence before relying on a local database file.',
-          ],
-          example: [
-            'Check the release from outside your usual setup',
-            'The instructions say to install the listed dependencies, populate the sample database and start the dashboard. From an empty directory, a reviewer runs those steps, selects North and sees the fixture’s one open RFI. After restarting, the expected records are still available as documented.',
-          ],
-          project: [
-            'Package your fictional dashboard with an install guide and a reproducible sample. Run it from a clean directory. Use a suitable free runtime if available, or demonstrate the local release and a static sample on GitHub Pages. Record the tested version, known sample result and restart behavior.',
-            'Run location … Clean-start commands … Smoke check … Restart result …',
-            'A reproducible release with a working sample, installation instructions and a recorded smoke check.',
-          ],
-          questions: [
-            check(
-              'Which part of your project can GitHub Pages serve directly?',
-              0,
-              [
-                option(
-                  'A static HTML/JavaScript dashboard that reads fictional JSON in the browser.',
-                  'Static files and client-side JavaScript fit a static host.',
-                ),
-                option(
-                  'A long-running Python process serving FastAPI requests.',
-                  'Running that process requires a Python runtime on a server or local machine.',
-                ),
-                option(
-                  'A Streamlit Python server that writes to a server-side SQLite file.',
-                  'A static file host does not run that server process.',
-                ),
-              ],
-            ),
-            check(
-              'Which release check would best catch an undocumented local dependency?',
-              1,
-              [
-                option(
-                  'Refresh the dashboard in a browser with the app already running.',
-                  'The running process can hide a missing setup step.',
-                ),
-                option(
-                  'Start from a clean environment and follow only the README and included files.',
-                  'This tests whether a new reviewer has all required information and inputs.',
-                ),
-                option(
-                  'Rename the release folder to “final.”',
-                  'A new name cannot verify a clean installation.',
-                ),
-              ],
-            ),
-          ],
-        }),
-      ],
-    },
-    {
-      id: 'ai',
-      title: 'Applied AI and automation',
-      summary:
-        'Compare model responses, ground answers in project documents and measure a supervised workflow.',
-      badge: 'AI Practitioner',
-      lessons: [
-        lesson({
-          week: 15,
-          id: 'compare-models',
-          title: 'Compare model responses',
-          summary:
-            'Use the same questions and scoring rules to investigate how model outputs differ.',
-          teaching: [
-            'Machine learning fits patterns from examples. A language model generates a sequence of tokens, which may be words, parts of words or punctuation. Fluent output can still misread a number or invent a plausible detail. Treat a draft as a candidate answer you can check against evidence.',
-            'Write the job, relevant context, response format and rule for missing information in a short prompt. Compare two sets of responses on the same 20 fictional questions. Define acceptable answers before reviewing the responses. Saved outputs or clearly labeled simulated responses let you practice the evaluation without a paid account.',
-          ],
-          example: [
-            'One prompt, two responses',
-            'The source says “Delivery window Thursday, 9 to 11. Dock unassigned.” Asked which dock to use, response A says “Dock 2.” Response B says “The dock has not been assigned.” A grounding rule awards the point to B. Record the source sentence so a reviewer can understand the score.',
-          ],
-          project: [
-            'Use the 20 questions, five fictional documents and human grading key in the starter materials. For a live comparison, give each model the same documents, question and brief. Keep the answer key out of the prompt. For an offline run, use the two supplied simulated response sets. Hide model identities while scoring against the key, then group the errors and label your evidence.',
-            'Prompt and response sources … Scores out of 20 … Recurring error and example …',
-            'Twenty paired, consistently scored cases with a documented response source and error pattern.',
-          ],
-          questions: [
-            check(
-              'Two models receive different project notes and different prompts. What change would make a side-by-side comparison fairer?',
-              2,
-              [
-                option(
-                  'Choose whichever answer uses the most professional language.',
-                  'Style alone does not measure factual performance.',
-                ),
-                option(
-                  'Give the weaker-looking model shorter questions after seeing its answers.',
-                  'Changing the task after seeing results makes the comparison difficult to interpret.',
-                ),
-                option(
-                  'Give both the same inputs and apply a scoring rule written in advance.',
-                  'This holds the task constant and reduces scoring drift.',
-                ),
-              ],
-            ),
-            check(
-              'A fluent response supplies a delivery address that is absent from the provided notes. Under a source-only rule, how should it score?',
-              0,
-              [
-                option(
-                  'As an unsupported claim, even if the address sounds plausible.',
-                  'The scoring rule requires support from the supplied material.',
-                ),
-                option(
-                  'As correct when the address is formatted properly.',
-                  'A valid format does not show where the address came from.',
-                ),
-                option(
-                  'As correct if the model repeats it a second time.',
-                  'Repetition does not supply evidence.',
-                ),
-              ],
-            ),
-          ],
-        }),
-        lesson({
-          week: 16,
-          id: 'grounded-assistant',
-          title: 'Ground answers in documents',
-          summary:
-            'Retrieve a relevant passage, produce structured output and check the cited evidence.',
-          teaching: [
-            'A retrieval-based assistant first selects relevant passages, then uses those passages to draft an answer. Store the document ID, revision and section with every passage. Keyword search is enough for a small local example. Embeddings represent text as numbers that support similarity search, but a nearby passage can still be outdated or irrelevant.',
-            'Ask for fields such as answer, source ID and supporting excerpt, with an explicit outcome when evidence is insufficient. Validate the structure, then read the cited passage to see whether it supports the actual claim. A well-formed JSON object can contain an incorrect answer.',
-          ],
-          example: [
-            'A revision changes the answer',
-            'Spec A, revision 1, says delivery is at the east gate. Revision 2 says to use the north gate. For a question about current delivery, select revision 2, answer “north gate” and cite its delivery section. If the documents say nothing about weekend access, return an insufficient-evidence result for that question.',
-          ],
-          project: [
-            'Build a small assistant over fictional construction notes using local search and saved answers or a free tool. Include two revisions and one unanswerable question. Reuse your Week 15 scoring rules and validate each answer’s source ID, excerpt and revision.',
-            'Documents and revisions … Supported answer and excerpt … Missing-evidence example …',
-            'A document-grounded answer with reproducible retrieval, a checked citation and an abstention.',
-          ],
-          questions: [
-            check(
-              'An answer has valid JSON and a real source ID. What check is still essential?',
-              1,
-              [
-                option(
-                  'Count how often the source ID appears in the output.',
-                  'Frequency does not establish that the cited passage supports the answer.',
-                ),
-                option(
-                  'Read the cited passage in the applicable revision and compare it with the claim.',
-                  'Correct structure and a real document do not guarantee evidential support.',
-                ),
-                option(
-                  'Remove the citation to simplify the result.',
-                  'Removing it would make the claim harder to verify.',
-                ),
-              ],
-            ),
-            check(
-              'The nearest search result mentions “access” but gives no weekend hours. What should a source-grounded assistant do?',
-              2,
-              [
-                option(
-                  'Reuse the weekday hours on the assumption they apply all week.',
-                  'The evidence does not extend weekday hours to weekends.',
-                ),
-                option(
-                  'Return the passage as proof that the office is always open.',
-                  'Topic similarity cannot support that particular claim.',
-                ),
-                option(
-                  'Report insufficient evidence and identify the missing hours.',
-                  'This gives a useful, accurate result that a reviewer can follow up.',
-                ),
-              ],
-            ),
-          ],
-        }),
-        lesson({
-          week: 17,
-          id: 'procurement-workflow',
-          title: 'Automate a procurement draft',
-          summary:
-            'Design a repeatable workflow with limited tools and a named human approval step.',
-          teaching: [
-            'A workflow follows a planned path, such as read a request, check the catalog, calculate pack count and prepare a draft. An agent can select from tools during a task. Start with the fixed path when the steps are known. Define the input, output and permissions of every tool you expose.',
-            'Keep data retrieval and draft preparation separate from consequential actions. A reviewer needs the item, quantity, units, source, estimated cost and any uncertainty before authorizing an order. For this exercise, keep every action simulated. Test duplicate events, missing data and a denied approval.',
-          ],
-          example: [
-            'Draft a requisition',
-            'A request needs 23 anchors. A fictional catalog lists ten per pack at $8. A lookup and calculator prepare a three-pack, $24 draft with the catalog row attached. A missing vendor contact leaves the draft in review. A repeated event ID should point to the existing draft.',
-          ],
-          project: [
-            'Build a fictional procurement tracker that looks up a catalog item, calculates packs and writes a draft for review. Reuse the earlier pack calculation and repeat-safe event ID. Simulate approval and rejection locally, and record what the reviewer sees before any state change.',
-            'Tool inputs and outputs … Draft and evidence … Duplicate event result … Review decision …',
-            'A repeat-safe procurement draft with visible evidence and a tested approval boundary.',
-          ],
-          questions: [
-            check(
-              'An assistant has calculated a $480 order from a request. What belongs at the review step?',
-              0,
-              [
-                option(
-                  'Show the item, pack calculation, price source and total to an authorized reviewer.',
-                  'The reviewer can check the inputs and make an informed decision before the draft proceeds.',
-                ),
-                option(
-                  'Automatically mark it approved because the arithmetic passed.',
-                  'A correct calculation does not authorize a purchase.',
-                ),
-                option(
-                  'Show only a confidence score and hide the line items.',
-                  'The reviewer needs the underlying evidence and quantities.',
-                ),
-              ],
-            ),
-            check(
-              'A supplier listing lacks pack size. Which workflow outcome preserves the known facts?',
-              1,
-              [
-                option(
-                  'Use the pack size from a similar item and approve the order.',
-                  'A different item’s packaging may be different.',
-                ),
-                option(
-                  'Flag the missing field and hold the draft for clarification.',
-                  'Pack size is essential to the calculation, so the draft cannot yet support a reliable total.',
-                ),
-                option(
-                  'Treat the missing value as zero and continue.',
-                  'Zero is unusable as a divisor and does not represent an unknown pack size.',
-                ),
-              ],
-            ),
-          ],
-        }),
-        lesson({
-          week: 18,
-          id: 'evaluate-ai',
-          title: 'Evaluate an AI workflow',
-          summary:
-            'Measure accuracy and escalation quality, then investigate the errors that matter most.',
-          teaching: [
-            'Build a fixed evaluation set with ordinary cases, tricky boundaries, missing evidence and duplicate inputs. Write each expected outcome before running the workflow. Track the result of each stage so you can distinguish a retrieval miss from an arithmetic mistake or an approval bypass.',
-            'A single accuracy number can hide an important failure. Count unsupported claims, missed escalations and attempts to proceed without approval separately. Report the denominator with every percentage. To measure recall for a review flag, divide the number of genuinely risky cases it caught by all genuinely risky cases in the test. Keep fresh cases aside to check whether a change generalizes beyond the examples you used to tune it.',
-          ],
-          example: [
-            'A pass rate hides a costly mistake',
-            'A tracker handles 18 of 20 sample requests as expected, for 90% overall. One remaining case drafts the wrong pack count. The other marks a request approved without review. Fix and retest the approval boundary even if the overall score exceeds the course pass mark.',
-          ],
-          project: [
-            'Run a fictional project email through your workflow. Extract and validate its fields, save a reviewable SQLite record and draft a response for human approval. Evaluate the workflow on a fixed set with expected outcomes. Include a missing source, a repeat event and denied approval. Group the errors, make one targeted fix and rerun both the original set and at least two fresh cases. Record any remaining limits.',
-            'Cases and expected outcomes … Baseline … Fix … Retest and remaining limit …',
-            'A scored comparison with failure categories, fresh cases and evidence that approval is enforced.',
-          ],
-          questions: [
-            check(
-              'A workflow passes 19 of 20 cases. The remaining case proceeds without required approval. What should the team conclude?',
-              2,
-              [
-                option(
-                  'It is ready for autonomous use because it passed 95%.',
-                  'The aggregate pass rate conceals a failure of a required approval rule.',
-                ),
-                option(
-                  'Discard the failed case because it is uncommon.',
-                  'A rare case can still expose an unacceptable outcome.',
-                ),
-                option(
-                  'Report both results and repair the approval boundary before real actions.',
-                  'The percentage and the consequence of the failure both matter.',
-                ),
-              ],
-            ),
-            check(
-              'You used five troublesome cases to refine a prompt. Which test best examines whether the change generalizes?',
-              0,
-              [
-                option(
-                  'Evaluate additional unseen cases with expected outcomes fixed in advance.',
-                  'Fresh cases reduce the chance that the prompt merely memorized your tuning examples.',
-                ),
-                option(
-                  'Repeat only the same five cases until they all pass.',
-                  'That checks familiar cases, but gives limited evidence about generalization.',
-                ),
-                option(
-                  'Ask the system whether it considers itself more accurate.',
-                  'A self-rating does not show performance on a task.',
-                ),
-              ],
-            ),
-          ],
-        }),
-      ],
-    },
-    {
-      id: 'product',
-      title: 'Engineering and product',
-      summary:
-        'Turn field needs into testable requirements and make the project easier to release and maintain.',
-      badge: 'Product Builder',
-      lessons: [
-        lesson({
-          week: 19,
-          id: 'requirements-backlog',
-          title: 'Write a product brief',
-          summary:
-            'Define the user’s problem, a measurable outcome and a small delivery backlog.',
-          teaching: [
-            'A product requirements document explains whose problem you are solving, how they handle it now, which outcome matters and what this release includes. Use evidence from a real conversation with permission, or clearly label an exercise based on fictional observations. An assumption is a question to test.',
-            'In an iterative project, keep a prioritized backlog and choose a small piece of user value for the next cycle. A user story describes a person, their need and the reason. Acceptance criteria turn that story into observable behavior. Include failure paths and estimate what the team can complete and review together.',
-          ],
-          example: [
-            'A backlog item small enough to finish',
-            'A coordinator loses time checking whether a vendor has answered an RFI. One story asks for a project-filtered list of unanswered RFIs. A criterion says that selecting North shows its two unanswered records and excludes closed records and other projects. Put automatic reminder emails into a later decision.',
-          ],
-          project: [
-            'Write a one-page product brief for one Fieldwork AI user. Define the problem, a success measure, scope and one assumption. Draft a prioritized backlog of five items and give the first story verifiable acceptance criteria tied to your database and UI.',
-            'User and problem … Evidence or assumption … Success measure … First story and acceptance checks …',
-            'A scoped brief and ordered backlog whose first story can be demonstrated and tested.',
-          ],
-          questions: [
-            check('Which acceptance criterion is directly testable?', 1, [
-              option(
-                'The dashboard should feel much smarter.',
-                'The phrase does not identify a repeatable observation.',
-              ),
-              option(
-                'With North selected, show its two open RFIs and exclude its closed RFI.',
-                'A known fixture can verify the count, project and status rule.',
-              ),
-              option(
-                'Make the interface as good as competitors.',
-                'A reference and measurable criteria would be needed to judge that claim.',
-              ),
-            ]),
-            check(
-              'A team can complete one backlog item this cycle. Which item best tests the coordinator’s stated problem?',
-              2,
-              [
-                option(
-                  'Offer five new theme colors.',
-                  'Visual variety does little to test whether unanswered RFIs are easy to find.',
-                ),
-                option(
-                  'Rename the repository and dashboard.',
-                  'Naming does not test the core workflow.',
-                ),
-                option(
-                  'Show unanswered RFIs for the selected project and observe a coordinator using it.',
-                  'This delivers a narrow user outcome and creates a chance to evaluate it.',
-                ),
-              ],
-            ),
-          ],
-        }),
-        lesson({
-          week: 20,
-          id: 'release-engineering',
-          title: 'Engineer a reliable release',
-          summary:
-            'Automate repeatable checks and map where project data moves.',
-          teaching: [
-            'Continuous integration runs repeatable checks when a change is proposed. Continuous delivery keeps a passing version ready to release. Choose checks that protect the behavior promised in the brief, and keep a way to restore the last working version. The same checks can run locally at no cost.',
-            'Draw the user interface, service, database and any external provider. Label what crosses each boundary, which component can read or write and where configuration belongs. Publish only fictional fixtures. If a private credential is required for a different deployment, manage it on the server through the host’s protected configuration.',
-          ],
-          example: [
-            'Protect an existing approval rule',
-            'A proposed change adds a new procurement status. A test submits a request without reviewer approval and confirms it stays pending. Another checks that an approved sample appears exactly once. A failed check blocks that release while the last known working version remains available.',
-          ],
-          project: [
-            'Add a repeatable test command and, where available for free, a CI workflow for the Fieldwork repository. Test a validation failure and the approval boundary. Draw the architecture and data flow. Run a deliberate failing test locally, restore it and document release recovery. Present the business problem, architecture, limits, security considerations and next milestone to a reviewer or in a recording.',
-            'Test command and results … Architecture and boundaries … Recovery step …',
-            'A reproducible test run, architecture sketch and demonstrated release recovery procedure.',
-          ],
-          questions: [
-            check(
-              'A change breaks a required approval test. What should happen to that release candidate?',
-              0,
-              [
-                option(
-                  'Hold the release, inspect the failure and rerun the check after the fix.',
-                  'The check protects a stated requirement. Resolve the cause before promoting the version.',
-                ),
-                option(
-                  'Mark the failing test optional to keep the schedule.',
-                  'That bypasses the behavior the team chose to protect.',
-                ),
-                option(
-                  'Deploy and wait for someone to report the same problem.',
-                  'The known failure already provides actionable evidence.',
-                ),
-              ],
-            ),
-            check(
-              'An interface is shipped as public browser JavaScript. Where should a private provider credential live if a future server integration needs one?',
-              1,
-              [
-                option(
-                  'In the browser bundle under an unusual variable name.',
-                  'Anyone who receives the public bundle can inspect its contents.',
-                ),
-                option(
-                  'In protected server-side configuration, accessible only to the service that needs it.',
-                  'This keeps the secret outside the public client and repository.',
-                ),
-                option(
-                  'In a screenshot attached to the public README.',
-                  'A screenshot is still public disclosure.',
-                ),
-              ],
-            ),
-          ],
-        }),
-      ],
-    },
-    {
-      id: 'venture',
-      title: 'Technology entrepreneurship',
-      summary:
-        'Investigate a recurring problem, test the smallest useful product and present the evidence.',
-      badge: 'Fieldwork Founder',
-      lessons: [
-        lesson({
-          week: 21,
-          id: 'customer-discovery',
-          title: 'Interview potential users',
-          summary:
-            'Learn how five owners or operators handle a real recurring problem today.',
-          teaching: [
-            'Ask about the last time a problem happened. What triggered it, what did the person do, how long did it take and who else was involved? A story about past behavior gives you details that a guess about future buying rarely provides. Listen for workarounds and the cost of leaving the problem alone.',
-            'Ask permission to take notes. Record patterns without identifying details and distinguish a direct observation from your interpretation. Seek examples that challenge your assumption. If you rehearse with fictional personas, label those notes as practice and keep them separate from real interviews.',
-          ],
-          example: [
-            'A question that uncovers a workflow',
-            '“Would you buy an AI tracker?” invites a polite prediction. “Walk me through the last late delivery you dealt with” can uncover the original email, a missed update and two hours spent calling suppliers. Ask what happened next and how often similar incidents occur.',
-          ],
-          project: [
-            'Plan and conduct five voluntary conversations with relevant owners or operators. Record an anonymized recent incident, current workaround and impact for each. You can rehearse with fictional cases first. In your notebook, identify one recurring theme, one exception and whether the evidence is real or simulated.',
-            'Interview context … Recent incident and workaround … Pattern, exception and evidence type …',
-            'Five clearly labeled interview records and a problem statement grounded in the available evidence.',
-          ],
-          questions: [
-            check(
-              'Which opening question is most likely to produce evidence about current behavior?',
-              2,
-              [
-                option(
-                  'Would you recommend a perfect procurement app?',
-                  'This invites a prediction about an imaginary product.',
-                ),
-                option(
-                  'Do you agree our dashboard is easier than your spreadsheet?',
-                  'The question suggests a preferred answer and starts with your solution.',
-                ),
-                option(
-                  'Tell me about the last order update that took longer than you expected.',
-                  'A recent, specific event makes it easier to uncover the steps and consequences.',
-                ),
-              ],
-            ),
-            check(
-              'Four interviewees report a delay. One says their spreadsheet already handles it well. How should you record the fifth response?',
-              0,
-              [
-                option(
-                  'Keep it and investigate what is different about that workflow.',
-                  'A counterexample can reveal segment boundaries, an effective workaround or a weaker hypothesis.',
-                ),
-                option(
-                  'Remove it so the summary describes a clear pattern.',
-                  'Removing inconvenient evidence exaggerates support for your claim.',
-                ),
-                option(
-                  'Count it as interest because the person agreed to an interview.',
-                  'Agreeing to talk does not establish a problem or intent to buy.',
-                ),
-              ],
-            ),
-          ],
-        }),
-        lesson({
-          week: 22,
-          id: 'build-the-mvp',
-          title: 'Test a narrow MVP',
-          summary:
-            'Build one complete workflow and measure whether it helps the intended user.',
-          teaching: [
-            'A minimum viable product tests an important assumption with the smallest useful version. Choose one person, one recurring job and one observable outcome. A local prototype with fictional records is enough to test whether people understand the workflow. Explain any manual steps behind the prototype.',
-            'Write the test before adding features. Give a participant a realistic task and let them try it without coaching. Capture completion, errors and time, together with what they expected at the sticking points. A small successful test informs the next iteration. Product-market fit requires broader evidence of sustained demand.',
-          ],
-          example: [
-            'Find the next unanswered RFI',
-            'The proposed MVP helps a coordinator identify the oldest unanswered RFI for a chosen project. Use the same fictional records for a spreadsheet baseline and a prototype trial. Verify the record selected as well as elapsed time. A fast wrong answer fails the task.',
-          ],
-          project: [
-            'Build one complete Fieldwork AI workflow from data entry to a useful result. Set a baseline, define task success and run the same realistic scenario with a test user or clearly labeled rehearsal. Reuse your acceptance checks and evidence from discovery. Record the result and one change it suggests.',
-            'Target workflow … Baseline and success rule … Observed outcome … Next change …',
-            'A runnable MVP and a task-based comparison with a stated baseline and evidence type.',
-          ],
-          questions: [
-            check(
-              'Which scope gives the clearest first test of an RFI follow-up product?',
-              1,
-              [
-                option(
-                  'Build scheduling, billing, payroll and messaging before showing it.',
-                  'A broad build increases effort and makes individual outcomes harder to interpret.',
-                ),
-                option(
-                  'Help one coordinator find the oldest unanswered RFI for a selected project.',
-                  'This defines the user, task and observable result.',
-                ),
-                option(
-                  'Show a logo to ten people and ask if they like the product.',
-                  'The logo does not demonstrate whether the workflow solves the problem.',
-                ),
-              ],
-            ),
-            check(
-              'A tester finishes in 20 seconds but selects a closed RFI instead of the oldest open one. What should you record?',
-              2,
-              [
-                option(
-                  'A success because the tester finished quickly.',
-                  'Speed does not establish that the required record was found.',
-                ),
-                option(
-                  'An invalid session because the answer weakened the result.',
-                  'The error is precisely the kind of evidence a usability test should capture.',
-                ),
-                option(
-                  'A failed task, the observed time and where the user went wrong.',
-                  'Accuracy and time together explain what needs improvement.',
-                ),
-              ],
-            ),
-          ],
-        }),
-        lesson({
-          week: 23,
-          id: 'pricing-and-testing',
-          title: 'Test pricing and adoption',
-          summary:
-            'Form a pricing hypothesis and look for meaningful signs that people will use the product.',
-          teaching: [
-            'Identify who uses the tool, who would authorize it and which unit would make sense to a buyer, such as a project or a team. Estimate the value of a measured time saving using explicit assumptions. The result informs a pricing conversation. To estimate a break-even monthly price, divide your fixed monthly costs by the expected number of paying customers and add the variable cost per customer. Test willingness to pay separately.',
-            'Choose one way to reach your intended users and define a meaningful next action, such as completing a fictional pilot task. Record invitations, trials and successful completions separately. Describe a proposed price inside your research exercise. Keep the course, its labs and the prototype test free.',
-          ],
-          example: [
-            'Separate value from willingness to pay',
-            'A team saves 15 minutes on each of eight monthly checks. That is two hours a month. At an assumed $30 per hour, the time is worth about $60. A hypothetical $20 monthly price still needs evidence about the buyer, budget and alternatives. Three completed trials out of ten invitations describe trial participation.',
-          ],
-          project: [
-            'Propose a pricing unit and a transparent value estimate for the hypothetical Fieldwork product. Design a free pilot invitation and observe a user test with consent or rehearse with labeled sample data. Record invitations, starts and completions separately, plus one reason someone might decline.',
-            'Buyer and pricing unit … Assumptions and estimate … Trial funnel … Objection …',
-            'A testable pricing hypothesis, a documented free pilot and an honestly labeled adoption measure.',
-          ],
-          questions: [
-            check(
-              'A tool saves 15 minutes per check across eight checks a month. At an assumed $30 per hour, what is the estimated monthly value of time saved?',
-              0,
-              [
-                option(
-                  '$60',
-                  'Eight times 15 minutes is 120 minutes, or two hours at $30 per hour.',
-                ),
-                option(
-                  '$240',
-                  'This counts eight full hours rather than eight quarter-hours.',
-                ),
-                option(
-                  '$20',
-                  'That could be a proposed price, but it does not follow from the time calculation.',
-                ),
-              ],
-            ),
-            check(
-              'Ten people were invited to a free trial. Four started and three completed the task. Which claim is justified?',
-              1,
-              [
-                option(
-                  'Three customers agreed to pay for the tool.',
-                  'No purchase or payment commitment was observed.',
-                ),
-                option(
-                  'Three of ten invitees completed the trial task, including three of the four starters.',
-                  'This reports the observed outcomes and makes both denominators clear.',
-                ),
-                option(
-                  'Everyone who did not start rejected the proposed price.',
-                  'The data does not explain why those invitees did not start.',
-                ),
-              ],
-            ),
-          ],
-        }),
-        lesson({
-          week: 24,
-          id: 'capstone-demo',
-          title: 'Present the Fieldwork capstone',
-          summary:
-            'Demonstrate the finished workflow, report measured results and make a supportable next decision.',
-          teaching: [
-            'A capstone demo should follow a person doing a job. Introduce the user and their initial problem, run the working product on fictional data, and show the result from input to decision. Include one failure or ambiguous case so the audience sees how the product behaves when the happy path breaks.',
-            'Connect your claims to evidence. Give the baseline, measurement method, sample size and limits. If participants repeat identical tasks in a fixed order, practice can influence the later result. Show where the data came from, how you tested the release and who reviews consequential actions. Close with the next experiment, owner and decision criterion. Include the steps a reviewer needs to run the same demonstration.',
-          ],
-          example: [
-            'Report a result at its real scale',
-            'In five fictional lookup tasks, the median completion time drops from 90 to 55 seconds and four of five tasks return the correct RFI. Report both the 35-second difference and the missed case. Show its cause and propose a retest on fresh records before making claims about field performance.',
-          ],
-          project: [
-            'Package your Fieldwork AI MVP, source repository, install guide, short demo and one-page pitch. Demonstrate one success and one failure path. Compare measured results against the baseline and distinguish actual user evidence from rehearsals. State the pricing or willingness-to-pay evidence, estimated operating costs and what scaling would change. Document the next pilot, its owner and the criterion for proceeding.',
-            'Problem and demo flow … Baseline and result with sample size … Failure case … Next pilot and decision …',
-            'A reproducible capstone, working demonstration and evidence-backed pitch with clear limits.',
-          ],
-          questions: [
-            check(
-              'A timed demo improved on five fictional tasks. Which statement belongs in the pitch?',
-              2,
-              [
-                option(
-                  'All project teams will save the same percentage of time.',
-                  'The exercise does not establish outcomes for every team.',
-                ),
-                option(
-                  'The measured improvement proves the product has market fit.',
-                  'A small task test does not establish broad or lasting demand.',
-                ),
-                option(
-                  'State the measured change, task count, fixture and remaining error before proposing a field pilot.',
-                  'This gives the audience the result and the scope of evidence supporting it.',
-                ),
-              ],
-            ),
-            check(
-              'Which package allows a reviewer to reproduce the capstone result?',
-              0,
-              [
-                option(
-                  'A versioned release, fictional fixture, run instructions, expected outcome and evaluation method.',
-                  'The reviewer has the inputs, environment guidance and basis for comparison.',
-                ),
-                option(
-                  'A screenshot of the best result and a feature wish list.',
-                  'A screenshot and ideas do not let the reviewer run the workflow.',
-                ),
-                option(
-                  'A price estimate with the demo data removed.',
-                  'A price estimate does not reproduce a working product or its measured result.',
-                ),
-              ],
-            ),
-          ],
-        }),
-      ],
-    },
-  ];
-})();
+];

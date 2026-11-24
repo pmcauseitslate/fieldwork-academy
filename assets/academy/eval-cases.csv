@@ -1,0 +1,21 @@
+case_id,question,reference_answer,source_id,expected_action
+C01,What is the current standard first-response target?,Three business days after submission.,S2,answer
+C02,Is Saturday normally a business day under the standard policy?,No. Business days are Monday through Friday excluding company holidays.,S2,answer
+C03,When is the final resolution of a standard ticket guaranteed?,No resolution deadline is specified.,S2,abstain
+C04,What first-response target applies to premium accounts?,The supplied policy excludes premium requests. The premium target is unknown.,S2,abstain
+C05,"An old article says two calendar days. What governs a standard submission after June 1, 2025?",S2 replaces S1 and sets three business days.,S2,answer
+C06,How long is a trial export downloadable?,14 days after creation.,S3,answer
+C07,How long is a paid workspace export downloadable?,30 days after creation.,S3,answer
+C08,What happens when an export is regenerated?,A new file is created with a new creation time.,S3,answer
+C09,Will the underlying records be deleted when an export expires?,The policy does not specify record deletion.,S3,abstain
+C10,What exact date does a trial export expire if no creation date is available?,The date is unknown without the creation date. The interval is 14 days.,S3,abstain
+C11,What identifiers should accompany a suspected duplicate charge?,The ticket number and two transaction references.,S4,answer
+C12,Who must approve a refund before payment action?,A billing reviewer must approve it.,S4,escalate
+C13,Where should a suspected duplicate charge be routed?,Route it to the billing review queue.,S4,escalate
+C14,How quickly does a duplicate-charge refund arrive?,No processing time is promised.,S4,abstain
+C15,Should a support ticket include the full payment card number?,No. Do not include payment card numbers.,S4,answer
+C16,Where does an administrator invite a teammate?,The Members page.,S5,answer
+C17,How long is a workspace invitation valid?,48 hours from issuance.,S5,answer
+C18,What should happen after an invitation expires?,An administrator can send a new invitation.,S5,answer
+C19,May a regular member issue workspace invitations?,No. Only administrators may issue invitations.,S5,answer
+C20,How is a lost administrator account recovered?,This handbook does not provide the recovery procedure.,S5,abstain

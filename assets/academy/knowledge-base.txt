@@ -1,0 +1,22 @@
+FICTIONAL SUPPORT HANDBOOK
+These excerpts and identifiers are sample evidence for the knowledge-assistant project.
+
+[S1] Standard support response, revision 1
+Status: archived. Replaced by S2 effective June 1, 2025.
+Standard-tier requests receive a first response within two calendar days after submission.
+
+[S2] Standard support response, revision 2
+Status: approved, effective June 1, 2025. Supersedes S1.
+A standard-tier request receives a first response within three business days after submission. Business days are Monday through Friday, excluding company holidays. This is a first-response target. No resolution deadline is specified. This policy does not cover premium-tier requests.
+
+[S3] Export retention
+Status: approved, effective June 1, 2025.
+A trial workspace's downloadable export expires 14 days after creation. A paid workspace's downloadable export expires 30 days after creation. Regenerating an export creates a new file with a new creation time. This document does not specify whether the underlying workspace records are deleted.
+
+[S4] Duplicate billing review
+Status: approved, effective June 1, 2025.
+For a suspected duplicate charge, record the ticket number and the two transaction references and route the case to the billing review queue. Do not include payment card numbers. A billing reviewer must approve a refund before any payment action. No processing time or refund amount is promised here.
+
+[S5] Workspace onboarding
+Status: approved, effective June 1, 2025.
+A workspace administrator can invite a teammate from the Members page. An invitation expires 48 hours after it is issued. If an invitation has expired, the administrator can send a new one. Only administrators may issue invitations. The procedure for a lost administrator account is outside this handbook.

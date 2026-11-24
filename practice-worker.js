@@ -4,12 +4,12 @@ let sqlite;
 
 const pythonCases = {
   1: {
-    name: 'labor_cost',
+    name: 'workload_hours',
     cases: [
-      { args: [3, 6, 24], expected: 432 },
-      { args: [2, 4.5, 32], expected: 288 },
-      { args: [1, 0, 25], expected: 0 },
-      { args: [4, 2, 18.75], expected: 150 },
+      { args: [10, 12], expected: 2 },
+      { args: [24, 7.5], expected: 3 },
+      { args: [0, 25], expected: 0 },
+      { args: [5, 9], expected: 0.75 },
     ],
   },
   2: {
@@ -71,37 +71,37 @@ async function runPython(source) {
 
 const queryCases = [
   {
-    name: 'Two projects, one closed RFI',
-    rfis: [
+    name: 'Two accounts, one closed ticket',
+    tickets: [
       [101, 20, 'open'],
       [102, 10, 'closed'],
       [103, 10, 'open'],
     ],
     expected: [
-      [101, 'East Wing'],
-      [103, 'North Yard'],
+      [101, 'Nova'],
+      [103, 'Orbit'],
     ],
   },
   {
     name: 'All closed',
-    rfis: [
+    tickets: [
       [205, 20, 'closed'],
       [202, 10, 'closed'],
     ],
     expected: [],
   },
   {
-    name: 'Mixed order and repeated project',
-    rfis: [
+    name: 'Mixed order and repeated account',
+    tickets: [
       [307, 10, 'open'],
       [301, 20, 'closed'],
       [305, 20, 'open'],
       [304, 10, 'open'],
     ],
     expected: [
-      [304, 'North Yard'],
-      [305, 'East Wing'],
-      [307, 'North Yard'],
+      [304, 'Orbit'],
+      [305, 'Nova'],
+      [307, 'Orbit'],
     ],
   },
 ];
@@ -112,13 +112,11 @@ function runSql(source) {
     const db = new sqlite.Database();
     try {
       db.run(
-        'CREATE TABLE projects (id INTEGER, name TEXT); CREATE TABLE rfis (id INTEGER, project_id INTEGER, status TEXT);',
+        'CREATE TABLE accounts (id INTEGER, name TEXT); CREATE TABLE tickets (id INTEGER, account_id INTEGER, status TEXT);',
       );
-      db.run(
-        "INSERT INTO projects VALUES (10, 'North Yard'), (20, 'East Wing')",
-      );
-      for (const row of test.rfis)
-        db.run('INSERT INTO rfis VALUES (?, ?, ?)', row);
+      db.run("INSERT INTO accounts VALUES (10, 'Orbit'), (20, 'Nova')");
+      for (const row of test.tickets)
+        db.run('INSERT INTO tickets VALUES (?, ?, ?)', row);
       db.run('PRAGMA query_only=ON');
       const statements = db.iterateStatements(source);
       const rows = [];
@@ -130,7 +128,7 @@ function runSql(source) {
         columns = statement.getColumnNames().length;
         if (!columns)
           throw new Error(
-            'Your query needs to return the RFI number and project name.',
+            'Your query needs to return the ticket ID and account name.',
           );
         while (statement.step()) {
           rows.push(statement.get());

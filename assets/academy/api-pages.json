@@ -1,0 +1,8 @@
+{
+  "description": "Fictional read-only responses for account 10. Request URLs are keys of the responses object.",
+  "responses": {
+    "/tickets?account=10&page=1": {"status": 200, "body": {"items": [{"id":"TKT-001","account_id":10},{"id":"TKT-003","account_id":10}], "next":"/tickets?account=10&page=2"}},
+    "/tickets?account=10&page=2": {"status": 200, "body": {"items":[{"id":"TKT-005","account_id":10}],"next":null}},
+    "/tickets/TKT-999": {"status":404,"body":{"error":"ticket not found"}}
+  }
+}

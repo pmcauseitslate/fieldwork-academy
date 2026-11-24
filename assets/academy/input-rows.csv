@@ -1,0 +1,5 @@
+id,account_id,queue,status,minutes,subject
+TKT-101,10,billing,open,0,Receipt already found
+TKT-102,20,access,closed,8,Invite timed out
+TKT-103,10,exports,open,,Download delayed
+TKT-104,20,access,pending,11,Team assignment

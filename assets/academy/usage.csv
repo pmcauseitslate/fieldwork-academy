@@ -1,0 +1,6 @@
+id,account_id,status,amount_usd
+U-1,10,billed,80.00
+U-2,20,pending,55.00
+U-3,10,credit,-15.00
+U-4,10,billed,45.00
+U-5,20,billed,26.50

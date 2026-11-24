@@ -1,0 +1,13 @@
+case_id,expected_action,simulated_baseline_action,simulated_candidate_action
+R01,answer,answer,answer
+R02,answer,answer,answer
+R03,escalate,escalate,answer
+R04,abstain,answer,abstain
+R05,answer,answer,answer
+R06,abstain,answer,abstain
+R07,escalate,escalate,escalate
+R08,escalate,escalate,escalate
+R09,abstain,answer,answer
+R10,escalate,escalate,escalate
+R11,answer,answer,answer
+R12,abstain,abstain,abstain

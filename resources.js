@@ -1,7 +1,7 @@
 /* Original roadmap links and primary-source additions, checked November 23, 2026. */
 (() => {
   const freeVideo = 'Free to watch. YouTube hosts the player.';
-  const freeReading = 'Free to read in your browser.';
+  const freeReading = 'Free to read online.';
   const freeDownload = 'Free local download. Installation is optional.';
 
   function resource(
@@ -41,7 +41,7 @@
       'Harvard CS50’s Introduction to Programming with Python – Full University Course',
       'CS50 · freeCodeCamp.org',
       'nLRL_NcnK-4',
-      'Keep the full course handy as you build your first calculator. Its chapter markers let you jump to functions, conditions, loops or tests.',
+      'A chaptered introduction to Python, covering functions, conditions, loops, testing, and files. The demonstration programs run locally.',
     ),
     resource(
       'cs50p',
@@ -59,7 +59,7 @@
       'CS50P – Lecture 0 – Functions, Variables',
       'CS50',
       'JP7ITIXGpHk',
-      'Watch David Malan turn a few lines into a reusable function. Try the same change with a cost calculation.',
+      'David Malan builds a reusable function, showing how arguments and return values separate a calculation from its display.',
     ),
     resource(
       'cs50p-week-zero',
@@ -68,7 +68,7 @@
       'Functions and variables · lecture notes and exercises',
       'Harvard CS50',
       'https://cs50.harvard.edu/python/weeks/0/',
-      'Use the opening week’s notes alongside your first Python lab.',
+      'Companion notes and exercises for the first Python workshop, including how to run a script and pass arguments into a function.',
     ),
     resource(
       'cs50p-conditionals',
@@ -86,7 +86,7 @@
       'Loops',
       'Harvard CS50',
       'https://cs50.harvard.edu/python/weeks/2/',
-      'Practice iterating over cost items to compute a running total.',
+      'Loop examples for counting records and computing total usage across a collection.',
     ),
     resource(
       'cs50p-exceptions',
@@ -113,7 +113,7 @@
       'File I/O',
       'Harvard CS50',
       'https://cs50.harvard.edu/python/weeks/6/',
-      'Read cost data from a CSV file and preserve its column meanings in your calculations.',
+      'Read a CSV export, inspect its field names, and preserve the meaning of counts, dates, and IDs.',
     ),
     resource(
       'cs50p-classes',
@@ -131,7 +131,7 @@
       'GitHub Skills',
       'GitHub',
       'https://github.com/skills',
-      'Practice commits, branches and pull requests in a repository of your own.',
+      'Short exercises in commits, branches, and pull requests using a practice repository.',
       'Public exercises are free. A free GitHub account is needed to do them on GitHub.',
     ),
 
@@ -150,7 +150,7 @@
       'CS50’s Introduction to Databases with SQL',
       'Harvard University',
       'https://cs50.harvard.edu/sql/',
-      'Practice querying and relating records, then use the same ideas for projects and daily logs.',
+      'Practice querying and relating records. Apply joins to questions about support tickets, customer accounts, and repeated events.',
       'Free OpenCourseWare. Official assignment submission uses an edX account.',
     ),
     video(
@@ -159,7 +159,7 @@
       'CS50 SQL – Lecture 0 – Querying',
       'CS50',
       'vHYeChEf2lA',
-      'Start with SELECT and WHERE. Think about which filters isolate records for a single job.',
+      'An introduction to SELECT and WHERE. A status filter can isolate unresolved requests for a single support queue.',
     ),
     resource(
       'apis-beginners',
@@ -198,7 +198,7 @@
       'Streamlit 101 – A faster way to build and share data apps',
       'Streamlit',
       'UI4f4iiVT6c',
-      'See how Python becomes an interactive app. Compare what the user sees with what your function receives.',
+      'Follow a value from an interface widget into a Python function and back to a displayed result.',
     ),
     resource(
       'mdn',
@@ -236,7 +236,7 @@
       'Deep Dive into LLMs like ChatGPT',
       'Andrej Karpathy',
       '7xTGNNLPyMI',
-      'Use the chapters on hallucinations and working memory to understand why a daily-report summary needs a source check.',
+      'The chapters on hallucination and context explain why generated answers need independent checks against source evidence.',
     ),
     resource(
       'google-ml',
@@ -255,7 +255,7 @@
       'Generative AI for Beginners',
       'Microsoft',
       'https://github.com/microsoft/generative-ai-for-beginners',
-      'Read the open lessons about prompts, applications and evaluating outputs. Compare their examples with your field-note workflow.',
+      'Open lessons on prompting, application design, and evaluation, with examples for comparing model output against expected behavior.',
       'Course materials are free. Some optional notebooks use metered model services.',
     ),
     resource(
@@ -275,7 +275,7 @@
       'AI Agents Course',
       'Hugging Face',
       'https://huggingface.co/learn/agents-course/en/unit0/introduction',
-      'Study tools, actions and observations, then decide where a human should approve a field-report workflow.',
+      'Explore tools, actions, and observations. Trace the step where a proposed customer-facing action needs human approval.',
       'Free lessons. Some optional hosted exercises need an account or have usage limits.',
     ),
     resource(
@@ -286,7 +286,7 @@
       'n8n',
       'https://n8n.io/education/',
       'Identify a trigger, the data passed into each step and what happens when an input is missing.',
-      'Free courses. The local Community Edition is available for practice on your own computer.',
+      'Free courses. Community Edition supports local practice.',
     ),
 
     video(
@@ -322,8 +322,8 @@
       'GitHub Actions documentation',
       'GitHub',
       'https://docs.github.com/en/actions',
-      'Follow the workflow syntax when you turn a regression test into an automatic check.',
-      'Free documentation. This course’s labs run in your browser.',
+      'Workflow syntax and examples for running regression checks on pull requests.',
+      'Free documentation. Academy labs run in the browser.',
     ),
     resource(
       'azure-learn',
@@ -342,7 +342,7 @@
       'OWASP Top 10',
       'OWASP Foundation',
       'https://owasp.org/www-project-top-ten/',
-      'Use the risk categories to review who should be able to see or change each project record.',
+      'Use the access-control guidance to review which roles may read an account record or approve a change.',
     ),
     resource(
       'owasp-genai',
@@ -360,7 +360,7 @@
       'How a small evaluation suite works',
       'Simon Willison · Prime Radiant',
       'https://blog.primeradiant.com/smevals/',
-      'Read how tasks and graders fit together, then create a few field-note examples with explicit pass conditions.',
+      'Examples of how tasks and graders fit together. Define a pass condition for a support answer and apply it to two prompt versions.',
     ),
 
     video(
@@ -369,7 +369,7 @@
       'How To Talk To Users | Startup School',
       'Y Combinator',
       'z1iF1c8w5Lg',
-      'Gustaf Alströmer explains how to ask about the last time a problem happened. Use the answers to narrow your pilot.',
+      'Gustaf Alströmer demonstrates questions about the last time a problem happened. Specific workarounds and their costs help scope a pilot.',
     ),
     video(
       'startup-ideas',
@@ -377,7 +377,7 @@
       'How to Get and Evaluate Startup Ideas | Startup School',
       'Y Combinator',
       'Th8JoIan4dg',
-      'Jared Friedman explains how to evaluate an idea. Write down one assumption about field teams that an interview could overturn.',
+      'Jared Friedman explains how to evaluate a startup idea. A useful interview tests a specific assumption about a customer’s workflow.',
     ),
     video(
       'startup-mvp',
@@ -385,7 +385,7 @@
       'How to Build An MVP | Startup School',
       'Y Combinator',
       'QRZ_l7cVzzU',
-      'Michael Seibel explains how to narrow the first version of a product. Name the one job that your first pilot must do well.',
+      'Michael Seibel explains how to narrow the first version of a product to one job an early customer needs done.',
     ),
     resource(
       'startup-school',
@@ -394,7 +394,7 @@
       'Startup School',
       'Y Combinator',
       'https://www.startupschool.org/',
-      'Use the MVP and customer-development lessons to plan a narrow pilot for a construction team.',
+      'Founder lessons on customer discovery, early product decisions, and designing a narrowly scoped pilot.',
       'The course is free. Y Combinator requires a free account for enrollment.',
     ),
     resource(
@@ -404,7 +404,7 @@
       'Y Combinator video library',
       'Y Combinator',
       'https://www.youtube.com/@ycombinator',
-      'Browse the original roadmap’s channel for further founder interviews and Startup School talks.',
+      'Founder interviews and talks on customer discovery, MVP design, and business models.',
       'Free public videos on YouTube.',
     ),
 
@@ -425,7 +425,7 @@
       'Python downloads',
       'Python Software Foundation',
       'https://www.python.org/downloads/',
-      'Install the interpreter when you are ready to run Python outside the browser.',
+      'The official interpreter for executing Python scripts outside the browser.',
       freeDownload,
     ),
     resource(
@@ -445,7 +445,7 @@
       'GitHub',
       'GitHub',
       'https://github.com/',
-      'Keep a copy of your source code and share a public repository.',
+      'Repository hosting for versioned source code, documentation, issues, and a shareable portfolio.',
       'A free account supports public repositories.',
     ),
     resource(
@@ -465,7 +465,7 @@
       'Download Ollama',
       'Ollama',
       'https://ollama.com/download',
-      'Run a suitable local model on your own hardware when you want to try the workflow with a real model.',
+      'A local runtime for trying the same evaluation workflow with a downloaded model.',
       'Local software is free. Model downloads need disk space and sufficient memory.',
     ),
     resource(
@@ -475,12 +475,70 @@
       'Self-host n8n',
       'n8n',
       'https://docs.n8n.io/hosting/',
-      'Explore a local Community Edition setup for building workflows on your own machine.',
+      'Installation instructions for running Community Edition locally.',
       'Free documentation. Local self-hosting avoids a cloud subscription.',
+    ),
+    resource(
+      'support-handoff', 'guide', [1, 3],
+      'How support engineers ask for help', 'GitLab Handbook',
+      'https://handbook.gitlab.com/handbook/support/workflows/how-to-get-help/',
+      'A support team’s public escalation workflow. Use its guidance to communicate what has already been investigated and what the next reviewer needs to know.',
+    ),
+    resource(
+      'api-testing', 'guide', [2, 3],
+      'What is API testing?', 'Postman',
+      'https://www.postman.com/api-platform/api-testing/',
+      'A guide to testing requests and responses. Build a small table of valid inputs, invalid inputs, and expected status codes before connecting a service.',
+      'Free article. API exercises in the academy use local or simulated requests.',
+    ),
+    resource(
+      'semantic-search', 'guide', [4],
+      'Semantic search', 'Sentence Transformers',
+      'https://www.sbert.net/examples/sentence_transformer/applications/semantic-search/README.html',
+      'Compare similarity search for short queries and longer passages. Inspect which documents appear in the top results before grading the answer.',
+      'Free documentation. The worked example can be studied without running a model.',
+    ),
+    resource(
+      'workflow-patterns', 'guide', [4],
+      'Building effective agents', 'Anthropic Engineering',
+      'https://www.anthropic.com/research/building-effective-agents',
+      'Compare routing, sequential workflows, and model-directed tool use. Identify the simplest workable design for a support decision requiring human approval.',
+    ),
+    resource(
+      'agent-evals', 'guide', [4, 5],
+      'Demystifying evals for AI agents', 'Anthropic Engineering',
+      'https://www.anthropic.com/research/demystifying-evals-for-ai-agents',
+      'A practical guide to tasks, graders, outcomes, and test sets. Use one recorded interaction to distinguish a failed tool call from a poor final answer.',
+    ),
+    resource(
+      'quality-metrics', 'guide', [4],
+      'Accuracy, recall, precision, and related metrics', 'Google for Developers',
+      'https://developers.google.com/machine-learning/crash-course/classification/accuracy-precision-recall',
+      'Worked examples for choosing a denominator. Count correct escalations, missed escalations, and unnecessary reviews before comparing prompt versions.',
+    ),
+    resource(
+      'telemetry-signals', 'guide', [5],
+      'Signals in OpenTelemetry', 'OpenTelemetry',
+      'https://opentelemetry.io/docs/concepts/signals/',
+      'Distinguish traces, metrics, and logs. Sketch how a slow support request can be linked to its retrieval or model call without logging customer text.',
+    ),
+    resource(
+      'portfolio-readme', 'guide', [1, 3, 6],
+      'About the repository README file', 'GitHub Docs',
+      'https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-readmes',
+      'GitHub’s guide to explaining what a project does and how another person can use it. Document the setup, a reproducible example, and the measured outcome for a portfolio reviewer.',
     ),
   ];
 
   const weeklyAssignments = {
+    'support-handoff': [3, 14],
+    'api-testing': [9, 10, 12],
+    'semantic-search': [16],
+    'workflow-patterns': [17],
+    'agent-evals': [18],
+    'quality-metrics': [18],
+    'telemetry-signals': [20],
+    'portfolio-readme': [6, 14, 24],
     'python-lecture-zero': [1],
     'cs50p-week-zero': [1],
     'cs50p-conditionals': [2],
@@ -531,7 +589,7 @@
       insight:
         'Karpathy shared a lecture for general audiences that follows a language model from training through conversation. He uses those stages to explain behavior such as hallucination.',
       application:
-        'Give the daily-report example a missing detail and check whether the summary fills it in without evidence.',
+        'Remove a cancellation rule from the knowledge base. Record whether the assistant identifies the gap or supplies an unsupported answer.',
       levels: [4],
     },
     {
@@ -539,9 +597,9 @@
       handle: '@emollick',
       url: 'https://x.com/emollick/status/2114503849826549842',
       insight:
-        'Mollick suggests gradually making a task more ambitious until you discover a limit or a capability you had overlooked.',
+        'Mollick recommends increasing a task’s difficulty to investigate the model’s capabilities and limits.',
       application:
-        'Start with one field note. Add a second note with a conflicting date. Record where your workflow first needs human judgment.',
+        'Begin with one support article, then add a second article with a conflicting effective date. Identify the first decision that needs human review.',
       levels: [4, 6],
     },
     {
@@ -551,7 +609,7 @@
       insight:
         'Willison shared a tool he built with Prime Radiant to run small evaluations across models, prompts and configurations.',
       application:
-        'Try two versions of a reporting prompt on the same sample notes. Score both against the same expected facts before choosing one.',
+        'Run two answer templates against the same support cases. Compare citation accuracy and correct escalation on the held-out examples.',
       levels: [4, 5],
     },
   ];

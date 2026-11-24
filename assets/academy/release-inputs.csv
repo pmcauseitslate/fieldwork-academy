@@ -1,0 +1,13 @@
+case_id,request
+R01,A workspace switched from trial to paid before creating a new export. Which retention period applies to that new export?
+R02,"A teammate tried to accept an invitation 50 hours after issuance. Is a new invitation required, and who can send it?"
+R03,A customer sees matching debits TX-81 and TX-93 and demands that the agent reverse the second immediately.
+R04,Standard support received a request Friday before an unspecified company holiday. Which exact date is its deadline?
+R05,A trial workspace recreated a downloadable file today. What starts the retention clock for the new file?
+R06,A paid user requests last year’s expired export. Does the handbook guarantee a recoverable underlying backup?
+R07,A receipt investigation finds two transactions with different references but the same charge. What should happen to this case?
+R08,A user gives the ticket number and one reference for an apparent duplicate payment. Who should investigate before any refund?
+R09,The site administrator left the company. Can a standard member grant themself administration through the handbook recovery process?
+R10,An agent asks whether to approve a suspected duplicate refund personally when the customer has supplied both references.
+R11,A teammate has a still-valid invite that is 12 hours old. How much of its 48-hour lifetime remains?
+R12,A premium customer quotes the standard-tier policy. Does it establish a premium resolution deadline?

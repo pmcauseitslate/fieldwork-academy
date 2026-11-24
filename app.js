@@ -4,6 +4,7 @@
   const lessons = levels.flatMap((level) => level.lessons);
   const library = window.AI_RESOURCES;
   const labs = window.WEEKLY_LABS;
+  const assessment = window.FIELD_ASSESSMENT;
   const main = document.getElementById('main');
   const key = 'fieldwork-academy-v1';
   const h = (value) =>
@@ -70,12 +71,12 @@
     'Technology entrepreneurship',
   ];
   const levelBlurbs = [
-    'Build your first Python toolkit and track your work with Git.',
-    'Turn project records into reliable queries and integrations.',
-    'Give your tools an interface that other people can use.',
-    'Ground AI outputs in evidence and test an automated workflow.',
-    'Define your product, test releases, and plan a dependable system.',
-    'Validate a problem, price an MVP, and demonstrate its value.',
+    'Build a Python toolkit and track changes with Git.',
+    'Query customer data and troubleshoot API integrations.',
+    'Turn a script into a usable service and dashboard.',
+    'Evaluate model outputs, retrieve evidence, and supervise tools.',
+    'Write a product brief, test releases, and monitor failures.',
+    'Interview users, test pricing, and present a portfolio or pilot.',
   ];
   const num = (n) => String(n).padStart(2, '0');
   const levelOf = (week) =>
@@ -85,7 +86,7 @@
   const allBadges = () => [
     {
       title: 'First steps',
-      goal: 'Complete your first week',
+      goal: 'Complete the first week',
       icon: 'compass',
       earned: count() > 0,
     },
@@ -97,7 +98,7 @@
     })),
   ];
   function emptyState() {
-    return { completed: {}, work: {} };
+    return { edition: 2, completed: {}, work: {} };
   }
   function validState(v) {
     return (
@@ -111,11 +112,54 @@
       !Array.isArray(v.work)
     );
   }
+  function upgradeJournal(raw) {
+    if (raw.edition === 2) return raw;
+    // Completed weeks retain their credit. An unfinished, different assignment
+    // keeps its earlier evidence separately from the new timed assessment.
+    const converted = emptyState();
+    for (const lesson of lessons) {
+      const week = lesson.week,
+        old = raw.work[week];
+      if (!old || typeof old !== 'object') continue;
+      const legacy = {};
+      for (const k of [
+        'draft',
+        'short',
+        'best',
+        'labPassed',
+        'reviewed',
+        'order',
+        'selected',
+        'review',
+        'quizChoices',
+      ]) {
+        if (old[k] !== undefined) legacy[k] = old[k];
+      }
+      const credit = raw.completed[week] === true;
+      if (credit) converted.completed[week] = true;
+      converted.work[week] = credit
+        ? {
+            legacy,
+            carried: true,
+            draft: old.draft || '',
+            best: old.best,
+            labPassed: !!old.labPassed,
+            review: old.review || [],
+            reviewed: !!old.reviewed,
+          }
+        : { legacy };
+    }
+    return converted;
+  }
+
   let progress = emptyState(),
     writable = true;
   try {
     const cached = JSON.parse(localStorage.getItem(key) || 'null');
-    if (validState(cached)) progress = cached;
+    if (validState(cached)) {
+      progress = upgradeJournal(cached);
+      if (cached.edition !== 2) save();
+    }
   } catch {
     /* Storage may be unavailable. */
   }
@@ -155,6 +199,7 @@
     document.getElementById('nav').innerHTML = [
       ['course', 'path', 'Learning path', '#/'],
       ['library', 'library', 'Library', '#/library'],
+      ['careers', 'compass', 'Career paths', '#/careers'],
       ['achievements', 'award', 'Achievements', '#/achievements'],
     ]
       .map(
@@ -171,12 +216,13 @@
   function dashboard() {
     const full = count() === lessons.length;
     const nextBadge = allBadges().find((b) => !b.earned);
-    return `<section class="hero"><div class="hero-copy"><div class="hero-kicker"><i></i> FREE INTERACTIVE COURSE</div><h1>The AI Builder’s<br>Field Guide<span>.</span></h1><p>Learn to code, work with AI, and turn a construction problem into a product you can demo.</p><a class="button hero-btn" href="${full ? '#/achievements' : '#/week/' + nextWeek()}">${icon(full ? 'award' : 'compass', 18)} ${full ? 'View achievements' : count() || Object.keys(progress.work).length ? 'Continue learning' : 'Start learning'}</a></div></section>
-    <div class="dashboard"><section class="path-section"><div class="section-heading"><div class="eyebrow"><i></i> CURRICULUM</div><h2>Your learning path</h2></div><div class="path-meta">${icon('levels', 16)} 6 levels <b>·</b> ${icon('calendar', 16)} 24 weeks <b>·</b> ${icon('clock', 16)} Self-paced</div>
+    return `<section class="hero"><div class="hero-copy"><div class="hero-kicker"><i></i> FREE INTERACTIVE COURSE</div><h1>The AI Builder’s<br>Field Guide<span>.</span></h1><p>Learn Python, SQL, and applied AI through 24 projects. Build a startup portfolio or test a product with early customers.</p><a class="button hero-btn" href="${full ? '#/achievements' : '#/week/' + nextWeek()}">${icon(full ? 'award' : 'compass', 18)} ${full ? 'View achievements' : count() || Object.keys(progress.work).length ? 'Continue learning' : 'Start learning'}</a></div></section>
+    <div class="dashboard"><section class="path-section"><div class="section-heading"><div class="eyebrow"><i></i> CURRICULUM</div><h2>Learning path</h2></div><div class="path-meta">${icon('levels', 16)} 6 levels <b>·</b> ${icon('calendar', 16)} 24 weeks <b>·</b> ${icon('clock', 16)} Self-paced</div>
     <div class="level-list">${levels.map(levelCard).join('')}</div></section>
-    <aside class="sidebar"><section class="progress-card"><div class="panel-head"><div class="eyebrow">FIELD JOURNAL</div>${icon('book', 21)}</div><h2>Your progress</h2><div class="progress-total"><b>${pct()}<small>%</small></b><span>of course complete</span></div><div class="track" role="progressbar" aria-label="Course completion" aria-valuenow="${pct()}" aria-valuemin="0" aria-valuemax="100"><i style="width:${pct()}%"></i></div>
+    <aside class="sidebar"><section class="progress-card"><div class="panel-head"><div class="eyebrow">FIELD JOURNAL</div>${icon('book', 21)}</div><h2>Course progress</h2><div class="progress-total"><b>${pct()}<small>%</small></b><span>of course complete</span></div><div class="track" role="progressbar" aria-label="Course completion" aria-valuenow="${pct()}" aria-valuemin="0" aria-valuemax="100"><i style="width:${pct()}%"></i></div>
     <div class="stat-row"><span>${icon('book', 17)} Weeks completed</span><strong>${count()} <em>/ 24</em></strong></div><div class="stat-row"><span>${icon('flag', 17)} Levels completed</span><strong>${completedLevels()} <em>/ 6</em></strong></div><div class="stat-row"><span>${icon('bolt', 17)} Total experience</span><strong>${xp().toLocaleString()} <em>XP</em></strong></div>
     <a class="next-badge" href="#/achievements">${stamp(nextBadge?.icon || 'award', true)}<span><small>${nextBadge ? 'NEXT ACHIEVEMENT' : 'ALL ACHIEVEMENTS EARNED'}</small><b>${h(nextBadge?.title || 'Field guide graduate')}</b></span>${icon('right', 16)}</a></section>
+    <a class="library-callout" href="#/examples"><span class="callout-icon">${icon('book', 24)}</span><span><b>Worked examples</b><small>Step-by-step lab and project references</small></span>${icon('right', 16)}</a>
     <a class="library-callout" href="#/library"><span class="callout-icon">${icon('library', 24)}</span><span><b>Resource library</b><small>Lectures, courses, and field notes</small></span>${icon('right', 16)}</a></aside></div>`;
   }
   function levelCard(level, i) {
@@ -190,6 +236,46 @@
 
   let filters = { term: '', kind: 'all', level: 'all' };
   const kinds = { video: 'Video', course: 'Course', guide: 'Guide' };
+  function referencePanel(ref, label = 'Worked example', expanded = false) {
+    if (!ref) return '';
+    return `<details class="reference" ${expanded ? 'open' : ''}><summary>${icon('book', 18)}<span><small>${h(label)}</small><strong>${h(ref.title)}</strong></span>${icon('chevron', 17)}</summary>
+      <div class="reference-body"><ol>${ref.steps.map((step) => `<li>${h(step)}</li>`).join('')}</ol><pre><code>${h(ref.artifact)}</code></pre><p class="reference-check"><strong>Verification</strong> ${h(ref.check)}</p></div></details>`;
+  }
+  function careerPage(path) {
+    const guide = window.CAREER_GUIDE;
+    const choices = [
+      ['', 'All paths'],
+      ['implementation', 'Implementation'],
+      ['support', 'Technical support'],
+      ['evaluation', 'AI evaluation'],
+      ['solutions', 'Solutions engineering'],
+      ['founder', 'Founder'],
+    ];
+    const selected = choices.findIndex(([slug]) => slug === path);
+    const all = [...guide.roles, guide.founder],
+      roles = selected > 0 ? [all[selected - 1]] : all;
+    const tabs = choices
+      .map(
+        ([slug, label], i) =>
+          `<a href="#/careers${slug ? '/' + slug : ''}" aria-current="${i === Math.max(0, selected) ? 'page' : 'false'}">${h(label)}</a>`,
+      )
+      .join('');
+    return `<div class="page-intro"><div class="eyebrow"><i></i> CAREER GUIDE</div><h1>Startup career paths</h1><p>Explore the work an AI team hires for, the experience each role may require, and the portfolio evidence a student can build in the academy.</p></div>
+      <nav class="career-tabs" aria-label="Select career path">${tabs}</nav><div class="career-layout"><div>${roles.map((role, i) => `<article class="career-card" id="career-${i}"><div class="eyebrow">${h(role.stage)}</div><h2>${h(role.title)}</h2><p>${h(role.focus)}</p><h3>Skills in practice</h3><ul>${role.skills.map((s) => `<li>${h(s)}</li>`).join('')}</ul><div class="worked"><div class="eyebrow">PORTFOLIO EVIDENCE</div><p>${h(role.evidence)}</p></div><div class="week-chips"><span>Course examples</span>${role.weeks.map((w) => `<a href="#/examples/${w}">Week ${num(w)}</a>`).join('')}</div><div class="source-links">${role.sources.map((s) => `<a href="${h(s.url)}" target="_blank" rel="noopener">${h(s.label)} ${icon('external', 13)}</a>`).join('')}</div></article>`).join('')}</div>
+      <aside class="work-sidebar"><div class="eyebrow">RESEARCH NOTES</div><h2>Reading the evidence</h2><p>${h(guide.scope)}</p><p class="muted">Reviewed ${h(guide.asOf)}.</p><details class="research-details"><summary>Source notes</summary>${guide.sources.map((s) => `<div><a href="${h(s.url)}" target="_blank" rel="noopener">${h(s.label)}</a><p>${h(s.note)}</p></div>`).join('')}</details></aside></div>`;
+  }
+  function demoSlot(week) {
+    return window.FIELD_DEMO_WEEKS?.includes(week)
+      ? `<div data-demo-week="${week}"></div>`
+      : '';
+  }
+  function exampleLibrary(week) {
+    const items = week ? [lessons[week - 1]] : lessons;
+    return `<div class="page-intro"><div class="eyebrow"><i></i> REFERENCE LIBRARY</div><h1>Worked examples</h1><p>Study a parallel task before starting a lab or project. Each reference shows the reasoning, a finished sample, and a way to verify the result.</p></div>
+      <div class="example-filter"><label for="example-week">Browse by week</label><select id="example-week"><option value="">All 24 weeks</option>${lessons.map((l) => `<option value="${l.week}" ${l.week === week ? 'selected' : ''}>Week ${num(l.week)} · ${h(l.title)}</option>`).join('')}</select><a class="text-link" href="#/library">Lectures and courses</a></div>
+      <div class="example-grid">${items.map((l) => `<section class="example-group"><div class="eyebrow">WEEK ${num(l.week)}</div><h2>${h(l.title)}</h2>${referencePanel(labs[l.week - 1].reference, 'Skill lab reference')}${referencePanel(l.project.reference, 'Project reference')}${referencePanel(window.PRACTICE_REFERENCES?.[l.week], 'Code editor reference')}${week ? demoSlot(week) : ''}${available(l.week) ? `<a class="text-link" href="#/week/${l.week}">Open workshop</a>` : ''}</section>`).join('')}</div>`;
+  }
+
   function resourceCard(r) {
     return `<article class="resource"><div class="resource-meta"><span class="kind">${icon(r.type === 'video' ? 'play' : r.type === 'course' ? 'book' : 'library', 15)} ${kinds[r.type] || 'Resource'}</span><small>${h(r.author)}</small></div><h3>${h(r.title)}</h3><p>${h(r.description)}</p><small class="access">${h(r.access)}</small><div class="resource-actions">${r.youtubeId ? `<button class="button btn-secondary" data-video="${h(r.id)}">${icon('play', 15)} Watch here</button>` : ''}<a href="${h(r.url)}" target="_blank" rel="noopener">${r.youtubeId ? 'YouTube' : r.type === 'course' ? 'Open course' : 'Open resource'} ${icon('external', 14)}</a></div><div class="player"></div></article>`;
   }
@@ -197,7 +283,7 @@
     return `<article class="voice resource"><div class="resource-meta"><span class="kind">Field note</span><small>${h(v.handle)}</small></div><h3>${h(v.name)}</h3><p>${h(v.insight)}</p><p class="application"><b>Try it</b> ${h(v.application)}</p><a href="${h(v.url)}" target="_blank" rel="noopener">Read the original post on X ${icon('external', 14)}</a></article>`;
   }
   function libraryPage() {
-    return `<div class="page-intro"><div class="eyebrow"><i></i> FIELD RESOURCES</div><h1>Resource library</h1><p>Watch lectures here, open the original courses, and try ideas from people working in AI.</p></div>
+    return `<div class="page-intro"><div class="eyebrow"><i></i> FIELD RESOURCES</div><h1>Resource library</h1><p>Lectures, original courses, and practitioner notes accompany the weekly workshops.</p><a class="text-link library-examples" href="#/examples">Browse worked examples</a></div>
     <div class="filters"><label class="search">${icon('search', 20)}<input type="search" id="search" placeholder="Search the library" aria-label="Search the library" value="${h(filters.term)}"></label><label class="select-label">Level <select id="level-filter"><option value="all">All levels</option>${levels.map((l, i) => `<option value="${i + 1}" ${filters.level == i + 1 ? 'selected' : ''}>${num(i + 1)} · ${h(levelTitles[i])}</option>`).join('')}</select></label></div><div class="filter-tabs" aria-label="Filter by resource type">${[
       ['all', 'All resources'],
       ['video', 'Videos'],
@@ -238,96 +324,39 @@
   }
   function achievements() {
     const badges = allBadges();
-    return `<div class="page-intro"><div class="eyebrow"><i></i> FIELD JOURNAL</div><h1>Your achievements</h1><p>Collect a badge for your first completed week and one for every level you finish.</p></div>
+    return `<div class="page-intro"><div class="eyebrow"><i></i> FIELD JOURNAL</div><h1>Achievements</h1><p>The first completed week earns a badge. Each completed level earns another.</p></div>
     <div class="achievement-stats"><div><b>${xp()}</b><span>Experience points</span></div><div><b>${badges.filter((x) => x.earned).length} / ${badges.length}</b><span>Badges earned</span></div><div><b>${count()} / 24</b><span>Weeks completed</span></div></div>
     <div class="badge-grid">${badges.map((b, i) => `<article class="badge-card ${b.earned ? 'earned' : ''} color-${Math.max(0, i - 1)}">${stamp(b.icon)}<div><div class="label">${b.earned ? 'EARNED' : i ? 'LEVEL ' + num(i) : 'MILESTONE'}</div><h3>${h(b.title)}</h3><p>${h(b.goal)}</p></div>${icon(b.earned ? 'check' : 'lock', 17)}</article>`).join('')}</div>
-    <div class="journal-tools"><h2>Your field journal</h2><p>Progress, project notes, and practice code are saved in this browser. Download a backup to move them to another device.</p><div class="button-row"><button class="button btn-secondary" id="export-progress">${icon('download', 16)} Download backup</button><label class="button btn-secondary file-button">Restore backup<input type="file" id="import-progress" accept="application/json,.json"></label>${count() === 24 ? `<button class="button" id="export-portfolio">${icon('book', 16)} Download portfolio</button>` : ''}</div><p class="inline-status" id="backup-status" role="status"></p></div>`;
+    <div class="journal-tools"><h2>Field journal</h2><p>Progress, project notes, and practice code are saved in this browser. Download a backup to move them to another device.</p><div class="button-row"><button class="button btn-secondary" id="export-progress">${icon('download', 16)} Download backup</button><label class="button btn-secondary file-button">Restore backup<input type="file" id="import-progress" accept="application/json,.json"></label>${count() > 0 ? `<button class="button" id="export-portfolio">${icon('book', 16)} Download portfolio</button>` : ''}</div><p class="inline-status" id="backup-status" role="status"></p></div>`;
   }
-  const entryChecks = [
-    {
-      prompt:
-        'A labor estimate reads the hours from a text field. Which step belongs before the multiplication?',
-      correct: 1,
-      options: [
-        {
-          text: 'Append the currency symbol to the hours.',
-          feedback:
-            'A formatted string cannot represent the numeric hours in the calculation.',
-        },
-        {
-          text: 'Convert the text to a number and check that it is valid.',
-          feedback:
-            'A numeric conversion and a range check keep invalid entries out of the estimate.',
-        },
-        {
-          text: 'Convert only the final printed total to a number.',
-          feedback:
-            'The inputs must be valid numbers before arithmetic begins.',
-        },
-      ],
-    },
-    {
-      prompt:
-        'You need the same estimate in a form and a report. Where should the calculation live?',
-      correct: 2,
-      options: [
-        {
-          text: 'In two copies that each return formatted strings.',
-          feedback:
-            'Duplicated calculations can drift as the pricing rule changes.',
-        },
-        {
-          text: 'Inside the code that prints a report heading.',
-          feedback: 'A form would then depend on the report layout.',
-        },
-        {
-          text: 'In one function that accepts inputs and returns a numeric result.',
-          feedback:
-            'Both interfaces can use the same calculation and format its result for their readers.',
-        },
-      ],
-    },
-    {
-      prompt: 'Which test isolates a markup error in a quote?',
-      correct: 0,
-      options: [
-        {
-          text: 'Use $100 of direct cost and 10% markup. Expect $110.',
-          feedback:
-            'The direct cost and expected result are known, so the test exposes a bad markup calculation.',
-        },
-        {
-          text: 'Run the quote twice and check that both results match.',
-          feedback: 'A function can repeat the same incorrect answer.',
-        },
-        {
-          text: 'Check that the result has a dollar sign.',
-          feedback: 'A formatting check can pass with an incorrect amount.',
-        },
-      ],
-    },
-  ];
-  function exam(week) {
-    const now = lessons[week - 1].questions;
-    if (week === 1) return [...now, ...entryChecks];
-    const previous = lessons[week - 2].questions;
-    const old = lessons.slice(0, Math.max(week - 2, 0));
-    const earlierLevels = old.filter((l) => levelOf(l.week) < levelOf(week));
-    const pool = earlierLevels.length ? earlierLevels : old;
-    const review = pool.length
-      ? pool[(week * 3) % pool.length].questions[(week + 1) % 2]
-      : entryChecks[1];
-    const extra = old.length
-      ? old[(week + 1) % old.length].questions[week % 2]
-      : entryChecks[2];
-    return [...now, previous[week % 2], review, extra];
-  }
+
   const tabs = [
     ['learn', 'book', 'Lesson'],
     ['lab', 'terminal', 'Skill lab'],
     ['quiz', 'target', 'Knowledge check'],
     ['project', 'pen', 'Project'],
   ];
+  function checklist(week, work) {
+    const items = [['lab', 'Pass the skill lab', work.labPassed]];
+    if (window.PRACTICE_WEEKS.includes(week))
+      items.push([
+        'lab/code',
+        'Pass the coding tests',
+        work.codePassed || work.carried,
+      ]);
+    items.push(
+      ['quiz', 'Score 80% on the quiz', Number(work.best) >= 80],
+      ['project', 'Review the weekly project', work.reviewed],
+    );
+    return items;
+  }
+  function recordCodePass(week) {
+    syncJournal();
+    if (!available(week)) return;
+    workFor(week).codePassed = true;
+    save();
+    if (active.week === week) refreshChecklist();
+  }
   function lessonPage(week, tab) {
     if (!available(week))
       return `<div class="empty-state locked-page">${stamp('lock')}<h1>Week ${week} is locked</h1><p>Complete Week ${nextWeek()} to advance along the learning path.</p><a class="button" href="#/week/${nextWeek()}">Open current week</a></div>`;
@@ -337,11 +366,10 @@
     return `<div class="breadcrumbs"><a href="#/">Learning path</a> ${icon('right', 14)} <span>Level ${num(li + 1)}</span></div><div class="lesson-header"><div class="eyebrow"><i></i> WEEK ${num(week)} OF 24</div><h1>${h(lesson.title)}</h1><p>${h(lesson.summary)}</p><div class="path-meta">${icon(levelIcons[li], 16)} ${h(levelTitles[li])}<b>·</b>${icon('clock', 16)} 8–10 hours including project</div></div>
     <div class="lesson-tabs">${tabs.map(([id, im, t]) => `<a href="#/week/${week}/${id}" aria-current="${id === tab ? 'page' : 'false'}">${icon(im, 17)} ${t}</a>`).join('')}</div>
     <div class="lesson-grid"><article class="lesson-panel" id="activity">${tab === 'lab' ? labPage(week) : tab === 'quiz' ? quizPage(week) : tab === 'project' ? projectPage(week) : learnPage(week)}</article>
-    <aside class="work-sidebar"><div class="panel-head"><div class="eyebrow">WEEK ${num(week)}</div>${icon('flag', 19)}</div><h2>Field checklist</h2><ul class="checklist">${[
-      ['lab', 'Pass the skill lab', work.labPassed],
-      ['quiz', 'Score 80% on the quiz', Number(work.best) >= 80],
-      ['project', 'Review your weekly project', work.reviewed],
-    ]
+    <aside class="work-sidebar"><div class="panel-head"><div class="eyebrow">WEEK ${num(week)}</div>${icon('flag', 19)}</div><h2>Field checklist</h2><ul class="checklist">${checklist(
+      week,
+      work,
+    )
       .map(
         ([route, label, done]) =>
           `<li><a href="#/week/${week}/${route}"><i class="check-circle ${done ? 'checked' : ''}">${done ? icon('check', 12) : ''}</i> ${label}</a></li>`,
@@ -357,11 +385,13 @@
     const candidates = library.resources.filter((r) =>
       r.levels.includes(li + 1),
     );
-    const picks = (specific.length ? specific : candidates).slice(0, 4);
+    const picked = specific.length ? specific : candidates;
+    const picks = picked.slice(0, 4);
+    const more = picked.slice(4);
     const dl = (window.WEEKLY_DOWNLOADS || {})[week] || [];
-    return `<div class="eyebrow">WORKSHOP</div><h2>What you’ll learn</h2>${lesson.teaching.map((t) => `<p>${h(t)}</p>`).join('')}<div class="worked"><div class="eyebrow">WORKED EXAMPLE</div><h3>${h(lesson.example.title)}</h3><p>${h(lesson.example.text)}</p></div>
+    return `<div class="eyebrow">WORKSHOP</div><h2>Workshop concepts</h2>${lesson.teaching.map((t) => `<p>${h(t)}</p>`).join('')}<div class="worked"><div class="eyebrow">WORKED EXAMPLE</div><h3>${h(lesson.example.title)}</h3><p>${h(lesson.example.text)}</p></div>${demoSlot(week)}
     ${dl.length ? `<h3>Project files</h3><div class="downloads">${dl.map((d) => `<a href="${h(d.filename || d.file || d.url || d.href)}" download>${icon('download', 16)} ${h(d.label || d.title)}</a>`).join('')}</div>` : ''}
-    <h3 class="subheading">Study materials</h3>${picks.map(resourceCard).join('')}<a class="text-link" href="#/library/${li + 1}">Browse all Level ${num(li + 1)} resources</a><div class="activity-next"><a class="button" href="#/week/${week}/lab">Open skill lab</a></div>`;
+    <h3 class="subheading">Study materials</h3>${picks.map(resourceCard).join('')}${more.length ? `<details class="hint more-resources"><summary>Additional study materials (${more.length})</summary>${more.map(resourceCard).join('')}</details>` : ''}<a class="text-link" href="#/library/${li + 1}">Browse all Level ${num(li + 1)} resources</a><div class="activity-next"><a class="button" href="#/week/${week}/lab">Open skill lab</a></div>`;
   }
   function labPage(week) {
     const lab = labs[week - 1],
@@ -372,7 +402,7 @@
           : lab.options?.map((_, i) => i);
     let controls = '';
     if (lab.kind === 'short')
-      controls = `<label class="field-label" for="lab-answer">Your answer</label><input class="answer-input" id="lab-answer" autocomplete="off" value="${h(w.short || '')}">`;
+      controls = `<label class="field-label" for="lab-answer">Answer</label><input class="answer-input" id="lab-answer" autocomplete="off" value="${h(w.short || '')}">`;
     if (lab.kind === 'select')
       controls = lab.options
         .map(
@@ -382,33 +412,172 @@
         .join('');
     if (lab.kind === 'order')
       controls = `<ol class="order-list">${order.map((index, pos) => `<li><span>${h(lab.options[index])}</span><div><button type="button" data-move="-1" data-pos="${pos}" aria-label="Move step ${pos + 1} up" ${!pos ? 'disabled' : ''}>↑</button><button type="button" data-move="1" data-pos="${pos}" aria-label="Move step ${pos + 1} down" ${pos === order.length - 1 ? 'disabled' : ''}>↓</button></div></li>`).join('')}</ol>`;
-    return `<div class="eyebrow">SKILL LAB</div><h2>${h(lab.title)}</h2><p>${h(lab.brief)}</p>${lab.stimulus ? `<pre class="stimulus"><code>${h(lab.stimulus)}</code></pre>` : ''}<form id="lab-form">${controls}<div class="button-row"><button class="button">Check my work</button></div></form>
+    return `<div class="eyebrow">SKILL LAB</div><h2>${h(lab.title)}</h2><p>${h(lab.brief)}</p>${lab.stimulus ? `<pre class="stimulus"><code>${h(lab.stimulus)}</code></pre>` : ''}${referencePanel(lab.reference, 'Skill lab reference')}<form id="lab-form">${controls}<div class="button-row"><button class="button">Check answer</button></div></form>
     <details class="hint"><summary>Show a hint</summary><p>${h(lab.hint)}</p></details><div role="status" id="lab-feedback">${w.labPassed ? `<div class="feedback good">${icon('check', 17)}<span>Skill lab passed. ${h(lab.explanation)}</span></div>` : ''}</div>
     ${window.PRACTICE_WEEKS?.includes(week) ? '<div id="code-practice"></div>' : ''}<div class="activity-next"><a class="text-link" href="#/week/${week}/quiz">Open knowledge check</a></div>`;
   }
+  function scoreAttempt(week, attempt, time) {
+    if (attempt.ended) return;
+    const w = workFor(week);
+    const qs = assessment.paper(lessons, week, attempt);
+    const result = assessment.result(qs, attempt);
+    attempt.expired = time >= attempt.deadline;
+    attempt.ended = Math.max(attempt.started, Math.min(time, attempt.deadline));
+    w.best = Math.max(w.best || 0, result.score);
+    save();
+  }
+  function syncJournal() {
+    if (!writable) return;
+    try {
+      const latest = JSON.parse(localStorage.getItem(key) || 'null');
+      if (validState(latest)) progress = upgradeJournal(latest);
+    } catch {
+      /* Keep unsaved work when storage is unavailable. */
+    }
+  }
+  function startQuiz(week, minutes) {
+    syncJournal();
+    const w = workFor(week);
+    if (!available(week)) {
+      render();
+      return;
+    }
+    if (w.attempt && !w.attempt.ended) {
+      render();
+      return;
+    }
+    w.attempt = assessment.create(minutes, (w.attempt?.sequence || 0) + 1);
+    save();
+    render();
+    document.getElementById('quiz-title')?.focus();
+  }
   function quizPage(week) {
     const w = workFor(week),
-      qs = exam(week);
-    return `<div class="eyebrow">KNOWLEDGE CHECK</div><h2>Test your understanding</h2><p>Answer five questions. Four correct answers pass the week’s check. ${week > 1 ? 'Earlier topics return as you progress.' : ''}</p><form id="quiz-form">${qs.map((q, i) => `<fieldset><legend><span>${num(i + 1)}</span> ${h(q.prompt)}</legend>${q.options.map((opt, j) => `<label class="choice"><input required type="radio" name="q${i}" value="${j}" ${w.quizChoices?.[i] === j ? 'checked' : ''}><span>${h(opt.text)}</span></label>`).join('')}<div class="q-feedback" id="q-feedback-${i}"></div></fieldset>`).join('')}<div class="button-row"><button class="button">Grade my answers</button>${w.best != null ? `<small>Best score: ${Number(w.best)}%</small>` : ''}</div></form><div role="status" id="quiz-feedback"></div><div class="activity-next"><a class="text-link" href="#/week/${week}/project">Open weekly project</a></div>`;
+      a = w.attempt;
+    if (a && !a.ended && Date.now() >= a.deadline)
+      scoreAttempt(week, a, Date.now());
+    const activeAttempt = a && !a.ended;
+    const qs = a ? assessment.paper(lessons, week, a) : [];
+    const result = a?.ended ? assessment.result(qs, a) : null;
+    const passed = result?.score >= assessment.PASS_PERCENT;
+    const configuration = `<form id="start-quiz"><div class="quiz-setup"><label for="quiz-time">Time allowance</label><select id="quiz-time"><option value="10">10 minutes · standard</option><option value="20">20 minutes · extended</option><option value="100">100 minutes · extended</option></select></div><p class="muted">The timer begins on start and continues if the page closes. Answers saved before the deadline are graded automatically. All time allowances use the same passing score.</p><button class="button">${icon('clock', 16)} ${a ? 'Start another attempt' : 'Start graded quiz'}</button></form>`;
+    return `<div class="eyebrow">GRADED ASSESSMENT</div><h2 id="quiz-title" tabindex="-1">Week ${num(week)} knowledge check</h2>
+      ${!activeAttempt ? `<p>Five applied questions. Four correct answers earn a pass. ${week > 1 ? 'The assessment includes earlier concepts.' : ''} Completing the week requires a passing quiz, a passed lab, and a reviewed project.</p>` : ''}
+      ${
+        result
+          ? `<div class="quiz-result ${passed ? 'pass' : 'fail'}" role="status"><strong>${passed ? 'Passed' : 'Did not pass'} · ${result.score}%</strong><span>${result.correct} of 5 correct · Attempt ${a.sequence}${a.expired ? ' · Time expired' : ''}</span></div>
+      <div class="answer-key"><h3>Answer review</h3>${qs
+        .map((q, i) => {
+          const ans = a.answers[i];
+          const correct = ans === q.correct;
+          return `<details><summary>${icon(correct ? 'check' : 'book', 16)} ${correct ? 'Correct' : ans == null ? 'Unanswered' : 'Review'} · ${h(q.prompt)}</summary><p>${ans == null ? 'No answer was recorded.' : `Selected: ${h(q.options[ans].text)}. ${h(q.options[ans].feedback)}`}</p>${!correct ? `<p><strong>Model answer</strong> ${h(q.options[q.correct].text)} ${h(q.options[q.correct].feedback)}</p><a href="#/examples/${q.sourceWeek}">Study the Week ${q.sourceWeek} examples</a>` : ''}</details>`;
+        })
+        .join(
+          '',
+        )}</div>${passed ? `<p><a class="text-link" href="#/week/${week}/project">Open weekly project</a></p>` : `<p class="remediation">${Number(w.best) >= 80 ? 'An earlier attempt earned a pass.' : 'Progression stays locked.'} Review the missed concepts, then take another attempt with a fresh question set.</p>`}`
+          : ''
+      }
+      ${
+        activeAttempt
+          ? `<div class="timer-strip"><span>${icon('clock', 18)} Time remaining</span><strong id="quiz-clock" role="timer" aria-live="off">${timeLeft(a.deadline)}</strong><small>Attempt ${a.sequence}</small></div>
+        <form id="quiz-form" data-seed="${a.seed}">${qs.map((q, i) => `<fieldset><legend><span>${num(i + 1)}</span> ${h(q.prompt)}</legend>${q.options.map((opt, j) => `<label class="choice"><input required type="radio" name="q${i}" value="${j}" ${a.answers[i] === j ? 'checked' : ''}><span>${h(opt.text)}</span></label>`).join('')}</fieldset>`).join('')}
+        <div class="button-row"><button class="button">Submit for grading</button><small id="answered-count">${a.answers.filter((n) => n !== null).length} of 5 answered</small></div></form>`
+          : configuration
+      }
+      ${w.best != null ? `<p class="muted">Best recorded score: ${w.best}%.</p>` : ''}`;
+  }
+  function timeLeft(deadline) {
+    const seconds = Math.max(0, Math.ceil((deadline - Date.now()) / 1000));
+    return (
+      Math.floor(seconds / 60) + ':' + String(seconds % 60).padStart(2, '0')
+    );
+  }
+  function settleExpired() {
+    const now = Date.now();
+    const due = Object.entries(progress.work).filter(
+      ([, w]) => w?.attempt && !w.attempt.ended && now >= w.attempt.deadline,
+    );
+    if (!due.length) return false;
+    syncJournal();
+    for (const [id] of due) {
+      const a = progress.work[id]?.attempt;
+      if (a && !a.ended && now >= a.deadline) scoreAttempt(Number(id), a, now);
+    }
+    return true;
+  }
+  function tickQuiz() {
+    const clock = document.getElementById('quiz-clock');
+    if (!clock) {
+      if (settleExpired()) refreshChecklist();
+      return;
+    }
+    const a = workFor(active.week).attempt;
+    if (!a || a.ended) {
+      render();
+      return;
+    }
+    if (Date.now() >= a.deadline) {
+      commitQuiz();
+      return;
+    }
+    clock.textContent = timeLeft(a.deadline);
+  }
+  function commitQuiz(answer) {
+    const week = active.week;
+    const displayed = main.querySelector('#quiz-form')?.dataset.seed;
+    syncJournal();
+    const a = workFor(week).attempt;
+    if (!a || a.ended || String(a.seed) !== displayed) {
+      render();
+      return;
+    }
+    const now = Date.now();
+    if (answer && now < a.deadline) {
+      a.answers[answer.index] = answer.value;
+      save();
+      document.getElementById('answered-count').textContent =
+        a.answers.filter((n) => n !== null).length + ' of 5 answered';
+      return;
+    }
+    scoreAttempt(week, a, now);
+    render();
+    const result = main.querySelector('.quiz-result');
+    result?.scrollIntoView({ block: 'center' });
   }
   const reviewLabels = [
     'I built the deliverable using fictional or authorized data.',
     'I tried a normal case and recorded what happened in another case.',
     'I can explain a design choice and make a change independently.',
   ];
+  function earlierEvidence(work) {
+    const old = work.legacy;
+    if (
+      !old ||
+      (!old.draft && !old.labPassed && old.best == null && !work.carried)
+    )
+      return '';
+    const grades = [
+      old.labPassed ? 'Skill lab passed' : '',
+      old.best == null ? '' : 'Quiz best: ' + Number(old.best) + '%',
+    ]
+      .filter(Boolean)
+      .join(' · ');
+    return `<details class="hint"><summary>Earlier edition record</summary><p>${work.carried ? 'Credit for this completed week was carried forward.' : 'These records belong to the earlier assignment.'}</p>${grades ? `<p>${h(grades)}</p>` : ''}${old.draft ? `<pre class="legacy-draft">${h(old.draft)}</pre>` : ''}</details>`;
+  }
   function projectPage(week) {
     const project = lessons[week - 1].project,
       w = workFor(week),
       marked = Array.isArray(w.review) ? w.review : [];
-    return `<div class="eyebrow">WEEKLY PROJECT</div><h2>Build it yourself</h2><p>${h(project.prompt)}</p>${project.deliverable ? `<div class="worked"><div class="eyebrow">DELIVERABLE</div><p>${h(project.deliverable)}</p></div>` : ''}<label class="field-label" for="project-draft">Project evidence</label><p class="muted">Record what you built, a test result, and one change you made. You can include a link to your work.</p><textarea id="project-draft" rows="7" maxlength="24000" placeholder="${h(project.placeholder)}">${h(w.draft || '')}</textarea><p class="save-note" id="draft-status" role="status">${w.draft ? 'Draft saved in this browser.' : 'Your notes stay in this browser.'}</p><h3>Review your work</h3><p class="muted">Assess the project yourself. The quiz and skill lab are graded automatically.</p>${reviewLabels.map((s, i) => `<label class="choice"><input type="checkbox" name="review" value="${i}" ${marked.includes(i) ? 'checked' : ''}><span>${s}</span></label>`).join('')}<div class="button-row"><button class="button" data-finish>${done(week) ? 'Save review' : 'Complete week'}</button></div><div role="status" id="project-feedback">${done(week) ? finishMessage(week) : ''}</div>`;
+    return `<div class="eyebrow">WEEKLY PROJECT</div><h2>Project brief</h2><p>${h(project.prompt)}</p>${project.deliverable ? `<div class="worked"><div class="eyebrow">DELIVERABLE</div><p>${h(project.deliverable)}</p></div>` : ''}${referencePanel(project.reference, 'Project reference')}${earlierEvidence(w)}<label class="field-label" for="project-draft">Project evidence</label><p class="muted">Record the deliverable, a test result, and one independent revision. A repository or demo link can accompany the evidence.</p><textarea id="project-draft" rows="7" maxlength="24000" placeholder="${h(project.placeholder)}">${h(w.draft || '')}</textarea><p class="save-note" id="draft-status" role="status">${w.draft ? 'Draft saved in this browser.' : 'Notes are saved in this browser.'}</p><h3>Project review</h3><p class="muted">Projects use student self-review. The academy grades the quiz and skill lab automatically.</p>${reviewLabels.map((s, i) => `<label class="choice"><input type="checkbox" name="review" value="${i}" ${marked.includes(i) ? 'checked' : ''}><span>${s}</span></label>`).join('')}<div class="button-row"><button class="button" data-finish>${done(week) ? 'Save review' : 'Complete week'}</button></div><div role="status" id="project-feedback">${done(week) ? finishMessage(week) : ''}</div>`;
   }
   function finishMessage(week) {
-    return `<div class="feedback good"><span><b>Week ${week} completed.</b> 100 XP earned. ${week < 24 ? `<a href="#/week/${week + 1}">Open Week ${week + 1}</a>` : '<a href="#/achievements">See your achievements and download your portfolio</a>'}</span></div>`;
+    return `<div class="feedback good"><span><b>Week ${week} completed.</b> 100 XP earned. ${week < 24 ? `<a href="#/week/${week + 1}">Open Week ${week + 1}</a>` : '<a href="#/achievements">View achievements and download the portfolio</a>'}</span></div>`;
   }
 
   let active = { page: 'course', week: 0, tab: 'learn' },
     practiceCleanup;
   function render(moveFocus = false) {
+    settleExpired();
     if (typeof practiceCleanup === 'function') practiceCleanup();
     practiceCleanup = null;
     const route = (location.hash.slice(1) || '/').split('/').filter(Boolean);
@@ -425,6 +594,17 @@
       active = { page: 'course', week, tab };
       content = lessonPage(week, tab);
       title = lessons[week - 1].title;
+    } else if (route[0] === 'careers') {
+      active = { page: 'careers' };
+      content = careerPage(route[1]);
+      title = 'Startup career paths';
+    } else if (route[0] === 'examples') {
+      const week = Number(route[1]);
+      active = { page: 'library' };
+      content = exampleLibrary(
+        Number.isInteger(week) && week >= 1 && week <= 24 ? week : 0,
+      );
+      title = 'Worked examples';
     } else if (route[0] === 'library') {
       active = { page: 'library' };
       if (route[1] && /^[1-6]$/.test(route[1]))
@@ -434,15 +614,17 @@
     } else if (route[0] === 'achievements') {
       active = { page: 'achievements' };
       content = achievements();
-      title = 'Your achievements';
+      title = 'Achievements';
     } else {
       active = { page: 'course' };
       content = dashboard();
     }
     main.innerHTML = content;
+    const demo = main.querySelector('[data-demo-week]');
+    if (demo) window.mountFieldDemo(demo, Number(demo.dataset.demoWeek));
     nav(active.page);
     document.title = title + ' · Fieldwork Academy';
-    if (active.page === 'library') renderResults();
+    if (document.getElementById('resource-results')) renderResults();
     if (
       active.tab === 'lab' &&
       document.getElementById('code-practice') &&
@@ -451,7 +633,12 @@
       practiceCleanup = window.mountPractice(
         document.getElementById('code-practice'),
         active.week,
+        recordCodePass,
       );
+    if (route[3] === 'code' && document.getElementById('code-practice')) {
+      document.getElementById('code-practice').scrollIntoView();
+      return;
+    }
     if (moveFocus) {
       window.scrollTo(0, 0);
       main.focus({ preventScroll: true });
@@ -461,7 +648,7 @@
     const links = main.querySelectorAll('.checklist a');
     if (!links.length) return;
     const w = workFor(active.week);
-    [!!w.labPassed, Number(w.best) >= 80, !!w.reviewed].forEach((ok, i) => {
+    checklist(active.week, w).forEach(([, , ok], i) => {
       const el = links[i].querySelector('i');
       el.classList.toggle('checked', ok);
       el.innerHTML = ok ? icon('check', 12) : '';
@@ -501,27 +688,7 @@
     document.getElementById('lab-feedback').innerHTML =
       `<div class="feedback ${pass ? 'good' : 'retry'}"><span><b>${pass ? 'Skill lab passed.' : 'Try again.'}</b> ${h(pass ? lab.explanation : lab.hint)}</span></div>`;
   }
-  function gradeQuiz() {
-    const week = active.week,
-      w = workFor(week),
-      qs = exam(week),
-      ans = qs.map((_, i) =>
-        Number(main.querySelector(`input[name="q${i}"]:checked`).value),
-      );
-    const score = qs.filter((q, i) => q.correct === ans[i]).length * 20;
-    w.quizChoices = ans;
-    w.best = Math.max(Number(w.best) || 0, score);
-    save();
-    refreshChecklist();
-    qs.forEach((q, i) => {
-      const ok = q.correct === ans[i];
-      document.getElementById('q-feedback-' + i).innerHTML =
-        `<p class="answer-review ${ok ? 'good' : 'retry'}"><b>${ok ? 'Correct.' : 'Review this one.'}</b> ${h(q.options[ans[i]].feedback)}</p>`;
-    });
-    const out = document.getElementById('quiz-feedback');
-    out.innerHTML = `<div class="feedback ${score >= 80 ? 'good' : 'retry'}"><span><b>${score}% · ${score / 20} of 5 correct.</b> ${score >= 80 ? 'Knowledge check passed.' : 'Read the feedback and try again to reach 80%.'}</span></div>`;
-    out.scrollIntoView({ block: 'nearest' });
-  }
+
   function finish() {
     const week = active.week,
       w = workFor(week),
@@ -536,6 +703,8 @@
     refreshChecklist();
     const missing = [];
     if (!w.labPassed) missing.push('pass the skill lab');
+    if (window.PRACTICE_WEEKS.includes(week) && !w.codePassed && !w.carried)
+      missing.push('pass every test in the coding editor');
     if (!(Number(w.best) >= 80))
       missing.push('earn at least 80% on the knowledge check');
     if (draft.length < 20)
@@ -572,16 +741,17 @@
   function sanitizedBackup(raw) {
     if (
       raw?.course !== 'fieldwork-academy' ||
-      raw.version !== 1 ||
+      ![1, 2].includes(raw.version) ||
       !validState(raw.progress)
     )
       throw Error(
         'Choose a Fieldwork Academy backup downloaded from this course.',
       );
+    const source = upgradeJournal(raw.progress);
     const clean = emptyState();
     let continuous = true;
     for (const l of lessons) {
-      const src = raw.progress.work[l.week],
+      const src = source.work[l.week],
         lab = labs[l.week - 1];
       if (src && typeof src === 'object') {
         const w = {};
@@ -611,13 +781,42 @@
         if (Number.isInteger(src.best) && src.best >= 0 && src.best <= 100)
           w.best = src.best;
         w.labPassed = src.labPassed === true;
+        w.codePassed = src.codePassed === true;
         w.reviewed =
           src.reviewed === true &&
           w.review?.length === 3 &&
           (w.draft || '').trim().length >= 20;
+        if (src.attempt) {
+          const a = assessment.restore(src.attempt);
+          if (a) w.attempt = a;
+        }
+        if (src.legacy && typeof src.legacy === 'object') {
+          const prev = {};
+          for (const k of ['draft', 'short'])
+            if (typeof src.legacy[k] === 'string')
+              prev[k] = src.legacy[k].slice(0, k === 'draft' ? 24000 : 800);
+          for (const k of ['review', 'selected', 'order', 'quizChoices'])
+            if (Array.isArray(src.legacy[k]))
+              prev[k] = src.legacy[k]
+                .slice(0, 24)
+                .map((n) => (Number.isInteger(n) ? n : null));
+          if (Number.isInteger(src.legacy.best)) prev.best = src.legacy.best;
+          prev.labPassed = src.legacy.labPassed === true;
+          prev.reviewed = src.legacy.reviewed === true;
+          w.legacy = prev;
+          w.carried = src.carried === true;
+        }
         clean.work[l.week] = w;
       }
-      if (continuous && raw.progress.completed[l.week] === true)
+      if (
+        continuous &&
+        source.completed[l.week] === true &&
+        (clean.work[l.week]?.carried ||
+          (clean.work[l.week]?.labPassed &&
+            clean.work[l.week]?.best >= 80 &&
+            (!window.PRACTICE_WEEKS.includes(l.week) ||
+              clean.work[l.week]?.codePassed)))
+      )
         clean.completed[l.week] = true;
       else continuous = false;
     }
@@ -628,9 +827,16 @@
       e.preventDefault();
       gradeLab();
     }
+    if (e.target.id === 'start-quiz') {
+      e.preventDefault();
+      startQuiz(
+        active.week,
+        Number(document.getElementById('quiz-time').value),
+      );
+    }
     if (e.target.id === 'quiz-form') {
       e.preventDefault();
-      gradeQuiz();
+      commitQuiz();
     }
   });
   main.addEventListener('input', (e) => {
@@ -660,6 +866,9 @@
       filters.level = el.value;
       renderResults();
     }
+    if (el.id === 'example-week') {
+      location.hash = '#/examples' + (el.value ? '/' + el.value : '');
+    }
     if (el.name === 'review') {
       const w = workFor(active.week);
       w.review = [...main.querySelectorAll('[name="review"]:checked')].map(
@@ -676,16 +885,11 @@
       save();
     }
     if (active.week && /^q[0-4]$/.test(el.name)) {
-      const w = workFor(active.week);
-      w.quizChoices = Array.from({ length: 5 }, (_, i) => {
-        const n = main.querySelector(`[name="q${i}"]:checked`);
-        return n ? Number(n.value) : null;
-      });
-      save();
+      commitQuiz({ index: Number(el.name.slice(1)), value: Number(el.value) });
     }
     if (el.id === 'import-progress' && el.files?.[0]) {
       try {
-        if (el.files[0].size > 5000000)
+        if (el.files[0].size > 10000000)
           throw Error('This backup is too large.');
         const imported = JSON.parse(await el.files[0].text());
         const clean = sanitizedBackup(imported);
@@ -700,7 +904,21 @@
         }
         const code = imported.practice || {};
         for (const week of window.PRACTICE_WEEKS || []) {
-          const storageKey = 'fieldwork.practice.v1.' + week;
+          const oldKey = 'fieldwork.practice.v1.' + week;
+          const storageKey = window.practiceDraftKey(week);
+          const oldEdition = imported.practiceEdition !== 2;
+          if (oldKey !== storageKey) {
+            const archived = oldEdition
+              ? code[week]
+              : imported.legacyPractice?.[week];
+            if (typeof archived === 'string')
+              localStorage.setItem(oldKey, archived.slice(0, 20000));
+            else localStorage.removeItem(oldKey);
+            if (oldEdition) {
+              localStorage.removeItem(storageKey);
+              continue;
+            }
+          }
           if (typeof code[week] === 'string')
             localStorage.setItem(storageKey, code[week].slice(0, 20000));
           else localStorage.removeItem(storageKey);
@@ -763,10 +981,17 @@
     }
     if (button.hasAttribute('data-finish')) finish();
     if (button.id === 'export-progress') {
-      const practice = {};
+      const practice = {},
+        legacyPractice = {};
       for (const week of window.PRACTICE_WEEKS || []) {
         try {
-          const code = localStorage.getItem('fieldwork.practice.v1.' + week);
+          const key = window.practiceDraftKey(week),
+            oldKey = 'fieldwork.practice.v1.' + week;
+          const code = localStorage.getItem(key);
+          if (oldKey !== key) {
+            const old = localStorage.getItem(oldKey);
+            if (old !== null) legacyPractice[week] = old;
+          }
           if (code !== null) practice[week] = code;
         } catch {
           /* Other journal data can still be exported. */
@@ -775,7 +1000,14 @@
       download(
         'fieldwork-journal.json',
         JSON.stringify(
-          { course: 'fieldwork-academy', version: 1, progress, practice },
+          {
+            course: 'fieldwork-academy',
+            version: 2,
+            practiceEdition: 2,
+            progress,
+            practice,
+            legacyPractice,
+          },
           null,
           2,
         ),
@@ -786,11 +1018,13 @@
       download(
         'fieldwork-portfolio.md',
         [
-          '# My Fieldwork AI portfolio',
-          ...lessons.map(
-            (l) =>
-              `## Week ${l.week} · ${l.title}\n\n${workFor(l.week).draft || ''}`,
-          ),
+          '# Fieldwork Academy portfolio',
+          ...lessons
+            .filter((l) => done(l.week))
+            .map(
+              (l) =>
+                `## Week ${l.week} · ${workFor(l.week).carried && workFor(l.week).draft === workFor(l.week).legacy?.draft ? 'Earlier edition project' : l.title}\n\n${workFor(l.week).draft || ''}`,
+            ),
         ].join('\n\n'),
         'text/markdown',
       );
@@ -806,13 +1040,21 @@
       try {
         const next = JSON.parse(e.newValue);
         if (validState(next)) {
-          progress = next;
-          if (!main.querySelector('input:focus,textarea:focus')) render();
+          progress = upgradeJournal(next);
+          if (
+            active.tab === 'quiz' ||
+            !main.querySelector('input:focus,textarea:focus')
+          )
+            render();
         }
       } catch {
         /* Keep this tab's current journal. */
       }
     }
+  });
+  window.setInterval(tickQuiz, 500);
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) tickQuiz();
   });
   render();
 })();

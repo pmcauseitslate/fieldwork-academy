@@ -1,0 +1,7 @@
+[
+  {"event_id":"e101", "account_id":10, "minutes":6},
+  {"event_id":"e102", "account_id":20, "minutes":7},
+  {"event_id":"e101", "account_id":10, "minutes":6},
+  {"event_id":"e103", "account_id":20},
+  {"event_id":"e104", "account_id":10, "minutes":4}
+]
