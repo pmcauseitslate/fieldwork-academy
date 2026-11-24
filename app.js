@@ -19,6 +19,8 @@
           "'": '&#39;',
         })[char],
     );
+  const workshops = window.ACADEMY_WORKSHOPS;
+  const workshopViews = window.createWorkshopViews(h);
   const paths = {
     path: '<path d="M4 6h6a4 4 0 0 1 0 8H9a3 3 0 0 0 0 6h9"/><circle cx="4" cy="6" r="2"/><path d="m16 17 3 3-3 3"/>',
     book: '<path d="M3 5c3-1 6-1 9 1 3-2 6-2 9-1v14c-3-1-6-1-9 1-3-2-6-2-9-1zM12 6v14"/>',
@@ -269,11 +271,20 @@
       ? `<div data-demo-week="${week}"></div>`
       : '';
   }
+  function guidedReference(lesson, selected) {
+    const spec = workshops[lesson.week]?.example;
+    if (!spec) return '';
+    if (!selected)
+      return `<a class="text-link" href="#/examples/${lesson.week}">Study the guided example</a>`;
+    return `<details class="reference" open><summary>${icon('book', 18)}<span><small>Guided example</small><strong>${h(spec.title)}</strong></span>${icon('chevron', 17)}</summary>
+      <div class="reference-body"><p>${h(spec.setup)}</p><ol>${spec.steps.map((s) => `<li>${h(s)}</li>`).join('')}</ol><pre><code>${h(spec.artifact)}</code></pre><p>${h(spec.result)}</p><h4>Change one thing</h4><p>${h(spec.change)}</p>
+      <details class="hint"><summary>Compare the changed result</summary><p>${h(spec.changedResult)}</p></details>${available(lesson.week) ? `<a class="text-link" href="#/week/${lesson.week}/learn/example">Open the guided workshop</a>` : ''}</div></details>`;
+  }
   function exampleLibrary(week) {
     const items = week ? [lessons[week - 1]] : lessons;
     return `<div class="page-intro"><div class="eyebrow"><i></i> REFERENCE LIBRARY</div><h1>Worked examples</h1><p>Study a parallel task before starting a lab or project. Each reference shows the reasoning, a finished sample, and a way to verify the result.</p></div>
       <div class="example-filter"><label for="example-week">Browse by week</label><select id="example-week"><option value="">All 24 weeks</option>${lessons.map((l) => `<option value="${l.week}" ${l.week === week ? 'selected' : ''}>Week ${num(l.week)} · ${h(l.title)}</option>`).join('')}</select><a class="text-link" href="#/library">Lectures and courses</a></div>
-      <div class="example-grid">${items.map((l) => `<section class="example-group"><div class="eyebrow">WEEK ${num(l.week)}</div><h2>${h(l.title)}</h2>${referencePanel(labs[l.week - 1].reference, 'Skill lab reference')}${referencePanel(l.project.reference, 'Project reference')}${referencePanel(window.PRACTICE_REFERENCES?.[l.week], 'Code editor reference')}${week ? demoSlot(week) : ''}${available(l.week) ? `<a class="text-link" href="#/week/${l.week}">Open workshop</a>` : ''}</section>`).join('')}</div>`;
+      <div class="example-grid">${items.map((l) => `<section class="example-group"><div class="eyebrow">WEEK ${num(l.week)}</div><h2>${h(l.title)}</h2>${guidedReference(l, week)}${referencePanel(labs[l.week - 1].reference, 'Skill lab reference')}${referencePanel(l.project.reference, 'Project reference')}${referencePanel(window.PRACTICE_REFERENCES?.[l.week], 'Code editor reference')}${week ? demoSlot(week) : ''}${available(l.week) ? `<a class="text-link" href="#/week/${l.week}">Open workshop</a>` : ''}</section>`).join('')}</div>`;
   }
 
   function resourceCard(r) {
@@ -333,10 +344,9 @@
   const tabs = [
     ['learn', 'book', 'Lesson'],
     ['lab', 'terminal', 'Skill lab'],
-    ['quiz', 'target', 'Knowledge check'],
     ['project', 'pen', 'Project'],
+    ['quiz', 'target', 'Knowledge check'],
   ];
-  const firstWeekTabs = [tabs[0], tabs[1], tabs[3], tabs[2]];
   function checklist(week, work) {
     const items = [['lab', 'Pass the skill lab', work.labPassed]];
     if (window.PRACTICE_WEEKS.includes(week))
@@ -345,17 +355,39 @@
         'Pass the coding tests',
         work.codePassed || work.carried,
       ]);
-    const quiz = ['quiz', 'Score 80% on the quiz', Number(work.best) >= 80];
-    const project = ['project', 'Review the weekly project', work.reviewed];
-    items.push(...(week === 1 ? [project, quiz] : [quiz, project]));
+    if (workshops[week]) {
+      items.push(['project', 'Pass the independent task', work.transferPassed]);
+      if (workshops[week].task.starter)
+        items.push([
+          'project/editor',
+          'Run the project successfully',
+          work.projectRunPassed,
+        ]);
+    }
+    items.push(
+      ['project', 'Review the weekly project', work.reviewed],
+      [
+        'quiz',
+        'Score 80% on the quiz',
+        Number(work.best) >= assessment.PASS_PERCENT,
+      ],
+    );
     return items;
   }
   function canStartQuiz(week, w) {
     return (
-      week !== 1 ||
       done(week) ||
-      Boolean(w.labPassed && w.codePassed && w.reviewed)
+      checklist(week, w).every(([route, , ok]) => route === 'quiz' || ok)
     );
+  }
+  function awardIfReady(week, w) {
+    if (
+      !done(week) &&
+      available(week) &&
+      Number(w.best) >= assessment.PASS_PERCENT &&
+      canStartQuiz(week, w)
+    )
+      progress.completed[week] = true;
   }
   function validQueueCase(row) {
     return (
@@ -397,7 +429,9 @@
   function recordCodePass(week) {
     syncJournal();
     if (!available(week)) return;
-    workFor(week).codePassed = true;
+    const w = workFor(week);
+    w.codePassed = true;
+    awardIfReady(week, w);
     save();
     if (active.week === week) refreshChecklist();
   }
@@ -408,7 +442,7 @@
       li = levelOf(week),
       work = workFor(week);
     return `<div class="breadcrumbs"><a href="#/">Learning path</a> ${icon('right', 14)} <span>Level ${num(li + 1)}</span></div><div class="lesson-header"><div class="eyebrow"><i></i> WEEK ${num(week)} OF 24</div><h1>${h(lesson.title)}</h1><p>${h(lesson.summary)}</p><div class="path-meta">${icon(levelIcons[li], 16)} ${h(levelTitles[li])}<b>·</b>${week === 1 ? icon('terminal', 16) + ' Browser workshop · No installation required' : icon('clock', 16) + ' 8–10 hours including project'}</div></div>
-    <div class="lesson-tabs">${(week === 1 ? firstWeekTabs : tabs).map(([id, im, t]) => `<a href="#/week/${week}/${id}" aria-current="${id === tab ? 'page' : 'false'}">${icon(im, 17)} ${t}</a>`).join('')}</div>
+    <div class="lesson-tabs">${tabs.map(([id, im, t]) => `<a href="#/week/${week}/${id}" aria-current="${id === tab ? 'page' : 'false'}">${icon(im, 17)} ${t}</a>`).join('')}</div>
     <div class="lesson-grid"><article class="lesson-panel" id="activity">${tab === 'lab' ? labPage(week) : tab === 'quiz' ? quizPage(week) : tab === 'project' ? projectPage(week) : learnPage(week)}</article>
     <aside class="work-sidebar"><div class="panel-head"><div class="eyebrow">WEEK ${num(week)}</div>${icon('flag', 19)}</div><h2>Field checklist</h2><ul class="checklist">${checklist(
       week,
@@ -450,13 +484,21 @@
       r.levels.includes(li + 1),
     );
     const picked = specific.length ? specific : candidates;
-    const picks = picked.slice(0, 4);
-    const more = picked.slice(4);
     const dl = (window.WEEKLY_DOWNLOADS || {})[week] || [];
     if (week === 1) return firstLessonPage(lesson, picked, dl);
-    return `<div class="eyebrow">WORKSHOP</div><h2>Workshop concepts</h2>${lesson.teaching.map((t) => `<p>${h(t)}</p>`).join('')}<div class="worked"><div class="eyebrow">WORKED EXAMPLE</div><h3>${h(lesson.example.title)}</h3><p>${h(lesson.example.text)}</p></div>${demoSlot(week)}
-    ${dl.length ? `<h3>Project files</h3><div class="downloads">${dl.map((d) => `<a href="${h(d.filename || d.file || d.url || d.href)}" download>${icon('download', 16)} ${h(d.label || d.title)}</a>`).join('')}</div>` : ''}
-    <h3 class="subheading">Study materials</h3>${picks.map(resourceCard).join('')}${more.length ? `<details class="hint more-resources"><summary>Additional study materials (${more.length})</summary>${more.map(resourceCard).join('')}</details>` : ''}<a class="text-link" href="#/library/${li + 1}">Browse all Level ${num(li + 1)} resources</a><div class="activity-next"><a class="button" href="#/week/${week}/lab">Open skill lab</a></div>`;
+    const further = `<details class="hint optional-study"><summary>Course files, reading and videos</summary><h3>Workshop notes</h3>${lesson.teaching.map((item) => `<p>${h(item)}</p>`).join('')}<h4>${h(lesson.example.title)}</h4><p>${h(lesson.example.text)}</p>${downloadLinks(week)}${picked.map(resourceCard).join('')}<a class="text-link" href="#/library/${li + 1}">Browse all Level ${num(li + 1)} resources</a></details>`;
+    return workshopViews.lesson(
+      week,
+      workshops[week],
+      workFor(week),
+      progress.work[week - 1] || {},
+      further,
+      demoSlot(week),
+    );
+  }
+  function downloadLinks(week) {
+    const files = (window.WEEKLY_DOWNLOADS || {})[week] || [];
+    return `<div class="downloads">${files.map((d) => `<a href="${h(d.filename || d.file || d.url || d.href)}" download>${icon('download', 16)} ${h(d.label || d.title)}</a>`).join('')}</div>`;
   }
   function labPage(week) {
     const lab = labs[week - 1],
@@ -479,7 +521,7 @@
       controls = `<ol class="order-list">${order.map((index, pos) => `<li><span>${h(lab.options[index])}</span><div><button type="button" data-move="-1" data-pos="${pos}" aria-label="Move step ${pos + 1} up" ${!pos ? 'disabled' : ''}>↑</button><button type="button" data-move="1" data-pos="${pos}" aria-label="Move step ${pos + 1} down" ${pos === order.length - 1 ? 'disabled' : ''}>↓</button></div></li>`).join('')}</ol>`;
     return `<div class="eyebrow">SKILL LAB</div><h2>${h(lab.title)}</h2><p>${h(lab.brief)}</p>${lab.stimulus ? `<pre class="stimulus"><code>${h(lab.stimulus)}</code></pre>` : ''}${referencePanel(lab.reference, 'Skill lab reference')}<form id="lab-form">${controls}<div class="button-row"><button class="button">Check answer</button></div></form>
     <details class="hint"><summary>Show a hint</summary><p>${h(lab.hint)}</p></details><div role="status" id="lab-feedback">${w.labPassed ? `<div class="feedback good">${icon('check', 17)}<span>Skill lab passed. ${h(lab.explanation)}</span></div>` : ''}</div>
-    ${window.PRACTICE_WEEKS?.includes(week) ? '<div id="code-practice"></div>' : ''}<div class="activity-next">${week === 1 ? '<a class="button" href="#/week/1/project">Open project review</a>' : `<a class="text-link" href="#/week/${week}/quiz">Open knowledge check</a>`}</div>`;
+    ${window.PRACTICE_WEEKS?.includes(week) ? '<div id="code-practice"></div>' : ''}<div class="activity-next"><a class="button" href="#/week/${week}/project">${week === 1 ? 'Open project review' : 'Open independent project'}</a></div>`;
   }
   function scoreAttempt(week, attempt, time) {
     if (attempt.ended) return;
@@ -489,12 +531,7 @@
     attempt.expired = time >= attempt.deadline;
     attempt.ended = Math.max(attempt.started, Math.min(time, attempt.deadline));
     w.best = Math.max(w.best || 0, result.score);
-    if (
-      week === 1 &&
-      w.best >= assessment.PASS_PERCENT &&
-      canStartQuiz(week, w)
-    )
-      progress.completed[week] = true;
+    awardIfReady(week, w);
     save();
   }
   function syncJournal() {
@@ -531,14 +568,11 @@
     const qs = a ? assessment.paper(lessons, week, a) : [];
     const result = a?.ended ? assessment.result(qs, a) : null;
     const passed = result?.score >= assessment.PASS_PERCENT;
-    const pending =
-      week === 1
-        ? checklist(1, w).filter(
-            ([route, , complete]) => route !== 'quiz' && !complete,
-          )
-        : [];
+    const pending = checklist(week, w).filter(
+      ([route, , ok]) => route !== 'quiz' && !ok,
+    );
     const configuration = !canStartQuiz(week, w)
-      ? `<div class="worked"><h3>Finish the practical work to open the quiz</h3><p>The timer starts only when an attempt begins. Complete the remaining steps below.</p><ul class="remaining-work">${pending.map(([route, label]) => `<li><a href="#/week/1/${route}">${h(label)}</a></li>`).join('')}</ul></div>`
+      ? `<div class="worked"><h3>Finish the practical work to open the quiz</h3><p>The timer starts only when an attempt begins. Complete the remaining steps below.</p><ul class="remaining-work">${pending.map(([route, label]) => `<li><a href="#/week/${week}/${route}">${h(label)}</a></li>`).join('')}</ul></div>`
       : `<form id="start-quiz"><div class="quiz-setup"><label for="quiz-time">Time allowance</label><select id="quiz-time"><option value="10">10 minutes · standard</option><option value="20">20 minutes · extended</option><option value="100">100 minutes · extended</option></select></div><p class="muted">The timer begins on start and continues if the page closes. Answers saved before the deadline are graded automatically. All time allowances use the same passing score.</p><button class="button">${icon('clock', 16)} ${a ? 'Start another attempt' : 'Start graded quiz'}</button></form>`;
     return `<div class="eyebrow">GRADED ASSESSMENT</div><h2 id="quiz-title" tabindex="-1">Week ${num(week)} knowledge check</h2>
       ${!activeAttempt ? `<p>Five applied questions. Four correct answers earn a pass. ${week > 1 ? 'The assessment includes earlier concepts.' : ''} Completing the week requires a passing quiz, a passed lab, and a reviewed project.</p>` : ''}
@@ -553,7 +587,7 @@
         })
         .join(
           '',
-        )}</div>${passed ? (week === 1 && done(week) ? finishMessage(week) : `<p><a class="text-link" href="#/week/${week}/project">Open weekly project</a></p>`) : `<p class="remediation">${Number(w.best) >= 80 ? 'An earlier attempt earned a pass.' : 'Progression stays locked.'} Review the missed concepts, then take another attempt with a fresh question set.</p>`}`
+        )}</div>${passed ? (done(week) ? finishMessage(week) : `<p><a class="text-link" href="#/week/${week}/project">Open weekly project</a></p>`) : `<p class="remediation">${Number(w.best) >= 80 ? 'An earlier attempt earned a pass.' : 'Progression stays locked.'} Review the missed concepts, then take another attempt with a fresh question set.</p>`}`
           : ''
       }
       ${
@@ -623,11 +657,6 @@
     const result = main.querySelector('.quiz-result');
     result?.scrollIntoView({ block: 'center' });
   }
-  const reviewLabels = [
-    'I built the deliverable using fictional or authorized data.',
-    'I tried a normal case and recorded what happened in another case.',
-    'I can explain a design choice and make a change independently.',
-  ];
   function earlierEvidence(work) {
     const old = work.legacy;
     if (
@@ -691,6 +720,29 @@
     const title = historical ? 'Earlier edition project' : lesson.title;
     const entry = `## Week ${lesson.week} · ${title}\n\n${work.draft || ''}`;
     const rows = lesson.week === 1 ? recentQueueCases(work.reviewCases) : [];
+    if (workshops[lesson.week] && !historical) {
+      const task = workshops[lesson.week].task;
+      const answers = task.fields
+        .map((field, i) =>
+          work.transferAnswers?.[i]
+            ? field.label + ' — ' + work.transferAnswers[i]
+            : '',
+        )
+        .filter(Boolean);
+      return [
+        entry,
+        answers.length ? 'Independent task\n\n' + answers.join('\n\n') : '',
+        work.projectCode
+          ? 'Project source\n\n' +
+            work.projectCode
+              .split('\n')
+              .map((line) => '    ' + line)
+              .join('\n')
+          : '',
+      ]
+        .filter(Boolean)
+        .join('\n\n');
+    }
     if (!rows.length) return entry;
     return [
       entry,
@@ -704,24 +756,36 @@
           .join('\n'),
     ].join('\n\n');
   }
-  function firstProjectStatus(w) {
-    return canStartQuiz(1, w)
-      ? '<div class="feedback good"><span>Project review saved. <a href="#/week/1/quiz">Open the Week 1 quiz</a>.</span></div>'
-      : '<div class="feedback good"><span>Project review saved. <a href="#/week/1/lab">Finish the skill lab and coding tests</a> to open the quiz.</span></div>';
+  function projectStatus(week, w) {
+    if (done(week)) return finishMessage(week);
+    return `<div class="feedback good"><span>Project review saved. <a href="#/week/${week}/quiz">${canStartQuiz(week, w) ? 'Open the Week ' + week + ' quiz' : 'See the remaining practical steps'}</a>.</span></div>`;
   }
   function projectPage(week) {
     const project = lessons[week - 1].project,
       w = workFor(week),
       marked = Array.isArray(w.review) ? w.review : [];
-    const first = week === 1;
-    const labels = first
-      ? [
-          'I ran my function on two different ticket counts and an empty queue.',
-          'I compared my predictions with the returned hours and investigated any difference.',
-          'My notes explain what changed and one assumption about real handling time.',
-        ]
-      : reviewLabels;
-    return `<div class="eyebrow">WEEKLY PROJECT</div><h2>Project brief</h2><p>${h(project.prompt)}</p>${project.deliverable ? `<div class="worked"><div class="eyebrow">DELIVERABLE</div><p>${h(project.deliverable)}</p></div>` : ''}${referencePanel(project.reference, 'Project reference')}${earlierEvidence(w)}${first ? queueEvidence(w) : ''}<label class="field-label" for="project-draft">${first ? 'Explain the results' : 'Project evidence'}</label><p class="muted">${first ? 'Explain the change in hours and one assumption in your own words. Saving the review adds the completed test record to the portfolio.' : 'Record the deliverable, a test result, and one independent revision. A repository or demo link can accompany the evidence.'}</p><textarea id="project-draft" rows="7" maxlength="24000" placeholder="${h(project.placeholder)}">${h(w.draft || '')}</textarea><p class="save-note" id="draft-status" role="status">${w.draft ? 'Draft saved in this browser.' : 'Notes are saved in this browser.'}</p><h3>Project review</h3><p class="muted">Projects use student self-review. The academy grades the quiz and skill lab automatically.</p>${labels.map((s, i) => `<label class="choice"><input type="checkbox" name="review" value="${i}" ${marked.includes(i) ? 'checked' : ''}><span>${s}</span></label>`).join('')}<div class="button-row"><button class="button" data-finish>${first ? 'Save project review' : done(week) ? 'Save review' : 'Complete week'}</button></div><div role="status" id="project-feedback">${done(week) ? finishMessage(week) : first && w.reviewed ? firstProjectStatus(w) : ''}</div>`;
+    if (workshops[week])
+      return workshopViews.project(
+        week,
+        workshops[week],
+        project,
+        w,
+        referencePanel(project.reference, 'Project reference') +
+          earlierEvidence(w),
+        w.reviewed || done(week) ? projectStatus(week, w) : '',
+        downloadLinks(week),
+      );
+    const labels = [
+      'I ran my function on two different ticket counts and an empty queue.',
+      'I compared my predictions with the returned hours and investigated any difference.',
+      'My notes explain what changed and one assumption about real handling time.',
+    ];
+    return `<div class="eyebrow">WEEKLY PROJECT</div><h2>Project brief</h2><p>${h(project.prompt)}</p><div class="worked"><div class="eyebrow">DELIVERABLE</div><p>${h(project.deliverable)}</p></div>${referencePanel(project.reference, 'Project reference')}${earlierEvidence(w)}${queueEvidence(w)}
+      <label class="field-label" for="project-draft">Explain the results</label><p class="muted">Explain the change in hours and one assumption in your own words. Saving the review adds the completed test record to the portfolio.</p>
+      <textarea id="project-draft" rows="7" maxlength="24000" placeholder="${h(project.placeholder)}">${h(w.draft || '')}</textarea><p class="save-note" id="draft-status" role="status">Notes are saved in this browser.</p>
+      <h3>Project review</h3><p class="muted">Projects use student self-review. The academy grades the quiz and skill lab automatically.</p>
+      ${labels.map((s, i) => `<label class="choice"><input type="checkbox" name="review" value="${i}" ${marked.includes(i) ? 'checked' : ''}><span>${s}</span></label>`).join('')}
+      <div class="button-row"><button class="button" data-finish>Save project review</button></div><div role="status" id="project-feedback">${done(week) || w.reviewed ? projectStatus(week, w) : ''}</div>`;
   }
   function finishMessage(week) {
     return `<div class="feedback good"><span><b>Week ${week} completed.</b> 100 XP earned. ${week < 24 ? `<a href="#/week/${week + 1}">Open Week ${week + 1}</a>` : '<a href="#/achievements">View achievements and download the portfolio</a>'}</span></div>`;
@@ -794,6 +858,65 @@
         recordCodePass,
         active.week === 1 ? recordQueueCase : undefined,
       );
+    const editorHost = main.querySelector('#workshop-editor');
+    if (editorHost) {
+      const week = active.week,
+        spec = workshops[week],
+        project = active.tab === 'project';
+      const key = project ? 'projectCode' : 'guidedCode';
+      practiceCleanup = window.mountWorkshopEditor(
+        editorHost,
+        project ? spec.task : spec.example,
+        {
+          week,
+          project,
+          download,
+          saved: workFor(week)[key],
+          onEdit(source) {
+            syncJournal();
+            const w = workFor(week);
+            w[key] = source;
+            if (project) {
+              w.projectRunPassed = false;
+              w.reviewed = false;
+              document.getElementById('project-run-status').textContent = '';
+              document.getElementById('project-feedback').replaceChildren();
+            }
+            save();
+            refreshChecklist();
+          },
+          onPass(source) {
+            syncJournal();
+            const w = workFor(week);
+            if (
+              !project ||
+              source !== w.projectCode ||
+              source === spec.task.starter ||
+              !available(week)
+            )
+              return;
+            w.projectRunPassed = true;
+            save();
+            refreshChecklist();
+            document.getElementById('project-run-status').textContent =
+              'Project run recorded.';
+          },
+        },
+      );
+      if (route[3] === 'editor') {
+        editorHost.scrollIntoView();
+        editorHost.querySelector('textarea').focus({ preventScroll: true });
+        return;
+      }
+    }
+    if (
+      route[3] === 'example' &&
+      active.tab === 'learn' &&
+      main.querySelector('.first-workshop')
+    ) {
+      main.querySelector('.first-workshop').scrollIntoView();
+      return;
+    }
     if (route[3] === 'queue' && document.getElementById('queue-tickets')) {
       const queue = document.querySelector('.queue-trial');
       queue.scrollIntoView();
@@ -855,6 +978,7 @@
       pass = order.every((j, i) => j === lab.answer[i]);
     }
     if (pass) w.labPassed = true;
+    awardIfReady(week, w);
     save();
     refreshChecklist();
     document.getElementById('lab-feedback').innerHTML =
@@ -871,73 +995,81 @@
     w.review = [...main.querySelectorAll('input[name="review"]:checked')].map(
       (el) => Number(el.value),
     );
-    const queueMissing =
+    const spec = workshops[week],
+      missing = [];
+    if (
       week === 1 &&
       !done(week) &&
       !w.reviewed &&
-      queueRequirements(recentQueueCases(w.queueCases)).some(([ok]) => !ok);
-    w.reviewed =
-      !queueMissing &&
-      draft.length >= 20 &&
-      w.review.length === reviewLabels.length;
+      queueRequirements(recentQueueCases(w.queueCases)).some(([ok]) => !ok)
+    )
+      missing.push(
+        '<a href="#/week/1/lab/queue">Run the remaining queues shown in the test record</a>.',
+      );
+    if (spec && !done(week)) {
+      if (!w.transferPassed)
+        missing.push('Check the independent task answers above.');
+      if (spec.task.starter && !w.projectRunPassed)
+        missing.push(
+          'Edit and run the project in the editor above' +
+            (spec.task.checks?.length ? ' and pass its checks.' : '.'),
+        );
+    }
+    if (
+      draft.length < 20 ||
+      (spec?.task.template && draft === spec.task.template.trim())
+    )
+      missing.push(
+        'Record the observed results in your own words (at least 20 characters).',
+      );
+    if (w.review.length !== 3) missing.push('Check each project review item.');
+    w.reviewed = !missing.length;
     if (
       week === 1 &&
       w.reviewed &&
       queueRequirements(recentQueueCases(w.queueCases)).every(([ok]) => ok)
     )
       w.reviewCases = recentQueueCases(w.queueCases);
+    awardIfReady(week, w);
     save();
     refreshChecklist();
-    if (week === 1 && !done(week)) {
-      if (!w.reviewed) {
-        const reminders = [
-          queueMissing
-            ? '<a href="#/week/1/lab/queue">Run the remaining queues shown in the test record</a>.'
-            : '',
-          draft.length < 20
-            ? 'Write a short explanation of the results (at least 20 characters).'
-            : '',
-          w.review.length < 3 ? 'Check each project review item.' : '',
-        ];
-        target.innerHTML = `<div class="feedback retry"><span>${reminders.filter(Boolean).join(' ')}</span></div>`;
-        return;
-      }
-      if (
-        !canStartQuiz(week, w) ||
-        !(Number(w.best) >= assessment.PASS_PERCENT)
-      ) {
-        target.innerHTML = firstProjectStatus(w);
-        return;
-      }
-    }
-    const missing = [];
-    if (!w.labPassed) missing.push('pass the skill lab');
-    if (window.PRACTICE_WEEKS.includes(week) && !w.codePassed && !w.carried)
-      missing.push('pass every test in the coding editor');
-    if (!(Number(w.best) >= 80))
-      missing.push('earn at least 80% on the knowledge check');
-    if (draft.length < 20)
-      missing.push('add at least 20 characters of project evidence');
-    if (w.review.length < 3) missing.push('check each project review item');
-    if (missing.length) {
-      target.innerHTML = `<div class="feedback retry"><span>To complete this week, ${h(missing.join(', '))}.</span></div>`;
-      return;
-    }
-    const newAward = !done(week);
-    progress.completed[week] = true;
-    save();
     nav('course');
-    target.innerHTML = finishMessage(week);
-    document.querySelector('.week-award').innerHTML =
-      icon('bolt', 17) + ' 100 XP earned';
-    if (newAward) {
-      const level = levels[levelOf(week)];
-      toast(
-        level.lessons.at(-1).week === week
-          ? 'Level complete · ' + level.badge
-          : 'Week complete · 100 XP earned',
-      );
-    }
+    target.innerHTML = missing.length
+      ? `<div class="feedback retry"><span>${missing.join(' ')}</span></div>`
+      : projectStatus(week, w);
+    if (done(week))
+      document.querySelector('.week-award').innerHTML =
+        icon('bolt', 17) + ' 100 XP earned';
+  }
+  function gradeTransfer() {
+    const week = active.week,
+      task = workshops[week].task;
+    syncJournal();
+    const w = workFor(week);
+    w.transferAnswers = task.fields.map((field, i) =>
+      document.getElementById('transfer-' + i).value.trim(),
+    );
+    const correct = task.fields.map((field, i) =>
+      workshopViews.matches(field, w.transferAnswers[i]),
+    );
+    w.transferPassed = correct.every(Boolean);
+    if (!w.transferPassed) w.reviewed = false;
+    save();
+    refreshChecklist();
+    correct.forEach((ok, i) => {
+      document
+        .getElementById('transfer-' + i)
+        .setAttribute('aria-invalid', String(!ok));
+      document.getElementById('field-result-' + i).textContent = ok
+        ? 'Correct.'
+        : 'Try again. ' + task.fields[i].feedback;
+    });
+    document.getElementById('transfer-status').textContent = w.transferPassed
+      ? 'Independent answers checked and passed.'
+      : correct.filter(Boolean).length +
+        ' of ' +
+        correct.length +
+        ' correct. Review the feedback beside each answer.';
   }
   function download(name, data, type) {
     const src = URL.createObjectURL(new Blob([data], { type })),
@@ -964,6 +1096,28 @@
         lab = labs[l.week - 1];
       if (src && typeof src === 'object') {
         const w = {};
+        const spec = workshops[l.week];
+        if (spec) {
+          for (const key of ['guidedCode', 'projectCode', 'prediction'])
+            if (typeof src[key] === 'string')
+              w[key] = src[key].slice(0, key === 'prediction' ? 1200 : 40000);
+          if (Array.isArray(src.transferAnswers))
+            w.transferAnswers = spec.task.fields.map((_, i) =>
+              typeof src.transferAnswers[i] === 'string'
+                ? src.transferAnswers[i].slice(0, 800)
+                : '',
+            );
+          w.transferPassed =
+            src.transferPassed === true &&
+            spec.task.fields.every((field, i) =>
+              workshopViews.matches(field, w.transferAnswers?.[i]),
+            );
+          w.projectRunPassed =
+            src.projectRunPassed === true &&
+            typeof w.projectCode === 'string' &&
+            !!w.projectCode.trim() &&
+            w.projectCode !== spec.task.starter;
+        }
         for (const [k, max] of [
           ['draft', 24000],
           ['short', 800],
@@ -1040,6 +1194,10 @@
       e.preventDefault();
       gradeLab();
     }
+    if (e.target.id === 'transfer-form') {
+      e.preventDefault();
+      gradeTransfer();
+    }
     if (e.target.id === 'start-quiz') {
       e.preventDefault();
       startQuiz(
@@ -1054,6 +1212,24 @@
   });
   main.addEventListener('input', (e) => {
     const el = e.target;
+    if (el.id === 'workshop-prediction') {
+      workFor(active.week).prediction = el.value;
+      save();
+    }
+    if (el.hasAttribute('data-transfer')) {
+      const w = workFor(active.week);
+      const i = Number(el.dataset.transfer);
+      (w.transferAnswers ||= [])[i] = el.value;
+      w.transferPassed = false;
+      w.reviewed = false;
+      save();
+      refreshChecklist();
+      el.removeAttribute('aria-invalid');
+      document.getElementById('field-result-' + i).textContent = '';
+      document.getElementById('transfer-status').textContent =
+        'Changes saved. Check the task answers again.';
+      document.getElementById('project-feedback').replaceChildren();
+    }
     if (el.id === 'search') {
       filters.term = el.value;
       renderResults();
@@ -1062,7 +1238,7 @@
       const w = workFor(active.week);
       w.draft = el.value;
       w.reviewed = false;
-      if (active.week === 1 && !done(1))
+      if (!done(active.week))
         document.getElementById('project-feedback').replaceChildren();
       save();
       refreshChecklist();
@@ -1090,7 +1266,7 @@
         (i) => Number(i.value),
       );
       w.reviewed = false;
-      if (active.week === 1 && !done(1))
+      if (!done(active.week))
         document.getElementById('project-feedback').replaceChildren();
       save();
       refreshChecklist();
@@ -1199,6 +1375,25 @@
       holder.innerHTML = labPage(active.week);
       list.replaceWith(holder.querySelector('.order-list'));
       main.querySelector(`[data-pos="${to}"]:not(:disabled)`)?.focus();
+    }
+    if (button.hasAttribute('data-outline')) {
+      const box = document.getElementById('project-draft'),
+        outline = workshops[active.week].task.template;
+      if (!box.value.trim()) {
+        box.value = outline;
+        box.dispatchEvent(new Event('input', { bubbles: true }));
+      } else {
+        document.getElementById('draft-status').textContent =
+          'The outline is available below the existing notes.';
+        if (!document.getElementById('outline-reference')) {
+          const sample = document.createElement('pre');
+          sample.id = 'outline-reference';
+          sample.className = 'stimulus';
+          sample.textContent = outline;
+          box.after(sample);
+        }
+      }
+      box.focus();
     }
     if (button.hasAttribute('data-finish')) finish();
     if (button.id === 'export-progress') {

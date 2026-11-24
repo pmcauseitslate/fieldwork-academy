@@ -15,9 +15,9 @@
 
 ## Learning and assessment
 
-Each weekly lab and project has a separate worked reference with reasoning, a sample artifact, and a way to verify it. The three browser coding exercises have parallel examples as well. The example library is open from the beginning. The Week 16 retrieval demonstration and Week 18 release comparison let students change inputs and inspect the results in the browser.
+Each week follows the same learning sequence. The lesson revisits a skill from the preceding project, defines new terms, and walks through a separate example. Learners can change inputs and compare predictions with results. Python and SQL examples run in the browser, HTML examples open as interactive previews, and decision-making exercises use worked case records. Optional reading, videos, and the previous project remain available on the lesson page.
 
-Week 1 begins with a hand calculation and an editable Python example that prints a welcome-message count. Students then write a separate support-workload calculator, pass four code checks and test three queues of their own. The project saves the predicted and returned hours with the student's explanation. Saving the project review opens the timed quiz once the lab and code checks pass.
+Week 1 introduces a support-workload calculator with four runtime checks and three student-chosen queues. Weeks 2–24 include a different independent task, field-level feedback, and a weekly portfolio assignment. Coding projects provide an editable starter, checks where applicable, and a code download. The quiz opens after the lab, independent work and saved project review. Written evidence and decision quality are self-reviewed. Existing completed weeks and active quiz attempts keep their credit and deadlines.
 
 The weekly assessment has five graded scenario questions. Starting an attempt starts a ten-minute timer. Extended allowances of 20 and 100 minutes are available before starting. A refresh retains the paper, saved answers, and deadline. At expiry, the academy grades the recorded answers; a blank earns zero points. On returning to a closed page, the expired attempt is settled before it can accept further answers. The results show answer explanations and references for missed topics. Retakes draw a fresh paper and retain the highest score.
 
@@ -25,7 +25,7 @@ A passing score of at least 80%, a passed lab, and a self-reviewed project with 
 
 ## Free access and local progress
 
-The academy requires no login, payment details, or paid API key. The Week 1 and Week 2 Python editors and Week 7 SQL editor execute code in a local browser worker. Downloadable fictional records and simulated model responses support the core assignments. YouTube videos load on request; the library describes any external provider’s enrollment or access requirements.
+The academy requires no login, payment details, or paid API key. The original Week 1 and Week 2 graded Python labs and Week 7 SQL lab use bundled runtimes. For the additional Python workshops the first run loads a pinned, free Python interpreter over the internet. Python then processes the exercise files in the browser. SQL projects use bundled SQLite, and HTML previews run in an isolated frame. [Pyodide runtime](https://pyodide.org/en/0.27.7/usage/quickstart.html) Downloadable fictional records and simulated model responses support the core assignments. YouTube videos load on request; the library describes any external provider’s enrollment or access requirements.
 
 The learning path, project journal, timed attempts and code drafts are saved in the browser. A journal backup can move them between devices. Students returning from the earlier edition keep their completed-week credit and earlier project and editor records. Unfinished weeks use the current assessments.
 
@@ -49,6 +49,6 @@ python3 -m http.server 8000
 
 Open [localhost:8000](http://localhost:8000/). GitHub Pages publishes the root of the main branch. The course uses project-relative assets and requires no build step.
 
-Run the assessment regression checks with `node --test tests/assessment.test.cjs`.
+Run the assessment and curriculum regression checks with `node --test tests/*.test.cjs`.
 
-The curriculum lives in `course.js`, graded labs and downloadable file mappings in `labs.js`, study resources in `resources.js`, and employer research in `career.js`. `assessment.js` builds the timed quizzes. `practice.js` and `practice-worker.js` run the code exercises. See the [runtime credits](vendor/README.md) and the [font licenses](assets/).
+The core syllabus lives in `course.js`. The three `workshops-*.js` files contain the weekly bridges, guided examples, starter programs and independent cases for Weeks 2–24. The site keeps graded labs and downloadable file mappings in `labs.js`, study resources in `resources.js`, and employer research in `career.js`. `assessment.js` builds the timed quizzes. `practice.js` and `practice-worker.js` run the code exercises. See the [runtime credits](vendor/README.md) and the [font licenses](assets/).

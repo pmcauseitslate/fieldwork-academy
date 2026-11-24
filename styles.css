@@ -2111,3 +2111,89 @@ textarea {
 .queue-checks li {
   margin-block: 4px;
 }
+
+.workshop-terms {
+  margin: 20px 0;
+}
+.workshop-terms summary {
+  font-weight: 650;
+  cursor: pointer;
+}
+.workshop-terms dl {
+  padding-left: 16px;
+  border-left: 2px solid var(--line);
+}
+.workshop-terms dt {
+  font-weight: 650;
+}
+.workshop-terms dd {
+  margin: 2px 0 12px;
+}
+.workshop-steps {
+  padding-left: 1.5rem;
+}
+.workshop-steps li {
+  margin: 8px 0;
+  padding-left: 3px;
+  white-space: pre-line;
+}
+#workshop-editor {
+  margin: 16px 0;
+}
+#workshop-editor textarea {
+  width: 100%;
+}
+#workshop-editor .hint a,
+#workshop-editor .hint strong {
+  display: block;
+  margin-block: 8px;
+}
+.workshop-output,
+.journal-excerpt {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.html-result iframe:not([hidden]) {
+  width: 100%;
+  height: 24rem;
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+.run-checks {
+  padding-left: 1.4rem;
+  overflow-wrap: anywhere;
+}
+.transfer-field {
+  margin: 16px 0;
+}
+.transfer-field p {
+  margin: 4px 0 8px;
+  color: var(--muted);
+}
+.transfer-field .answer-input {
+  width: min(100%, 28rem);
+}
+.transfer-field small {
+  display: block;
+  margin-block: 4px;
+}
+.transfer-field input[aria-invalid='true'] {
+  border-color: #9e4329;
+}
+.project-work {
+  border-top: 1px solid var(--line);
+  padding-top: 24px;
+  margin-top: 24px;
+}
+.outline-control {
+  background: none;
+  cursor: pointer;
+  border: none;
+  padding: 0;
+  margin: 0 0 8px;
+}
+
+#workshop-editor [hidden] {
+  display: none;
+}
