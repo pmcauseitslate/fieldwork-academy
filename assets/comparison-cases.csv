@@ -1,0 +1,21 @@
+case_id,skill,question,reference_answer,supporting_document_ids
+Q01,lookup,How many cartons were ordered on PO-007?,12 cartons,D3
+Q02,lookup,How many cartons have been received on PO-007?,8 cartons,D3
+Q03,arithmetic,How many PO-007 cartons remain?,4 cartons,D3
+Q04,arithmetic,What is the total price of PO-007 in this sample?,$240,D3
+Q05,arithmetic,What is the value of the received PO-007 cartons?,$160,D3
+Q06,arithmetic,What is the value of the remaining PO-007 cartons?,$80,D3
+Q07,conflicting sources,Which document governs the exterior-door lead time?,Signed addendum D2,D2
+Q08,lookup,How is the current exterior-door lead time measured?,8 business days after shop drawing approval,D2
+Q09,missing evidence,On which calendar date are the exterior doors due?,Unknown; no shop drawing approval date,D2
+Q10,conflicting sources,Does the May 1 five-day interval govern exterior doors?,No; D2 replaces D1 for exterior doors,D1+D2
+Q11,lookup,What finish is listed for interior doors?,F-3,D4
+Q12,missing evidence,What interior-door delivery date was agreed?,No date agreed,D4
+Q13,missing evidence,What is the confirmed date for the rest of PO-007?,No confirmed date,D3
+Q14,lookup,Which team has RFI-013?,Design,D5
+Q15,lookup,What is the current status of RFI-013?,Open,D5
+Q16,lookup,When is RFI-013 due?,"June 9, 2026",D5
+Q17,missing evidence,What backing height was approved in response to RFI-013?,No approved response is recorded,D5
+Q18,lookup,Which project owns RFI-013?,North Yard,D5
+Q19,scope,Does D2 set a lead time for interior doors?,No; the rule is for exterior doors,D2+D4
+Q20,cross-reference,Which items in D3 and D4 still need a confirmed delivery date?,The remaining PO-007 shipment and the interior doors,D3+D4

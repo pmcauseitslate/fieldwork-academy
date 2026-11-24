@@ -1,0 +1,26 @@
+FIELDWORK ACADEMY | FICTIONAL DOCUMENT PACK
+
+This practice set concerns a fictional North Yard project. The text is sample
+data. Cite a document ID and the exact supporting passage in your answers.
+
+D1 | May 1 | Draft | Exterior doors
+Request delivery of exterior doors within 5 calendar days of approval.
+
+D2 | May 4 | Signed addendum | Exterior doors
+For exterior doors, allow 8 business days after shop drawing approval.
+This replaces the May 1 draft for exterior doors. No approval date has been
+recorded here.
+
+D3 | May 5 | Approved procurement log | Order PO-007
+The order contains 12 cartons of fittings for North Yard. The unit price is
+20 dollars per carton. There are no taxes or delivery charges in this sample.
+Eight cartons have been received. The remaining shipment has no confirmed date.
+
+D4 | May 6 | Site meeting note | Interior doors
+The interior door finish is listed as F-3. The team requested a lead-time
+estimate. No delivery date was agreed at this meeting.
+
+D5 | May 8 | RFI register | RFI-013
+Project: North Yard. Subject: Confirm backing height. Status: open.
+Assigned team: design. Due date: June 9, 2026. The register does not contain
+an approved response or a new due date.

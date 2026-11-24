@@ -1,0 +1,21 @@
+case_id,fictional_candidate_A,fictional_candidate_B
+Q01,Twelve cartons. [D3],12 cartons are on the purchase order. [D3]
+Q02,Eight have arrived. [D3],PO-007 records eight cartons received. [D3]
+Q03,The order has four cartons still to arrive (12 minus 8). [D3],There are eight cartons remaining. [D3]
+Q04,Twelve cartons at $20 each make $240. [D3],The sample order total is $240. [D3]
+Q05,Eight received cartons cost $160. [D3],The received portion is $160. [D3]
+Q06,The unreceived portion is worth $80. [D3],"Four cartons remain, at $20 each. Their value is $80. [D3]"
+Q07,The signed May 4 addendum governs. [D2],D2 replaces the May 1 draft for exterior doors. [D2]
+Q08,The lead time is eight calendar days after drawing approval. [D2],Allow eight business days after shop drawing approval. [D2]
+Q09,No calendar date can be determined until the approval date is known. [D2],"They are due on May 12, eight days after the addendum. [D2]"
+Q10,"No. The signed addendum supersedes D1 for exterior doors. [D1, D2]",The May 1 draft was replaced for exterior doors. [D2]
+Q11,The finish is F-3. [D4],Interior doors are listed with finish F-3. [D4]
+Q12,No date was agreed in the meeting. [D4],The team requested an estimate; no agreed date is supplied. [D4]
+Q13,The outstanding shipment is expected May 15. [D3],The log gives no confirmed date for the balance. [D3]
+Q14,The design team is assigned. [D5],The design team holds RFI-013. [D5]
+Q15,RFI-013 is open. [D5],It is closed. [D5]
+Q16,"Its recorded due date is June 9, 2026. [D5]","June 9, 2026. [D5]"
+Q17,The register has no approved answer. [D5],Backing height was approved at 48 inches. [D5]
+Q18,It belongs to North Yard. [D5],The RFI is for North Yard. [D5]
+Q19,"No. The signed addendum names exterior doors, while the interior-door note has no agreed date. [D2, D4]","Yes, eight business days for all doors. [D2]"
+Q20,"The unreceived PO-007 balance and the interior doors both lack a confirmed delivery date. [D3, D4]","The remaining fitting cartons and the interior-door shipment need delivery dates. [D3, D4]"

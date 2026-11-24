@@ -1,0 +1,51 @@
+change_id,project_id,vendor_id,description,status,amount
+CO-001,P-DEPOT,V-BEAM,Revised hinge package,approved,135.00
+CO-002,P-YARD,V-IRON,Requested layout change,approved,40.00
+CO-003,P-DEPOT,V-PINE,Extra concrete delivery,approved,80.00
+CO-004,P-YARD,V-BEAM,Alternate finish trim,approved,190.00
+CO-005,P-DEPOT,V-IRON,Revised equipment mount,approved,30.00
+CO-006,P-YARD,V-PINE,Additional backing,approved,170.00
+CO-007,P-DEPOT,V-BEAM,Revised panel cutout,approved,130.00
+CO-008,P-YARD,V-IRON,Return trip allowance,approved,105.00
+CO-009,P-DEPOT,V-PINE,Extra leveling compound,approved,115.00
+CO-010,P-YARD,V-BEAM,Modified access panel,approved,180.00
+CO-011,P-DEPOT,V-IRON,Revised hinge package,approved,55.00
+CO-012,P-YARD,V-PINE,Requested layout change,approved,100.00
+CO-013,P-DEPOT,V-BEAM,Extra concrete delivery,approved,70.00
+CO-014,P-YARD,V-IRON,Alternate finish trim,pending,115.00
+CO-015,P-DEPOT,V-PINE,Revised equipment mount,approved,25.00
+CO-016,P-YARD,V-BEAM,Additional backing,approved,165.00
+CO-017,P-DEPOT,V-IRON,Revised panel cutout,pending,90.00
+CO-018,P-YARD,V-PINE,Return trip allowance,approved,160.00
+CO-019,P-DEPOT,V-BEAM,Extra leveling compound,approved,65.00
+CO-020,P-YARD,V-IRON,Modified access panel,approved,35.00
+CO-021,P-DEPOT,V-PINE,Revised hinge package,approved,145.00
+CO-022,P-YARD,V-BEAM,Requested layout change,approved,85.00
+CO-023,P-DEPOT,V-IRON,Extra concrete delivery,approved,90.00
+CO-024,P-YARD,V-PINE,Alternate finish trim,approved,120.00
+CO-025,P-DEPOT,V-BEAM,Revised equipment mount,approved,195.00
+CO-026,P-YARD,V-IRON,Additional backing,pending,40.00
+CO-027,P-DEPOT,V-PINE,Revised panel cutout,approved,645.00
+CO-028,P-YARD,V-BEAM,Return trip allowance,pending,265.00
+CO-029,P-DEPOT,V-IRON,Extra leveling compound,approved,150.00
+CO-030,P-YARD,V-PINE,Modified access panel,approved,175.00
+CO-031,P-DEPOT,V-BEAM,Revised hinge package,pending,45.00
+CO-032,P-YARD,V-IRON,Requested layout change,approved,205.00
+CO-033,P-DEPOT,V-PINE,Extra concrete delivery,declined,220.00
+CO-034,P-YARD,V-BEAM,Alternate finish trim,pending,205.00
+CO-035,P-DEPOT,V-IRON,Revised equipment mount,approved,200.00
+CO-036,P-YARD,V-PINE,Additional backing,approved,140.00
+CO-037,P-DEPOT,V-BEAM,Revised panel cutout,pending,85.00
+CO-038,P-YARD,V-IRON,Return trip allowance,approved,125.00
+CO-039,P-DEPOT,V-PINE,Extra leveling compound,declined,65.00
+CO-040,P-YARD,V-BEAM,Modified access panel,approved,185.00
+CO-041,P-DEPOT,V-IRON,Revised hinge package,pending,120.00
+CO-042,P-YARD,V-PINE,Requested layout change,approved,155.00
+CO-043,P-DEPOT,V-BEAM,Extra concrete delivery,approved,75.00
+CO-044,P-YARD,V-IRON,Alternate finish trim,pending,75.00
+CO-045,P-DEPOT,V-PINE,Revised equipment mount,declined,160.00
+CO-046,P-YARD,V-BEAM,Additional backing,approved,45.00
+CO-047,P-DEPOT,V-IRON,Revised panel cutout,approved,50.00
+CO-048,P-YARD,V-PINE,Return trip allowance,approved,95.00
+CO-049,P-DEPOT,V-BEAM,Extra leveling compound,approved,60.00
+CO-050,P-YARD,V-IRON,Modified access panel,approved,110.00

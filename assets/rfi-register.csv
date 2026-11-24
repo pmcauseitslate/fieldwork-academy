@@ -1,0 +1,7 @@
+rfi_id,project_id,subject,status,due_date
+RFI-011,P-YARD,Clarify door swing,closed,2026-06-08
+RFI-012,P-DEPOT,Confirm paint finish,open,2026-06-09
+RFI-013,P-YARD,Confirm backing height,open,2026-06-09
+RFI-014,P-YARD,Verify equipment pad,closed,2026-06-08
+RFI-015,P-YARD,Resolve ceiling datum,closed,2026-06-09
+RFI-016,P-DEPOT,Clarify top rail height,closed,2026-06-10

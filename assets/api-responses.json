@@ -1,0 +1,17 @@
+[
+  {
+    "request": "GET /orders/7",
+    "status": 200,
+    "body": {"order_id": 7, "quantity_received": 0, "unit": "box"}
+  },
+  {
+    "request": "GET /orders/8",
+    "status": 200,
+    "body": {"order_id": 8, "unit": "box"}
+  },
+  {
+    "request": "GET /orders/9",
+    "status": 503,
+    "body": {"message": "Sample service temporarily unavailable"}
+  }
+]
