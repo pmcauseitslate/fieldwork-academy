@@ -795,6 +795,11 @@
         'text/markdown',
       );
   });
+  document.querySelector('.skip').addEventListener('click', (event) => {
+    event.preventDefault();
+    main.focus({ preventScroll: true });
+    main.scrollIntoView({ block: 'start' });
+  });
   window.addEventListener('hashchange', () => render(true));
   window.addEventListener('storage', (e) => {
     if (e.key === key && e.newValue) {
